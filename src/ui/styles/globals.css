@@ -1,0 +1,282 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Design tokens - Dark ocean / glass intent */
+    --color-ocean-50: #f0f7fa;
+    --color-ocean-100: #d9eaf0;
+    --color-ocean-200: #b8d8e5;
+    --color-ocean-300: #8bbdd4;
+    --color-ocean-400: #5a9cbe;
+    --color-ocean-500: #3d81a8;
+    --color-ocean-600: #2d678d;
+    --color-ocean-700: #275473;
+    --color-ocean-800: #254760;
+    --color-ocean-900: #233d50;
+    --color-ocean-950: #162834;
+
+    --color-glass-50: #f8fafc;
+    --color-glass-100: #f1f5f9;
+    --color-glass-200: #e2e8f0;
+    --color-glass-300: #cbd5e1;
+    --color-glass-400: #94a3b8;
+    --color-glass-500: #64748b;
+    --color-glass-600: #475569;
+    --color-glass-700: #334155;
+    --color-glass-800: #1e293b;
+    --color-glass-900: #0f172a;
+    --color-glass-950: #020617;
+  }
+
+  html,
+  body {
+    min-height: 100vh;
+    /* Robust fallback: use existing hero image or gradient only */
+    background-image: 
+      url('/images/hero-ocean-poster.jpg'),
+      linear-gradient(135deg, #0ea5e9 0%, #0284c7 25%, #0369a1 50%, #075985 75%, #0c4a6e 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    /* Desktop: fixed attachment for parallax effect */
+    background-attachment: fixed, fixed;
+  }
+
+  /* Mobile: disable fixed attachment for performance */
+  @media (max-width: 767px) {
+    html,
+    body {
+      background-attachment: scroll, scroll;
+    }
+  }
+
+  body {
+    @apply text-glass-900 antialiased;
+    position: relative;
+  }
+
+  /* Dark overlay for readability - reduced opacity to reveal ocean colors */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.28);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @media (min-width: 768px) {
+    body::before {
+      background-color: rgba(0, 0, 0, 0.20);
+    }
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Marquee styles */
+  .marquee-row {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .marquee-item {
+    flex-shrink: 0;
+  }
+
+  .marquee-left .marquee-track {
+    animation: marquee-left 40s linear infinite;
+  }
+
+  .marquee-right .marquee-track {
+    animation: marquee-right 40s linear infinite;
+  }
+
+  .marquee-paused .marquee-track {
+    animation-play-state: paused;
+  }
+
+  .marquee-disabled {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .marquee-disabled .marquee-track {
+    animation: none;
+  }
+
+  .marquee-disabled .marquee-track {
+    scroll-snap-type: x mandatory;
+  }
+
+  .marquee-disabled .marquee-item {
+    scroll-snap-align: center;
+  }
+}
+
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Utility classes for animations */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+}
+
+/* Stagger delay utilities */
+.animate-delay-100 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+/* Smooth transitions for interactive elements */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Image loading placeholder */
+.image-placeholder {
+  background: linear-gradient(135deg, rgba(45, 103, 141, 0.1) 0%, rgba(37, 71, 115, 0.1) 100%);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

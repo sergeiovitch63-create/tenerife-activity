@@ -1,0 +1,536 @@
+{
+  "common": {
+    "siteName": "Tenerife Activity",
+    "search": "Search",
+    "searchInput": "Search input",
+    "mustSee": "Must See",
+    "getInspired": "Get Inspired",
+    "backToHome": "Back to Home",
+    "breadcrumb": "Breadcrumb",
+    "videoPreview": "Video preview"
+  },
+  "home": {
+    "title": "Tenerife Activity",
+    "subtitle": "Discover extraordinary experiences in the heart of the Canary Islands",
+    "searchPlaceholder": "Search experiences, activities, or locations...",
+    "chooseYourVibe": "Choose Your Vibe",
+    "chooseYourVibeDescription": "Explore curated experiences tailored to your travel intentions",
+    "notSureWhatToPick": "Not sure what to pick?",
+    "getCuratedRecommendations": "Get curated recommendations based on your mood, time, and group.",
+    "exploreVibes": "Explore Vibes"
+  },
+  "nav": {
+    "mustSee": "Must See",
+    "getInspired": "Get Inspired",
+    "contact": "Contact",
+    "trustLine": "Curated experiences · Trusted local partners",
+    "toggleMenu": "Toggle menu"
+  },
+  "mustSee": {
+    "title": "Must-See Experiences in Tenerife",
+    "subtitle": "The essential experiences recommended by locals.",
+    "introduction": "These experiences are selected based on quality, popularity, and operator reliability. If you only do a few things in Tenerife, start here.",
+    "categories": {
+      "teideNature": "🌋 Teide & Nature",
+      "teideNatureDesc": "Essential mountain and natural experiences.",
+      "iconicAttractions": "🎢 Iconic Attractions",
+      "iconicAttractionsDesc": "World-renowned parks and must-visit destinations.",
+      "cultureLocal": "🌆 Culture & Local Life",
+      "cultureLocalDesc": "Authentic experiences and island exploration."
+    },
+    "itemCategories": {
+      "relaxation": "Relaxation",
+      "zoo": "Zoo",
+      "show": "Show",
+      "themePark": "Theme Park",
+      "boatTour": "Boat Tour",
+      "waterPark": "Water Park",
+      "adventure": "Adventure",
+      "islandTour": "Island Tour",
+      "aquarium": "Aquarium",
+      "nightShow": "Night Show",
+      "stargazing": "Stargazing",
+      "nature": "Nature",
+      "party": "Party",
+      "paragliding": "Paragliding"
+    },
+    "trust": {
+      "handPicked": "Hand-picked experiences",
+      "handPickedDesc": "Curated by local experts",
+      "trustedPartners": "Trusted local partners",
+      "trustedPartnersDesc": "Verified operators only",
+      "secureBooking": "Secure booking & flexible cancellation",
+      "secureBookingDesc": "Book with confidence"
+    }
+  },
+  "inspired": {
+    "title": "Get Inspired",
+    "subtitle": "Tell us your mood, time, and who you're traveling with. We'll recommend the perfect experiences for your Tenerife adventure.",
+    "pickMood": "Pick your mood",
+    "timeAvailable": "Time available",
+    "travelingWith": "Who are you traveling with?",
+    "recommendedVibes": "Recommended Vibes",
+    "recommendedExperiences": "Recommended Experiences",
+    "disclaimer": "Curated recommendations based on your selections. Availability may vary. All experiences are operated by verified partners.",
+    "moods": {
+      "relax": "Relax & Recharge",
+      "adventure": "Adventure",
+      "romantic": "Romantic",
+      "family": "Family Fun",
+      "culture": "Culture & Local",
+      "ocean": "Ocean Day"
+    },
+    "times": {
+      "2-3hours": "2–3 hours",
+      "halfday": "Half day",
+      "fullday": "Full day",
+      "evening": "Evening",
+      "multiday": "Multi-day"
+    },
+    "groups": {
+      "couple": "Couple",
+      "family": "Family",
+      "friends": "Friends",
+      "solo": "Solo",
+      "seniors": "Seniors"
+    }
+  },
+  "search": {
+    "title": "Search results",
+    "for": "for",
+    "noResults": "No experiences found",
+    "noResultsDesc": "We couldn't find any experiences matching your filters. Try adjusting your selection.",
+    "emptyStateDescription": "Search for experiences, activities, or locations in Tenerife.",
+    "resultsCount": "{count} experience found",
+    "resultsCount_plural": "{count} experiences found",
+    "suggestions": {
+      "teide": "Teide",
+      "boat": "Boat",
+      "siamPark": "Siam Park"
+    },
+    "resetFilters": "Reset filters",
+    "sortBy": "Sort by:",
+    "filters": {
+      "allPrices": "All Prices",
+      "under50": "Under €50",
+      "between50_100": "€50 - €100",
+      "over100": "Over €100",
+      "short": "2-3 hours",
+      "halfDay": "Half Day",
+      "fullDay": "Full Day",
+      "multiDay": "Multi Day",
+      "fourPlus": "4+ Stars",
+      "topRated": "Top Rated"
+    },
+    "sort": {
+      "recommended": "Recommended",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "rating": "Highest Rated",
+      "popularity": "Most Popular"
+    }
+  },
+  "experience": {
+    "overview": "Overview",
+    "highlights": "Highlights",
+    "whatsIncluded": "What's Included",
+    "meetingPoint": "Meeting Point",
+    "cancellationPolicy": "Cancellation Policy",
+    "checkAvailability": "Check availability",
+    "startingFrom": "Starting from",
+    "priceFrom": "From",
+    "viewExperience": "View experience",
+    "reviewsCount": "{count} review",
+    "reviewsCount_plural": "{count} reviews",
+    "pickupAvailable": "Pickup available",
+    "redirectMessage": "You'll be redirected to secure partner booking",
+    "operatedBy": "Operated by verified partners",
+    "trust": {
+      "curated": "Curated experiences",
+      "curatedDesc": "Handpicked by our team",
+      "trusted": "Trusted local operators",
+      "trustedDesc": "Verified partners only",
+      "secure": "Secure partner booking",
+      "secureDesc": "Safe and protected"
+    }
+  },
+  "vibe": {
+    "notFound": "Vibe not found",
+    "notFoundDesc": "The vibe you're looking for doesn't exist or has been removed.",
+    "noExperiences": "No experiences found",
+    "noExperiencesDesc": "We couldn't find any experiences matching your filters. Try adjusting your selection."
+  },
+  "vibes": {
+    "vipTours": "VIP Tours",
+    "themeParks": "Theme Parks",
+    "ticketsAttractions": "Tickets & Attractions",
+    "busExcursions": "Bus Excursions",
+    "boatTripsCruises": "Boat Trips & Cruises",
+    "showsEntertainment": "Shows & Entertainment",
+    "waterSports": "Water Sports",
+    "cableCarObservatory": "Cable Car & Observatory",
+    "divingFishing": "Diving & Fishing",
+    "adventureNature": "Adventure & Nature",
+    "gastronomyTastings": "Gastronomy & Tastings",
+    "carRental": "Car Rental",
+    "bikeRental": "Bike Rental",
+    "transfersTransport": "Transfers & Private Transport",
+    "items": {
+      "vipTours": {
+        "description": "Exclusive premium tours"
+      },
+      "themeParks": {
+        "description": "Family fun and entertainment"
+      },
+      "ticketsAttractions": {
+        "description": "Skip-the-line tickets and attractions"
+      },
+      "busExcursions": {
+        "description": "Guided bus tours around the island"
+      },
+      "boatTripsCruises": {
+        "description": "Ocean adventures and cruises"
+      },
+      "showsEntertainment": {
+        "description": "Live shows and evening entertainment"
+      },
+      "waterSports": {
+        "description": "Aquatic activities and water fun"
+      },
+      "cableCarObservatory": {
+        "description": "Mountain views and stargazing"
+      },
+      "divingFishing": {
+        "description": "Underwater adventures and fishing trips"
+      },
+      "adventureNature": {
+        "description": "Outdoor adventures and nature experiences"
+      },
+      "gastronomyTastings": {
+        "description": "Culinary experiences and tastings"
+      },
+      "carRental": {
+        "description": "Vehicle rental services"
+      },
+      "bikeRental": {
+        "description": "Bicycle rental services"
+      },
+      "transfersTransport": {
+        "description": "Airport transfers and transport services"
+      }
+    }
+  },
+  "experiencePage": {
+    "notFound": "Experience not found",
+    "notFoundDesc": "The experience you're looking for doesn't exist or has been removed."
+  },
+  "booking": {
+    "title": "Booking",
+    "redirecting": "Redirecting to partner booking",
+    "bookingSummary": "Booking Summary",
+    "missingInfo": "Booking information missing",
+    "selectExperience": "Please select an experience to continue with booking.",
+    "summary": {
+      "experience": "Experience:",
+      "location": "Location:",
+      "duration": "Duration:"
+    },
+    "countdownMessage": "You will be redirected to our partner's secure booking platform in {countdown} seconds.",
+    "continueToBooking": "Continue to Booking"
+  },
+  "partners": {
+    "metadata": {
+      "title": "Partner with Tenerife Activity | Accommodation Partnerships",
+      "description": "Join our accommodation partner program. Earn 10% commission on every activity booked. No investment, no subscription. Fully managed by our excursion partner."
+    },
+    "hero": {
+      "title": "Partner with Tenerife Activity",
+      "subtitle": "Enhance your guest experience and generate additional revenue through our curated excursion program."
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "paragraph1": "Our partnership model is designed to be simple and straightforward. We handle all aspects of the excursion business, while you focus on providing exceptional accommodation services to your guests.",
+      "paragraph2": "When guests book activities through your accommodation, you earn a commission on every booking. There are no upfront costs, no subscription fees, and no ongoing management responsibilities on your part."
+    },
+    "benefits": {
+      "title": "Why It Benefits Accommodations",
+      "paragraph1": "Offering curated excursions enhances your accommodation's value proposition and provides guests with a seamless way to discover and book experiences during their stay.",
+      "paragraph2": "By partnering with us, you differentiate your property from competitors, increase guest satisfaction, and create an additional revenue stream without increasing your operational overhead.",
+      "paragraph3": "Your guests benefit from access to carefully selected, high-quality activities, while you benefit from a professional partnership that requires no time or resources to manage."
+    },
+    "earnings": {
+      "title": "What Partners Earn",
+      "paragraph1": "Partners earn a {commission} commission on every activity booked through the partnership program.",
+      "commission": "10%",
+      "paragraph2": "Commissions are calculated on the total booking value and paid monthly via bank transfer. You receive detailed monthly statements that clearly show all bookings, commissions earned, and payment details.",
+      "paragraph3": "There are no minimum booking requirements, no hidden fees, and no charges for using our platform. You only receive money—you never pay anything to participate."
+    },
+    "management": {
+      "title": "What You Don't Have to Manage",
+      "paragraph1": "We handle all operational aspects of the excursion program, so you don't have to.",
+      "items": {
+        "selection": "Activity selection, curation, and quality control",
+        "booking": "Booking management and customer service",
+        "payment": "Payment processing and financial administration",
+        "suppliers": "Supplier relationships and contract management",
+        "marketing": "Marketing materials and promotional content",
+        "technology": "Technology platform and booking systems"
+      },
+      "paragraph2": "Your role is simply to make the program available to your guests. Everything else is handled by our experienced excursion partner."
+    },
+    "legal": {
+      "title": "Legal & Professional Framework",
+      "paragraph1": "All partnerships are governed by clear, professional agreements that define roles, responsibilities, and commission structures.",
+      "paragraph2": "Our excursion partner is fully licensed and insured, ensuring compliance with all relevant tourism regulations and consumer protection requirements.",
+      "paragraph3": "Partners receive comprehensive documentation, including partnership terms, commission schedules, payment procedures, and support contact information. All financial transactions are transparent and documented.",
+      "paragraph4": "The partnership is non-exclusive, meaning you can continue working with other excursion providers if you choose. There are no long-term commitments or penalties for ending the partnership."
+    },
+    "cta": {
+      "question": "Ready to enhance your accommodation offering and generate additional revenue?",
+      "button": "Apply as a partner",
+      "disclaimer": "Partnership application form coming soon. Please contact us directly for more information."
+    },
+    "section": {
+      "title": "Turn your accommodation into a revenue stream",
+      "subtitle": "Your guests already book excursions. Now you earn from it — automatically.",
+      "benefits": {
+        "commission": "10% commission on every activity booked",
+        "legal": "100% legal, tracked & paid monthly",
+        "zeroWork": "Zero work — we handle bookings, payments & support",
+        "value": "Increase your listing value & stand out instantly"
+      },
+      "trust": "No cost. No commitment. No risk.",
+      "button": "Become a partner"
+    }
+  },
+  "demo": {
+    "title": "Demo mode",
+    "subtitle": "Walk through the end-to-end journey and operator readiness."
+  },
+  "getInspired": {
+    "hero": {
+      "title": "Get Inspired",
+      "subtitle": "Answer a few quick questions and discover personalized activity recommendations perfectly matched to your travel style and preferences."
+    },
+    "quiz": {
+      "step": "Step",
+      "of": "of",
+      "percent": "%",
+      "loading": "Loading quiz...",
+      "error": "Unable to load question. Please refresh the page.",
+      "noOptions": "No options available",
+      "questionFallback": "Question",
+      "progress": "Step {current} of {total}",
+      "questions": {
+        "group": "Who are you travelling with?",
+        "experience": "What kind of experience are you looking for?",
+        "intensity": "How active do you want it to be?",
+        "time": "How much time do you have?",
+        "budget": "What's your budget per person?",
+        "priority": "What matters most to you?"
+      },
+      "options": {
+        "group": {
+          "solo": "Solo",
+          "couple": "Couple",
+          "family": "Family",
+          "friends": "Friends",
+          "group6plus": "Group (6+)"
+        },
+        "experience": {
+          "chillRelax": "Chill & Relax",
+          "adventureNature": "Adventure & Nature",
+          "funEntertainment": "Fun & Entertainment",
+          "luxuryVip": "Luxury & VIP",
+          "cultureShows": "Culture & Shows"
+        },
+        "intensity": {
+          "veryRelaxed": "Very relaxed",
+          "balanced": "Balanced",
+          "veryActive": "Very active"
+        },
+        "time": {
+          "1-2h": "1–2 hours",
+          "halfday": "Half day",
+          "fullday": "Full day",
+          "severalDays": "Several days"
+        },
+        "budget": {
+          "budget": "€ Budget",
+          "comfortable": "€€ Comfortable",
+          "premium": "€€€ Premium / VIP"
+        },
+        "priority": {
+          "incredibleViews": "Incredible views",
+          "uniqueExperience": "Unique experience",
+          "comfortEase": "Comfort & ease",
+          "adrenaline": "Adrenaline",
+          "instagramMoments": "Instagram moments"
+        }
+      },
+      "buttons": {
+        "back": "Back",
+        "next": "Next",
+        "seeResults": "See Results",
+        "takeQuizAgain": "Take Quiz Again",
+        "startOver": "Start Over",
+        "viewExperience": "View experience"
+      },
+      "results": {
+        "title": "Your perfect Tenerife experiences",
+        "titleFallback": "We found inspiration for you!",
+        "subtitle": "Based on your preferences, here are our recommendations",
+        "subtitleFallback": "Here are some popular experiences you will love.",
+        "noResults": "No activities found matching your criteria. Try adjusting your preferences.",
+        "experienceFallback": "Experience",
+        "noDescription": "No description available",
+        "items": {
+          "1": {
+            "title": "Teide by Night",
+            "description": "Experience the magical sunset and stargazing from Mount Teide, Spain's highest peak. Witness breathtaking views and the clearest skies in Europe.",
+            "tags": ["Adventure", "Nature", "Stargazing", "Sunset"]
+          },
+          "2": {
+            "title": "Siam Park",
+            "description": "Europe's best water park with thrilling slides, lazy rivers, and tropical landscapes. Perfect for families and thrill-seekers.",
+            "tags": ["Water Park", "Family", "Fun", "Entertainment"]
+          },
+          "3": {
+            "title": "Loro Parque",
+            "description": "World-famous animal park and conservation center. Discover exotic animals, stunning shows, and learn about wildlife conservation.",
+            "tags": ["Zoo", "Animals", "Family", "Education"]
+          },
+          "4": {
+            "title": "Luxury Catamaran Cruise",
+            "description": "Sail along Tenerife's stunning coastline on a luxury catamaran. Spot whales and dolphins, enjoy premium amenities, and relax in style.",
+            "tags": ["Boat", "Luxury", "Wildlife", "Relaxation"]
+          }
+        }
+      }
+    }
+  },
+  "seo": {
+    "siteName": "Tenerife Activity",
+    "defaultDescription": "Premium tourism experiences in Tenerife. Discover curated activities, tours, and adventures for your perfect Canary Islands getaway.",
+    "home": {
+      "title": "Tenerife Activity",
+      "description": "Premium tourism experiences in Tenerife"
+    },
+    "partners": {
+      "title": "Partner with Tenerife Activity | Accommodation Partnerships",
+      "description": "Join our accommodation partner program. Earn 10% commission on every activity booked. No investment, no subscription. Fully managed by our excursion partner."
+    },
+    "getInspired": {
+      "title": "Get Inspired | Tenerife Activity",
+      "description": "Discover the perfect Tenerife experiences for your mood, time, and travel group. Curated recommendations to help you plan your ideal trip."
+    },
+    "contact": {
+      "title": "Contact Us | Tenerife Activity",
+      "description": "Get in touch with Tenerife Activity. We're here to help you plan your perfect Canary Islands experience."
+    },
+    "search": {
+      "title": "Search | Tenerife Activity",
+      "description": "Search for experiences in Tenerife"
+    },
+    "vibe": {
+      "notFoundTitle": "Vibe not found | Tenerife Activity",
+      "titleTemplate": "{vibe} | Tenerife Activity",
+      "descriptionTemplate": "Discover {vibe} experiences in Tenerife"
+    },
+    "experience": {
+      "notFoundTitle": "Experience not found | Tenerife Activity",
+      "titleTemplate": "{experience} | Tenerife Activity",
+      "descriptionTemplate": "Book {experience} in Tenerife"
+    }
+  },
+  "metadata": {
+    "home": {
+      "title": "Tenerife Activity",
+      "description": "Premium tourism experiences in Tenerife"
+    },
+    "mustSee": {
+      "title": "Must-See Experiences in Tenerife | Tenerife Activity",
+      "description": "The essential Tenerife experiences recommended by locals. Curated selection of quality, popular, and reliable experiences for time-constrained travelers."
+    },
+    "inspired": {
+      "title": "Get Inspired | Tenerife Activity",
+      "description": "Discover the perfect Tenerife experiences for your mood, time, and travel group. Curated recommendations to help you plan your ideal trip."
+    },
+    "search": {
+      "title": "Search | Tenerife Activity",
+      "description": "Search for experiences in Tenerife"
+    },
+    "experience": {
+      "notFoundTitle": "Experience not found | Tenerife Activity",
+      "descriptionTemplate": "Book {title} in Tenerife"
+    },
+    "vibe": {
+      "notFoundTitle": "Vibe not found | Tenerife Activity",
+      "descriptionTemplate": "Discover {vibe} experiences in Tenerife"
+    }
+  },
+  "notFound": {
+    "vibe": {
+      "title": "Vibe not found",
+      "description": "The vibe you're looking for doesn't exist or has been removed.",
+      "backToHome": "Back to Home"
+    },
+    "experience": {
+      "title": "Experience not found",
+      "description": "The experience you're looking for doesn't exist or has been removed.",
+      "backToHome": "Back to Home"
+    },
+    "page": {
+      "title": "404 - Page Not Found",
+      "description": "The page you're looking for doesn't exist.",
+      "goToHome": "Go to Home"
+    }
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try again",
+    "goToHome": "Go to Home"
+  },
+  "activityPacks": {
+    "title": "Activity Packs",
+    "subtitle": "Curated experiences, perfectly combined",
+    "viewPack": "View pack",
+    "packs": {
+      "twinTicket": {
+        "title": "Twin Ticket",
+        "category": "Theme Parks",
+        "badge": "Best Seller",
+        "description": "One ticket, two iconic parks: Siam Park + Loro Parque. The easiest way to see Tenerife's top attractions."
+      },
+      "twoParksTicket": {
+        "title": "Two Parks Ticket",
+        "category": "Theme Parks",
+        "badge": "Great Value",
+        "description": "Combine two parks in one smart deal (e.g., Jungle Park + Aqualand). Perfect for families and groups."
+      },
+      "specialPacks": {
+        "title": "Special Packs",
+        "category": "Water Sports",
+        "badge": "Most Popular",
+        "description": "Curated water-activity bundles (Parasailing, Jet Ski, Fly Fish and more). Big thrills, better price."
+      },
+      "boosterPacks": {
+        "title": "Booster Packs",
+        "category": "Water Sports",
+        "badge": "Hot Deal",
+        "description": "Mix and match the island's best ocean experiences (Jet Ski + Parasailing style combos) at a special rate."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "We're here to help you plan your perfect Tenerife experience.",
+    "whatsapp": "Contact via WhatsApp",
+    "email": "Email",
+    "fastReply": "We reply fast",
+    "forPartners": "For Partners",
+    "forPartnersDescription": "Are you an accommodation provider interested in partnering with us?",
+    "partnersCta": "Learn More About Partnerships"
+  }
+}

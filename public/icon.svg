@@ -1,0 +1,59 @@
+<svg
+  width="40"
+  height="40"
+  viewBox="0 0 120 120"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <!-- Gradient principal bleu -->
+    <linearGradient id="oceanGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7DD3FC" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0EA5E9" />
+    </linearGradient>
+
+    <!-- Gradient vagues -->
+    <linearGradient id="waveGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#7DD3FC" />
+    </linearGradient>
+  </defs>
+
+  <!-- Cercle -->
+  <circle
+    cx="60"
+    cy="60"
+    r="52"
+    fill="url(#oceanGradient)"
+  />
+
+  <!-- Vague 1 -->
+  <path
+    d="M20 62 C35 55, 55 70, 75 62 C90 56, 100 58, 100 58"
+    stroke="url(#waveGradient)"
+    stroke-width="6"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Vague 2 -->
+  <path
+    d="M20 72 C35 65, 55 80, 75 72 C90 66, 100 68, 100 68"
+    stroke="url(#waveGradient)"
+    stroke-width="6"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.85"
+  />
+
+  <!-- Vague 3 -->
+  <path
+    d="M20 82 C35 75, 55 90, 75 82 C90 76, 100 78, 100 78"
+    stroke="url(#waveGradient)"
+    stroke-width="6"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.7"
+  />
+</svg>
