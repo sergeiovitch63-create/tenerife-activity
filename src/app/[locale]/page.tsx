@@ -91,25 +91,25 @@ export default async function HomePage({
       </div>
 
       {/* Recommendations Carousel */}
-      <Section variant="default" background="default">
+      <Section variant="default" background="default" className="pb-4 md:pb-6">
         <Container size="lg">
-          <div className="flex flex-col items-center gap-6 md:gap-8 pt-6 md:pt-10 pb-6 md:pb-10">
+          <div className="flex flex-col items-center gap-6 md:gap-8 pt-6 md:pt-10 pb-2 md:pb-3">
             <RecommendationsCarousel />
           </div>
         </Container>
       </Section>
 
       {/* Our Partners Section */}
-      <Section variant="default" background="default" className="pt-8 md:pt-12 pb-4 md:pb-6">
+      <Section variant="default" background="default">
         <Container size="lg">
-          <div className="flex flex-col items-center gap-6 md:gap-8 pt-4 md:pt-6 pb-2 md:pb-3">
+          <div className="flex flex-col items-center gap-6 md:gap-8 pt-6 md:pt-10 pb-6 md:pb-10">
             <PartnersLogos />
           </div>
         </Container>
       </Section>
 
       {/* Choose Your Vibe Section */}
-      <Section variant="loose" background="default" className="pt-4 md:pt-6">
+      <Section variant="loose" background="default" className="pt-2 md:pt-4">
         <div id="vibes" className="scroll-mt-24">
           <Container size="xl">
             <Stack direction="column" gap="lg">

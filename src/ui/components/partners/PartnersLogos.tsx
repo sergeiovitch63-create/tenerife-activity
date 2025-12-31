@@ -1,7 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { cn } from '@/ui/lib/cn'
 
 interface PartnerLogo {
   name: string
@@ -39,60 +39,78 @@ const partnerLogos: PartnerLogo[] = [
 ]
 
 export function PartnersLogos() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Duplicate items multiple times for seamless looping (same as Must See)
+  const partnersDuplicated = [
+    ...partnerLogos,
+    ...partnerLogos,
+    ...partnerLogos,
+    ...partnerLogos,
+  ]
+
+  useEffect(() => {
+    // Check for prefers-reduced-motion
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
   return (
-    <div className="w-full">
-      {/* Title */}
-      <h2 className="mb-4 md:mb-6 text-center text-2xl md:text-3xl font-semibold text-white tracking-tight">
+    <div
+      className="w-full max-w-5xl mx-auto px-4"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Section Title */}
+      <h2 className="mb-8 text-center text-2xl md:text-3xl font-semibold text-white tracking-tight">
         Our Trusted Partners
       </h2>
 
-      {/* Logos Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 items-start justify-items-center max-w-4xl mx-auto px-4">
-        {partnerLogos.map((partner, index) => (
-          <a
-            key={partner.name}
-            href={partner.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Open WhatsApp chat with ${partner.name}`}
-            className={cn(
-              'flex flex-col items-center justify-center gap-3',
-              'w-full',
-              'cursor-pointer',
-              'transition-opacity duration-300 ease-out',
-              'hover:opacity-90'
-            )}
-          >
-            {/* Square Tile Container */}
-            <div
-              className={cn(
-                'relative',
-                'w-[120px] h-[120px] md:w-[160px] md:h-[160px]',
-                'bg-white/10 backdrop-blur-sm',
-                'border border-white/20',
-                'rounded-lg',
-                'flex items-center justify-center',
-                'transition-opacity duration-300 ease-out',
-                'opacity-75 hover:opacity-100'
-              )}
-            >
-              <div className="relative w-full h-full p-4">
-                <Image
-                  src={partner.logoPath}
-                  alt={partner.alt}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 120px, 160px"
-                  loading="lazy"
-                />
-              </div>
+      {/* Horizontal Carousel - Same pattern as Must See */}
+      <div
+        className={`marquee-row ${prefersReducedMotion ? 'marquee-disabled' : 'marquee-left'} ${isHovered && !prefersReducedMotion ? 'marquee-paused' : ''}`}
+      >
+        <div className="marquee-track">
+          {partnersDuplicated.map((partner, index) => (
+            <div key={`${partner.name}-${index}`} className="marquee-item">
+              <a
+                href={partner.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open WhatsApp chat with ${partner.name}`}
+                className="flex flex-col items-center gap-2 cursor-pointer"
+              >
+                {/* Square Tile Container - Smaller than Must See */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 border border-white/20 flex items-center justify-center">
+                  <div className="relative w-full h-full p-3">
+                    <Image
+                      src={partner.logoPath}
+                      alt={partner.alt}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 640px) 96px, 112px"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+                {/* Partner Name */}
+                <div className="text-center">
+                  <p className="mt-3 text-xs sm:text-sm font-medium text-white text-center whitespace-nowrap">
+                    {partner.name}
+                  </p>
+                </div>
+              </a>
             </div>
-            {/* Partner Name */}
-            <p className="text-sm md:text-base font-medium text-white text-center">
-              {partner.name}
-            </p>
-          </a>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )

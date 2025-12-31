@@ -1,13 +1,12 @@
 'use client'
 
-import { useRef, useMemo, useState, useEffect, useCallback, memo } from 'react'
+import { useRef, useMemo, useState, memo } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { cn } from '@/ui/lib/cn'
 import type { Vibe } from '@/core/entities/vibe'
 import { trackingProvider } from '@/config/tracking'
 import { useVibeVideoPlayback } from './useVibeVideoPlayback'
-import { getThumbnailPaths } from './video-utils'
 import { vibeSlugToTranslationKey } from './vibe-translations'
 import { vibeThumbnails } from '@/data/vibeThumbnails'
 import Image from 'next/image'
@@ -48,14 +47,13 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   // Use useMemo to ensure stable videoPath across renders
   const videoPath = useMemo(() => getVibeVideoPath(vibe.slug), [vibe.slug])
-  const thumbnailPaths = useMemo(() => getThumbnailPaths(videoPath), [videoPath])
   const hasVideo = !!videoPath
   
   // Get translated vibe title
   const translationKey = vibeSlugToTranslationKey(vibe.slug)
   const translatedTitle = t(translationKey as any) || vibe.title
   
-  // Get vibe thumbnail (fallback for non-video vibes)
+  // Get vibe thumbnail from static mapping (used for all vibes)
   const vibeThumbnail = useMemo(() => {
     const thumb = vibeThumbnails[vibe.slug]
     if (!thumb) {
@@ -64,57 +62,11 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
     return thumb || null
   }, [vibe.slug])
   
-  // Thumbnail state: try webp first, then jpg, then null (gradient shows)
-  const [thumbnailSrc, setThumbnailSrc] = useState<string | null>(null)
   const [isVideoReady, setIsVideoReady] = useState(false)
   const [hasVideoError, setHasVideoError] = useState(false)
-  
-  // Track which thumbnail formats we've already tried to prevent infinite loops
-  const triedFormatsRef = useRef<Set<string>>(new Set())
-  const initializedRef = useRef(false)
-  const hasErroredRef = useRef(false)
 
   // Register with video playback manager
   const containerRef = useVibeVideoPlayback(vibe.id, videoRef)
-
-  // Initialize thumbnail source once when paths are available
-  useEffect(() => {
-    // Only initialize once per component mount
-    if (!initializedRef.current && hasVideo && !hasErroredRef.current) {
-      initializedRef.current = true
-      if (thumbnailPaths.webp) {
-        setThumbnailSrc(thumbnailPaths.webp)
-        triedFormatsRef.current.add(thumbnailPaths.webp)
-      } else if (thumbnailPaths.jpg) {
-        setThumbnailSrc(thumbnailPaths.jpg)
-        triedFormatsRef.current.add(thumbnailPaths.jpg)
-      } else {
-        setThumbnailSrc(null)
-        hasErroredRef.current = true
-      }
-    }
-  }, [hasVideo, thumbnailPaths.webp, thumbnailPaths.jpg])
-
-  // Handle thumbnail load error - try jpg fallback ONCE
-  const handleThumbnailError = useCallback(() => {
-    // Only execute if we haven't already errored
-    if (hasErroredRef.current) return
-    
-    // Use functional setState to access current value
-    setThumbnailSrc((currentSrc) => {
-      // Only try fallback if we haven't already tried jpg
-      if (currentSrc?.endsWith('.webp') && thumbnailPaths.jpg && !triedFormatsRef.current.has(thumbnailPaths.jpg)) {
-        // Try jpg fallback once
-        triedFormatsRef.current.add(thumbnailPaths.jpg)
-        return thumbnailPaths.jpg
-      } else {
-        // Both failed or already tried, use gradient (set to null) - prevent further attempts
-        hasErroredRef.current = true
-        triedFormatsRef.current.add(currentSrc || '')
-        return null
-      }
-    })
-  }, [thumbnailPaths.jpg])
 
   const handleClick = () => {
     trackingProvider.track({ type: 'vibe_opened', vibeId: vibe.id })
@@ -175,33 +127,26 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
                   }}
                 />
 
-                {/* Thumbnail poster layer - uses CSS background-image (NO visible <img> tag to prevent broken icon) */}
-                <div
-                  className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500"
-                  style={{
-                    backgroundImage: thumbnailSrc ? `url(${thumbnailSrc})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    opacity: isVideoReady ? 0 : 1,
-                    zIndex: 1,
-                  }}
-                >
-                  {/* Hidden image element to detect load errors and trigger fallback - only render once per format */}
-                  {thumbnailSrc && !hasErroredRef.current && (
-                    <img
-                      key={thumbnailSrc}
-                      src={thumbnailSrc}
-                      alt=""
-                      style={{ display: 'none', width: 0, height: 0, position: 'absolute' }}
-                      onError={handleThumbnailError}
-                      onLoad={() => {
-                        // Image loaded successfully - mark as tried to prevent re-renders
-                        triedFormatsRef.current.add(thumbnailSrc)
-                      }}
+                {/* Thumbnail poster layer - uses static thumbnail from /videos/thumbnails/ */}
+                {vibeThumbnail && (
+                  <div
+                    className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500"
+                    style={{
+                      zIndex: 1,
+                      opacity: isVideoReady ? 0 : 1,
+                    }}
+                  >
+                    <Image
+                      src={vibeThumbnail}
+                      alt={translatedTitle}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 41.666667vw"
+                      loading="lazy"
+                      decoding="async"
                     />
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Video element - ALWAYS rendered */}
                 <video
@@ -212,7 +157,7 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
                   preload="none"
                   controls={false}
                   disablePictureInPicture
-                  poster={thumbnailSrc || undefined}
+                  poster={vibeThumbnail || undefined}
                   className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-500 ease-out"
                   style={{
                     position: 'absolute',
@@ -248,16 +193,20 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
               </>
             ) : (
               vibeThumbnail ? (
-                <Image
-                  src={vibeThumbnail}
-                  alt={translatedTitle}
-                  fill
-                  loading="lazy"
-                  decoding="async"
-                  fetchPriority="low"
-                  className="object-cover rounded-lg"
-                  sizes="(max-width: 768px) 100vw, 41.666667vw"
-                />
+                <>
+                  <Image
+                    src={vibeThumbnail}
+                    alt={translatedTitle}
+                    fill
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 768px) 100vw, 41.666667vw"
+                  />
+                  {/* Subtle dark gradient overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent pointer-events-none" />
+                </>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-sm font-medium text-glass-500">
