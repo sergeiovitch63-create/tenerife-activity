@@ -54,3 +54,4 @@ export function getConnectionType(): string | null {
   return connection?.effectiveType || null
 }
 
+

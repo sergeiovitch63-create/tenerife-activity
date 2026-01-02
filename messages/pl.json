@@ -292,6 +292,13 @@
     "section": {
       "title": "Zamień swój obiekt w źródło przychodów",
       "subtitle": "Twoi goście już rezerwują wycieczki. Teraz na tym zarabiasz — automatycznie.",
+      "explanatoryText": "Twoi goście już szukają aktywności do zarezerwowania podczas pobytu. Z Tenerife Activity po prostu umieszczasz kod QR w swoim obiekcie. Goście skanują, rezerwują wycieczki, a ty zarabiasz prowizję — bez robienia czegokolwiek.",
+      "flyerPreview": {
+        "title": "Co zobaczą twoi goście",
+        "description": "To jest ulotka umieszczona w twoim obiekcie. Goście skanują kod QR i rezerwują natychmiast.",
+        "placeholder": "Ulotka zostanie tutaj dodana",
+        "format": "Format: A5"
+      },
       "benefits": {
         "commission": "10% prowizji od każdej zarezerwowanej aktywności",
         "legal": "100% legalne, śledzone i wypłacane miesięcznie",

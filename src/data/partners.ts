@@ -52,3 +52,4 @@ export function getAllPartners(): Partner[] {
   return partners
 }
 
+

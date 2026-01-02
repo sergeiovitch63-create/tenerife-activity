@@ -47,3 +47,4 @@ Images are referenced in the Activity Packs data configuration:
 - `/images/activity-packs/booster-packs/cover.jpg`
 
 
+

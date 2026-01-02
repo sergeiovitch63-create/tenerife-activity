@@ -292,6 +292,13 @@
     "section": {
       "title": "Verwandeln Sie Ihre Unterkunft in eine Einnahmequelle",
       "subtitle": "Ihre Gäste buchen bereits Ausflüge. Jetzt verdienen Sie daran — automatisch.",
+      "explanatoryText": "Ihre Gäste suchen bereits nach Aktivitäten, die sie während ihres Aufenthalts buchen können. Mit Tenerife Activity platzieren Sie einfach einen QR-Code in Ihrer Unterkunft. Gäste scannen, buchen ihre Ausflüge und Sie verdienen Provision — ohne etwas zu tun.",
+      "flyerPreview": {
+        "title": "Was Ihre Gäste sehen werden",
+        "description": "Dies ist der Flyer, der in Ihrer Unterkunft platziert wird. Gäste scannen den QR-Code und buchen sofort.",
+        "placeholder": "Flyer wird hier hinzugefügt",
+        "format": "Format: A5"
+      },
       "benefits": {
         "commission": "10% Provision bei jeder gebuchten Aktivität",
         "legal": "100% legal, verfolgt und monatlich ausgezahlt",

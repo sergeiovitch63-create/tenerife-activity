@@ -539,3 +539,4 @@ This audit identifies all user-facing hardcoded strings that are NOT using next-
 - Some metadata strings use template literals with variables - these will need translation functions that support interpolation
 - Pluralization is needed for strings like "X experience(s) found" and "X reviews"
 
+

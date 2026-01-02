@@ -285,6 +285,13 @@
     "section": {
       "title": "Transformez votre hébergement en source de revenus",
       "subtitle": "Vos clients réservent déjà des excursions. Maintenant vous en profitez — automatiquement.",
+      "explanatoryText": "Vos clients cherchent déjà des activités à réserver pendant leur séjour. Avec Tenerife Activity, vous placez simplement un code QR dans votre hébergement. Les clients scannent, réservent leurs excursions, et vous gagnez une commission — sans rien faire.",
+      "flyerPreview": {
+        "title": "Ce que verront vos clients",
+        "description": "Voici le dépliant placé dans votre hébergement. Les clients scannent le code QR et réservent instantanément.",
+        "placeholder": "Le dépliant sera ajouté ici",
+        "format": "Format : A5"
+      },
       "benefits": {
         "commission": "10% de commission sur chaque activité réservée",
         "legal": "100% légal, suivi et payé mensuellement",

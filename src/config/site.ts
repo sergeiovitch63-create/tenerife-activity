@@ -9,3 +9,4 @@ export const siteUrl =
 
 export const defaultOgImage = `${siteUrl}/og-image.jpg`
 
+

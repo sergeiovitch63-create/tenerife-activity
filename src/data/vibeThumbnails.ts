@@ -19,3 +19,4 @@ export const vibeThumbnails: Record<string, string> = {
   'transfers-transport': '/videos/thumbnails/transfers-transport.png',
 } as const
 
+

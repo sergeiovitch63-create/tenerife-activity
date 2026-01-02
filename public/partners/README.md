@@ -34,3 +34,4 @@ Partner logos are referenced in `/src/data/partners.ts`. To add a new partner:
 1. Add the logo file to this directory following the naming convention
 2. Update `/src/data/partners.ts` with the new partner entry
 
+

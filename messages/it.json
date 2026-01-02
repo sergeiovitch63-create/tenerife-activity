@@ -292,6 +292,13 @@
     "section": {
       "title": "Trasforma la tua struttura in una fonte di reddito",
       "subtitle": "I tuoi ospiti prenotano già escursioni. Ora ne guadagni — automaticamente.",
+      "explanatoryText": "I tuoi ospiti stanno già cercando attività da prenotare durante il loro soggiorno. Con Tenerife Activity, posizioni semplicemente un codice QR nella tua struttura. Gli ospiti scansionano, prenotano le loro escursioni e tu guadagni commissione — senza fare nulla.",
+      "flyerPreview": {
+        "title": "Cosa vedranno i tuoi ospiti",
+        "description": "Questo è il volantino posizionato nella tua struttura. Gli ospiti scansionano il codice QR e prenotano all'istante.",
+        "placeholder": "Il volantino sarà aggiunto qui",
+        "format": "Formato: A5"
+      },
       "benefits": {
         "commission": "10% di commissione su ogni attività prenotata",
         "legal": "100% legale, tracciato e pagato mensilmente",

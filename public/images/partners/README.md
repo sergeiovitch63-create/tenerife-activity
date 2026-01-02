@@ -25,3 +25,4 @@ The component automatically handles:
 - Hover effects (opacity transition)
 - Lazy loading
 
+
