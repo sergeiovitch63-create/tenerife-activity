@@ -3,12 +3,9 @@ import { Link } from '@/navigation'
 import { Button } from '@/ui/components/shared'
 import { getTranslations } from 'next-intl/server'
 
-export default async function NotFound({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
+export default async function NotFound({ params }: { params: { locale: string } }) {
+  // Get locale from params (null-safe, fallback to 'en')
+  const locale = params?.locale || 'en'
   const t = await getTranslations({ locale, namespace: 'notFound.vibe' })
 
   return (

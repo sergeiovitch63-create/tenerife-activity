@@ -2,9 +2,92 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
+function hostnameFromEnvUrl(v) {
+  if (!v || typeof v !== 'string' || !v.trim()) return null
+  try {
+    return new URL(v).hostname
+  } catch {
+    return null
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
+  
+  // Image configuration for remote domains
+  // Required for Next/Image component
+  images: {
+    remotePatterns: [
+      // Atlantico API / assets hosts (env-driven - highest priority)
+      ...[
+        process.env.ATLANTICO_BASE_URL,
+        process.env.ATLANTICO_ASSETS_BASE_URL,
+        process.env.ATLANTICO_IMAGES_BASE_URL,
+        process.env.NEXT_PUBLIC_ATLANTICO_IMAGES_BASE_URL,
+        process.env.NEXT_PUBLIC_ATLANTICO_ASSETS_BASE_URL,
+      ]
+        .map(hostnameFromEnvUrl)
+        .filter(Boolean)
+        .map((hostname) => ({
+          protocol: 'https',
+          hostname,
+          pathname: '/**',
+        })),
+      // Common Atlantico hostnames (tested by debug endpoint)
+      {
+        protocol: 'https',
+        hostname: 'api.atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'testapi.atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'admin.atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'backoffice.atlanticoexcursiones.com',
+        pathname: '/**',
+      },
+      // Legacy/alternative domains
+      {
+        protocol: 'https',
+        hostname: 'static.atlantico-excursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.atlantico-excursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.atlantico-excursiones.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.tenerife-activity.com',
+        pathname: '/**',
+      },
+    ],
+  },
   
   // Disable webpack persistent filesystem cache in development to fix Windows ENOENT issues
   // This prevents file system locking problems on Windows that cause slow rebuilds and Fast Refresh issues

@@ -539,5 +539,103 @@
     "forPartners": "For Partners",
     "forPartnersDescription": "Are you an accommodation provider interested in partnering with us?",
     "partnersCta": "Learn More About Partnerships"
+  },
+  "activities": {
+    "gomeraVipTour": {
+      "includes": {
+        "title": "INCLUDES:",
+        "items": {
+          "ferry": "Round-trip ferry from Tenerife to La Gomera from Los Cristianos pier in premium class with an open bar of food and drinks on board.",
+          "stops": "Stops at San Sebastián de La Gomera, Abrante viewpoint, Garajonay National Park, Roque de Agando, and other points of interest in La Gomera.",
+          "driver": "One driver per vehicle.",
+          "lunch": "Lunch.",
+          "explanations": "Explanations in Spanish, German, and French.",
+          "vehicle": "Spacious air-conditioned, four-wheel-drive minivan.",
+          "transport": "Transport from your hotel or nearby.",
+          "insurance": "Civil liability insurance."
+        }
+      }
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "description": "Review your selected activities",
+    "loading": "Loading cart...",
+    "empty": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "itemTitle": "Activity {t_group} - {t_id}",
+    "date": "Date",
+    "time": "Time",
+    "participants": "Participants",
+    "adults": "adults",
+    "children": "children",
+    "infants": "infants",
+    "language": "Language",
+    "edit": "Edit",
+    "remove": "Remove",
+    "total": "Total",
+    "proceedToCheckout": "Proceed to Checkout",
+    "addToCart": "Add to Cart",
+    "finalizePurchases": "Finalize Your Purchases",
+    "addedToCart": "Added to cart ✅",
+    "errors": {
+      "noOption": "Please select an option",
+      "noDate": "Please select a date",
+      "noParticipants": "Please select at least 1 adult",
+      "addFailed": "Failed to add item to cart"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "description": "Complete your booking",
+    "empty": "Your cart is empty",
+    "backToCart": "Back to Cart",
+    "revalidating": "Validating your booking...",
+    "priceUpdated": "Price has been updated",
+    "priceDiff": "Price difference: {diff}",
+    "availabilityIssue": "Availability Issue",
+    "availabilityIssueDesc": "One or more items are no longer available. Please update your selection.",
+    "orderSummary": "Order Summary",
+    "activity": "Activity",
+    "date": "Date",
+    "time": "Time",
+    "total": "Total",
+    "customerInfo": "Customer Information",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "pickupInfo": "Pickup Information (Optional)",
+    "hotel": "Hotel",
+    "room": "Room",
+    "meetingPoint": "Meeting Point",
+    "meetingTime": "Meeting Time",
+    "notes": "Additional Notes",
+    "acceptTerms": "I accept the terms and conditions",
+    "processing": "Processing...",
+    "pay": "Pay",
+    "errors": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneRequired": "Phone is required",
+      "termsRequired": "You must accept the terms and conditions",
+      "cartEmpty": "Your cart is empty",
+      "multiItemNotSupported": "Only one activity can be booked at a time. Please remove other items from your cart.",
+      "paymentFailed": "Payment initiation failed. Please try again."
+    },
+    "success": {
+      "title": "Payment Successful",
+      "description": "Your payment has been processed successfully",
+      "message": "Thank you for your booking! Your payment has been processed successfully. You will receive a confirmation email shortly.",
+      "backToHome": "Back to Home",
+      "viewCart": "View Cart"
+    },
+    "cancel": {
+      "title": "Payment Cancelled",
+      "description": "Your payment has been cancelled",
+      "message": "Your payment has been cancelled. No charges have been made. You can return to your cart to complete your booking later.",
+      "backToCart": "Back to Cart",
+      "backToHome": "Back to Home"
+    }
   }
 }

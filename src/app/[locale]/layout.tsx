@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 import { Header } from '@/ui/components/navigation'
 import { Footer } from '@/ui/components/navigation'
 import { AttributionCapture } from '../AttributionCapture'
+import { FloatingBackButton } from '@/components/navigation/FloatingBackButton'
 import { locales, type Locale } from '@/i18n/request'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
@@ -67,6 +68,7 @@ export default async function LocaleLayout({
         <AttributionCapture />
       </Suspense>
       <Header />
+      <FloatingBackButton />
       {children}
       <Footer locale={locale} />
     </NextIntlClientProvider>

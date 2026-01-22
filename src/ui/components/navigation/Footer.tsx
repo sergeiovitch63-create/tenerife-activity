@@ -1,16 +1,22 @@
+'use client'
+
 import { Link } from '@/navigation'
 import { Container } from '@/ui/components/layout'
-import { getTranslations } from 'next-intl/server'
+import { useTranslations } from 'next-intl'
 import { whatsappUrl, contactEmail } from '@/config/contact'
 
 interface FooterProps {
   locale: string
 }
 
-export async function Footer({ locale }: FooterProps) {
-  const tNav = await getTranslations('nav')
-  const tCommon = await getTranslations('common')
-  const tContact = await getTranslations('contact')
+export function Footer({ locale }: FooterProps) {
+  const tNav = useTranslations('nav')
+  const tCommon = useTranslations('common')
+  const tContact = useTranslations('contact')
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[NAV_HOOK_OK]', 'Footer')
+  }
 
   return (
     <footer className="w-full bg-glass-900 text-glass-300 border-t border-glass-800">

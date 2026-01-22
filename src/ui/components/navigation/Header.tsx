@@ -115,7 +115,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300',
+        'w-full z-50 transition-all duration-300',
         isHeroVisible
           ? 'bg-white/95 backdrop-blur-sm border-b border-slate-200/50'
           : 'bg-transparent'

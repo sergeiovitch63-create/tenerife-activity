@@ -1,0 +1,263 @@
+/**
+ * GET /api/atlantico/prices?eventId=&date=YYYY-MM-DD&office?
+ * 
+ * Fetches prices from Atlantico API and returns normalized JSON
+ * Parses according to pProd value (0 = per person, 2 = per day)
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { fetchText, fetchJson } from '@/lib/atlantico/client'
+import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
+
+interface PricesPerPersonResponse {
+  type: 'per_person'
+  adult: number | null
+  child: number | null
+  infant: number | null
+}
+
+interface PricesPerDayResponse {
+  type: 'per_day'
+  tiers: Array<{ days: number; price: number }>
+}
+
+interface PricesUnknownResponse {
+  type: 'unknown'
+  raw: any
+}
+
+type PricesResponse = PricesPerPersonResponse | PricesPerDayResponse | PricesUnknownResponse
+
+/**
+ * Get pProd from event details or accept as query param
+ */
+async function getPProd(eventId: string, lang: string, pProdParam?: string | null): Promise<'0' | '1' | '2' | '3' | null> {
+  // If pProd provided in query, use it
+  if (pProdParam && ['0', '1', '2', '3'].includes(pProdParam)) {
+    return pProdParam as '0' | '1' | '2' | '3'
+  }
+
+  // Otherwise fetch from eventDetails
+  try {
+    const eventDetails = await fetchJson(`/eventDetails/${eventId}/${lang}`)
+    const pProd = eventDetails?.pProd
+    if (pProd && ['0', '1', '2', '3'].includes(String(pProd))) {
+      return String(pProd) as '0' | '1' | '2' | '3'
+    }
+  } catch {
+    // Silent fail, will use default parsing
+  }
+
+  return null
+}
+
+/**
+ * Parse per-person prices from pipe-separated string
+ * Format: "adult|child|infant|adultComm|childComm|infantComm"
+ */
+function parsePerPerson(text: string): PricesPerPersonResponse | null {
+  const parts = text.split('|').map((p) => p.trim()).filter(Boolean)
+  
+  if (parts.length < 3) {
+    return null
+  }
+
+  const adult = parseFloat(parts[0])
+  const child = parseFloat(parts[1])
+  const infant = parseFloat(parts[2])
+
+  if (isNaN(adult) || adult <= 0) {
+    return null
+  }
+
+  return {
+    type: 'per_person',
+    adult: isNaN(adult) ? null : adult,
+    child: isNaN(child) ? null : child,
+    infant: isNaN(infant) ? null : infant,
+  }
+}
+
+/**
+ * Parse per-day prices from pipe-separated string
+ * Format: "days|price|comm|days|price|comm..."
+ */
+function parsePerDay(text: string): PricesPerDayResponse | null {
+  const parts = text.split('|').map((p) => p.trim()).filter(Boolean)
+  
+  if (parts.length < 3 || parts.length % 3 !== 0) {
+    return null
+  }
+
+  const tiers: Array<{ days: number; price: number }> = []
+  
+  for (let i = 0; i < parts.length; i += 3) {
+    const days = parseFloat(parts[i])
+    const price = parseFloat(parts[i + 1])
+    
+    if (!isNaN(days) && !isNaN(price) && days > 0 && price > 0) {
+      tiers.push({ days, price })
+    }
+  }
+
+  if (tiers.length === 0) {
+    return null
+  }
+
+  return {
+    type: 'per_day',
+    tiers,
+  }
+}
+
+/**
+ * Parse JSON response for per-person prices
+ */
+function parsePerPersonFromJson(raw: any): PricesPerPersonResponse | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return null
+  }
+
+  // Check for VPVA/VPVC/VPVOS or PVPA/PVPC/PVPOS keys
+  const adult = raw.VPVA ?? raw.vpva ?? raw.PVPA ?? raw.pvpa ?? null
+  const child = raw.VPVC ?? raw.vpvc ?? raw.PVPC ?? raw.pvpc ?? null
+  const infant = raw.VPVOS ?? raw.vpvos ?? raw.PVPOS ?? raw.pvpos ?? null
+
+  if (adult === null && child === null && infant === null) {
+    return null
+  }
+
+  const adultNum = typeof adult === 'number' ? adult : typeof adult === 'string' ? parseFloat(adult) : null
+  const childNum = typeof child === 'number' ? child : typeof child === 'string' ? parseFloat(child) : null
+  const infantNum = typeof infant === 'number' ? infant : typeof infant === 'string' ? parseFloat(infant) : null
+
+  if (adultNum === null || isNaN(adultNum) || adultNum <= 0) {
+    return null
+  }
+
+  return {
+    type: 'per_person',
+    adult: adultNum,
+    child: childNum && !isNaN(childNum) ? childNum : null,
+    infant: infantNum && !isNaN(infantNum) ? infantNum : null,
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = request.nextUrl
+    const eventId = searchParams.get('eventId')
+    const date = searchParams.get('date')
+    const office = searchParams.get('office')
+    const lang = searchParams.get('lang') || 'ENG'
+    const pProdParam = searchParams.get('pProd')
+
+    if (!eventId || !date) {
+      return NextResponse.json(
+        {
+          error: 'Missing parameters',
+          message: 'eventId and date are required',
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid date format',
+          message: 'Date must be in YYYY-MM-DD format',
+        },
+        { status: 400 }
+      )
+    }
+
+    // Normalize language - use proper mapping (CAS/ENG/FRA/RUS/ALE/ITA)
+    // If lang is already in correct format, use it; otherwise map from locale
+    const normalizedLang = lang.length === 3 && ['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA'].includes(lang.toUpperCase())
+      ? lang.toUpperCase()
+      : mapLocaleToAtlanticoLang(lang)
+
+    // Get pProd
+    const pProd = await getPProd(eventId, normalizedLang, pProdParam)
+
+    // Build endpoint
+    const endpoint = office
+      ? `/loadPrices/${eventId}/${date}/${office}`
+      : `/loadPrices/${eventId}/${date}`
+
+    // Fetch prices (always as text first, then parse)
+    const text = await fetchText(endpoint)
+
+    // Try to parse as JSON first
+    let raw: any = text
+    const trimmed = text.trim()
+    
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+      try {
+        raw = JSON.parse(trimmed)
+      } catch {
+        // Keep as text
+      }
+    }
+
+    // Parse according to pProd
+    let response: PricesResponse
+
+    if (pProd === '0') {
+      // Per person format
+      if (typeof raw === 'string') {
+        const parsed = parsePerPerson(raw)
+        if (parsed) {
+          response = parsed
+        } else {
+          response = { type: 'unknown', raw }
+        }
+      } else if (typeof raw === 'object') {
+        const parsed = parsePerPersonFromJson(raw)
+        if (parsed) {
+          response = parsed
+        } else {
+          response = { type: 'unknown', raw }
+        }
+      } else {
+        response = { type: 'unknown', raw }
+      }
+    } else if (pProd === '2') {
+      // Per day format
+      if (typeof raw === 'string') {
+        const parsed = parsePerDay(raw)
+        if (parsed) {
+          response = parsed
+        } else {
+          response = { type: 'unknown', raw }
+        }
+      } else {
+        response = { type: 'unknown', raw }
+      }
+    } else {
+      // Unknown pProd or no pProd, return raw
+      response = { type: 'unknown', raw }
+    }
+
+    return NextResponse.json(response, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30', // 60s cache
+      },
+    })
+  } catch (error) {
+    // Server-only logging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[ATLANTICO_PRICES] Error:', error)
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch prices',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    )
+  }
+}

@@ -4,8 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "powershell -Command \"Get-NetTCPConnection -LocalPort 3000..3010 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id (Get-Process -Id $_.OwningProcess).Id -Force -ErrorAction SilentlyContinue }; npm run dev\"",
     "build": "next build",
     "start": "next start",
+    "clean": "node scripts/clean.mjs",
+    "clean:next": "node scripts/clean.mjs",
+    "clean:all": "node scripts/clean.mjs --all",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
@@ -13,30 +17,35 @@
     "thumbnails": "node scripts/generate-thumbnails.mjs",
     "i18n:sync": "node scripts/i18n-sync.mjs",
     "i18n:sync:force": "node scripts/i18n-sync.mjs --force",
-    "i18n:report": "node scripts/i18n-sync.mjs --report"
+    "i18n:report": "node scripts/i18n-sync.mjs --report",
+    "smoke:atlantico": "node scripts/smoke-atlantico.mjs",
+    "sniff:gomera": "tsx scripts/sniff-atlantico-gomera.ts",
+    "test:gomera-dump": "tsx scripts/test-gomera-limits-dump.ts",
+    "atl:limits:probe": "tsx scripts/probe-limits.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
+    "clsx": "^2.1.1",
     "next": "^14.2.0",
+    "next-intl": "^3.15.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "next-intl": "^3.15.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.4.0"
+    "tailwind-merge": "^2.4.0",
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
+    "playwright": "^1.57.0",
+    "postcss": "^8.4.0",
     "prettier": "^3.3.0",
-    "prettier-plugin-tailwindcss": "^0.5.0"
+    "prettier-plugin-tailwindcss": "^0.5.0",
+    "tailwindcss": "^3.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.5.0"
   }
 }
-
-
-

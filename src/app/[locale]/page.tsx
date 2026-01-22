@@ -1,6 +1,7 @@
 import { Section, Container, Stack } from '@/ui/components/layout'
 import { VibesList } from '@/ui/components/vibe/VibesList.client'
 import { vibeRepository } from '@/config/repositories'
+import { experienceRepository } from '@/config/repositories'
 import { Suspense } from 'react'
 import { ScrollToVibes } from './ScrollToVibes'
 import { getTranslations } from 'next-intl/server'
@@ -14,6 +15,7 @@ import { Link } from '@/navigation'
 import { Button } from '@/ui/components/shared/Button'
 import { buildMetadata } from '@/lib/seo'
 import { type Locale } from '@/i18n/request'
+import { loadCuration, applyCuration, sortExperiencesWithCuration } from '@/lib/vibes/curation'
 
 export async function generateMetadata({
   params,
@@ -38,7 +40,41 @@ export default async function HomePage({
 }) {
   const { locale } = await params
   const vibes = await vibeRepository.findAll()
+  const allExperiences = await experienceRepository.findAll()
   const t = await getTranslations()
+  
+  // Load curation from database (if available)
+  let curatedRows: Record<string, any> = {}
+  try {
+    curatedRows = await loadCuration()
+  } catch (err) {
+    // Silently fail if Supabase is not configured (dev mode)
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[HOME] Curation not available:', err instanceof Error ? err.message : 'Unknown error')
+    }
+  }
+  
+  // Apply curation to experiences
+  const curatedExperiences = applyCuration(allExperiences, curatedRows)
+  
+  // Filter experiences by vibe for each vibe
+  const vibesWithExperiences = vibes.map((vibe) => {
+    const activitiesForVibe = sortExperiencesWithCuration(
+      curatedExperiences.filter((exp) => exp.vibeId === vibe.id)
+    )
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[HOME_VIBE]', {
+        vibe: vibe.slug,
+        count: activitiesForVibe.length,
+      })
+    }
+    
+    return {
+      ...vibe,
+      experiences: activitiesForVibe,
+    }
+  })
 
   return (
     <>
@@ -123,7 +159,7 @@ export default async function HomePage({
               </div>
 
               {/* Vibe Rows - Progressive rendering */}
-              <VibesList vibes={vibes} />
+              <VibesList vibes={vibesWithExperiences.map(({ experiences, ...vibe }) => vibe)} />
             </Stack>
           </Container>
         </div>

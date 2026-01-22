@@ -39,6 +39,15 @@ next-env.d.ts
 # pnpm
 .pnpm-store
 
+# curation data
+data/curation.json
+data/atlantico_full_catalog.json
+data/atlantico_full_catalog.meta.json
+data/.refresh.lock
+
+# debug files
+debug-gomera.html
+
 
 
 

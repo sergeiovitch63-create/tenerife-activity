@@ -1,0 +1,324 @@
+[
+  {
+    "index": 1,
+    "id": "1",
+    "slug": "vip-tours",
+    "title": {
+      "en": "VIP Tours",
+      "es": "Tours VIP",
+      "fr": "Tours VIP"
+    },
+    "description": {
+      "en": "Exclusive premium tours",
+      "es": "Tours premium exclusivos",
+      "fr": "Visites premium exclusives"
+    },
+    "tagline": {
+      "en": "Exclusive access to Tenerife's most coveted experiences"
+    },
+    "order": 1,
+    "thumbnail": "/videos/thumbnails/VIP-Tours.png",
+    "video": "/videos/VIP-Tours.mp4",
+    "translationKey": "vipTours"
+  },
+  {
+    "index": 2,
+    "id": "2",
+    "slug": "theme-parks",
+    "title": {
+      "en": "Theme Parks",
+      "es": "Parques temáticos",
+      "fr": "Parcs à thème"
+    },
+    "description": {
+      "en": "Family fun and entertainment",
+      "es": "Diversión familiar y entretenimiento",
+      "fr": "Divertissement et plaisir en famille"
+    },
+    "tagline": {
+      "en": "Unforgettable family adventures await"
+    },
+    "order": 2,
+    "thumbnail": "/videos/thumbnails/vibe-theme-parks.png",
+    "video": "/videos/vibe-theme-parks.mp4",
+    "translationKey": "themeParks"
+  },
+  {
+    "index": 3,
+    "id": "3",
+    "slug": "tickets-attractions",
+    "title": {
+      "en": "Tickets & Attractions",
+      "es": "Entradas y atracciones",
+      "fr": "Billets et attractions"
+    },
+    "description": {
+      "en": "Skip-the-line tickets and attractions",
+      "es": "Entradas sin colas y atracciones",
+      "fr": "Billets coupe-file et attractions"
+    },
+    "tagline": {
+      "en": "Skip the queues, maximize your time"
+    },
+    "order": 3,
+    "thumbnail": "/videos/thumbnails/tickets-attractions.png",
+    "video": "/videos/tickets-attractions.mp4",
+    "translationKey": "ticketsAttractions"
+  },
+  {
+    "index": 4,
+    "id": "4",
+    "slug": "bus-excursions",
+    "title": {
+      "en": "Bus Excursions",
+      "es": "Excursiones en autobús",
+      "fr": "Excursions en bus"
+    },
+    "description": {
+      "en": "Guided bus tours around the island",
+      "es": "Tours guiados en autobús por la isla",
+      "fr": "Visites guidées en bus autour de l'île"
+    },
+    "tagline": {
+      "en": "Discover the island in comfort and style"
+    },
+    "order": 4,
+    "thumbnail": "/videos/thumbnails/bus-excursions.png",
+    "video": "/videos/bus-excursions.mp4",
+    "translationKey": "busExcursions"
+  },
+  {
+    "index": 5,
+    "id": "5",
+    "slug": "boat-trips-cruises",
+    "title": {
+      "en": "Boat Trips & Cruises",
+      "es": "Viajes en barco y cruceros",
+      "fr": "Voyages en bateau et croisières"
+    },
+    "description": {
+      "en": "Ocean adventures and cruises",
+      "es": "Aventuras oceánicas y cruceros",
+      "fr": "Aventures océaniques et croisières"
+    },
+    "tagline": {
+      "en": "Set sail for unforgettable ocean moments"
+    },
+    "order": 5,
+    "thumbnail": "/videos/thumbnails/boat-trips-cruises.png",
+    "video": "/videos/boat-trips-cruises.mp4",
+    "translationKey": "boatTripsCruises"
+  },
+  {
+    "index": 6,
+    "id": "6",
+    "slug": "shows-entertainment",
+    "title": {
+      "en": "Shows & Entertainment",
+      "es": "Espectáculos y entretenimiento",
+      "fr": "Spectacles et divertissements"
+    },
+    "description": {
+      "en": "Live shows and evening entertainment",
+      "es": "Espectáculos en vivo y entretenimiento nocturno",
+      "fr": "Spectacles en direct et divertissements du soir"
+    },
+    "tagline": {
+      "en": "Evenings filled with world-class performances"
+    },
+    "order": 6,
+    "thumbnail": "/videos/thumbnails/shows-entertainment.png",
+    "video": "/videos/shows-entertainment.mp4",
+    "translationKey": "showsEntertainment"
+  },
+  {
+    "index": 7,
+    "id": "7",
+    "slug": "water-sports",
+    "title": {
+      "en": "Water Sports",
+      "es": "Deportes acuáticos",
+      "fr": "Sports nautiques"
+    },
+    "description": {
+      "en": "Aquatic activities and water fun",
+      "es": "Actividades acuáticas y diversión acuática",
+      "fr": "Activités aquatiques et plaisir aquatique"
+    },
+    "tagline": {
+      "en": "Dive into thrilling aquatic adventures"
+    },
+    "order": 7,
+    "thumbnail": "/videos/thumbnails/water-sports.png",
+    "video": "/videos/water-sports.mp4",
+    "translationKey": "waterSports"
+  },
+  {
+    "index": 8,
+    "id": "8",
+    "slug": "cable-car-observatory",
+    "title": {
+      "en": "Cable Car & Observatory",
+      "es": "Teleférico y observatorio",
+      "fr": "Téléphérique et observatoire"
+    },
+    "description": {
+      "en": "Mountain views and stargazing",
+      "es": "Vistas de montaña y observación de estrellas",
+      "fr": "Vues sur la montagne et observation des étoiles"
+    },
+    "tagline": {
+      "en": "Reach new heights and gaze at the stars"
+    },
+    "order": 8,
+    "thumbnail": "/videos/thumbnails/cable-car-observatory.png",
+    "video": "/videos/cable-car-observatory.mp4",
+    "translationKey": "cableCarObservatory"
+  },
+  {
+    "index": 9,
+    "id": "9",
+    "slug": "diving-fishing",
+    "title": {
+      "en": "Diving & Fishing",
+      "es": "Buceo y pesca",
+      "fr": "Plongée et pêche"
+    },
+    "description": {
+      "en": "Underwater adventures and fishing trips",
+      "es": "Aventuras submarinas y viajes de pesca",
+      "fr": "Aventures sous-marines et sorties de pêche"
+    },
+    "tagline": {
+      "en": "Explore the depths or cast your line"
+    },
+    "order": 9,
+    "thumbnail": "/videos/thumbnails/diving-fishing.png",
+    "video": "/videos/diving-fishing.mp4",
+    "translationKey": "divingFishing"
+  },
+  {
+    "index": 10,
+    "id": "10",
+    "slug": "adventure-nature",
+    "title": {
+      "en": "Adventure & Nature",
+      "es": "Aventura y naturaleza",
+      "fr": "Aventure et nature"
+    },
+    "description": {
+      "en": "Outdoor adventures and nature experiences",
+      "es": "Aventuras al aire libre y experiencias naturales",
+      "fr": "Aventures en plein air et expériences nature"
+    },
+    "tagline": {
+      "en": "Connect with Tenerife's wild side"
+    },
+    "order": 10,
+    "thumbnail": "/videos/thumbnails/adventure-nature.png",
+    "video": "/videos/adventure-nature.mp4",
+    "translationKey": "adventureNature"
+  },
+  {
+    "index": 11,
+    "id": "11",
+    "slug": "gastronomy-tastings",
+    "title": {
+      "en": "Gastronomy & Tastings",
+      "es": "Gastronomía y degustaciones",
+      "fr": "Gastronomie et dégustations"
+    },
+    "description": {
+      "en": "Culinary experiences and tastings",
+      "es": "Experiencias culinarias y degustaciones",
+      "fr": "Expériences culinaires et dégustations"
+    },
+    "tagline": {
+      "en": "Savor the authentic flavors of the Canaries"
+    },
+    "order": 11,
+    "thumbnail": "/videos/thumbnails/gastronomy-tastings.png",
+    "video": "/videos/gastronomy-tastings.mp4",
+    "translationKey": "gastronomyTastings"
+  },
+  {
+    "index": 12,
+    "id": "12",
+    "slug": "car-rental",
+    "title": {
+      "en": "Car Rental",
+      "es": "Alquiler de coche",
+      "fr": "Location de voiture"
+    },
+    "description": {
+      "en": "Vehicle rental services",
+      "es": "Servicios de alquiler de vehículos",
+      "fr": "Servicios de location de véhicules"
+    },
+    "tagline": {
+      "en": "Freedom to explore at your own pace"
+    },
+    "order": 12,
+    "thumbnail": "/videos/thumbnails/car-rental.png",
+    "video": "/videos/car-rental.mp4",
+    "translationKey": "carRental"
+  },
+  {
+    "index": 13,
+    "id": "13",
+    "slug": "bike-rental",
+    "title": {
+      "en": "Bike Rental",
+      "es": "Alquiler de bicicleta",
+      "fr": "Location de vélo"
+    },
+    "description": {
+      "en": "Bicycle rental services",
+      "es": "Servicios de alquiler de bicicletas",
+      "fr": "Servicios de location de vélos"
+    },
+    "tagline": {
+      "en": "Pedal through scenic routes"
+    },
+    "order": 13,
+    "thumbnail": "/videos/thumbnails/bike-rental.png",
+    "video": "/videos/bike-rental.mp4",
+    "translationKey": "bikeRental"
+  },
+  {
+    "index": 14,
+    "id": "14",
+    "slug": "transfers-transport",
+    "title": {
+      "en": "Transfers & Transport",
+      "es": "Traslados y transporte privado",
+      "fr": "Transferts et transport privé"
+    },
+    "description": {
+      "en": "Airport transfers and transport services",
+      "es": "Traslados al aeropuerto y servicios de transporte",
+      "fr": "Transferts aéroport et services de transport"
+    },
+    "tagline": {
+      "en": "Seamless journeys from start to finish"
+    },
+    "order": 14,
+    "thumbnail": "/videos/thumbnails/transfers-transport.png",
+    "video": "/videos/transfers-transport.mp4",
+    "translationKey": "transfersTransport"
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
