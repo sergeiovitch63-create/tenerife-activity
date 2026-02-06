@@ -547,8 +547,6 @@ export function ActivityDetailClient({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Image */}
-      {/* Hero image - SafeImage handles fallback automatically */}
       <div className="relative w-full h-96 bg-ocean-600">
         <SafeImage
           src={heroImageUrl || item.image || undefined}
@@ -884,7 +882,8 @@ export function ActivityDetailClient({
                 )}
                 </>
               )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Booking Sidebar */}
