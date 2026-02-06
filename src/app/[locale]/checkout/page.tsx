@@ -270,8 +270,23 @@ export default function CheckoutPage() {
     }
 
     // Check for availability issues - disable Pay if any item is unavailable
-    const hasUnavailableItems = revalidatedItems.some(item => !item.available)
-    if (hasAvailabilityIssues || hasUnavailableItems) {
+    // EXCEPT for wdays_only mode and calendarMode === 'none' (on-request booking)
+    const hasUnavailableItems = revalidatedItems.some(item => {
+      // Allow calendarMode === 'none': on-request booking, no availability check needed
+      if (item.calendarMode === 'none') {
+        return false
+      }
+      // Allow wdays_only items: if item has valid sesTime (not "00:00") but availabilityReason is set,
+      // it's likely wdays_only mode where availability is "to confirm"
+      if (item.sesTime && item.sesTime !== '00:00' && item.availabilityReason) {
+        // wdays_only mode - allow payment (availability to confirm)
+        return false
+      }
+      return !item.available
+    })
+    
+    // Block only if not wdays_only and has availability issues
+    if (hasAvailabilityIssues && hasUnavailableItems) {
       alert(t('availabilityIssueDesc') + ' Please select an available time above.')
       return
     }
@@ -302,22 +317,78 @@ export default function CheckoutPage() {
         console.log('[CHECKOUT] locale:', locale, '-> atlanticoLanguage:', atlanticoLanguage)
       }
 
-      // Ensure sesTime defaults to "00:00" if missing or empty
-      const sesTime = item.sesTime && item.sesTime !== '' ? item.sesTime : '00:00'
+      // Step 0: Reload limits to get current calendarMode and requiresSessionTime (source of truth)
+      let calendarMode: 'sessions' | 'dates' | 'wdays_only' | 'none' = item.calendarMode || 'sessions'
+      let requiresSessionTime: boolean = true // Default to true for backward compatibility
+      
+      // Only fetch limits if we have a tourDate (for calendarMode === 'none', we don't need it)
+      if (item.tourDate) {
+        try {
+          const monthStart = item.tourDate.substring(0, 7) + '-01'
+          const limitsResponse = await fetch(`/api/atlantico/limits?eventId=${item.t_id}&lang=${atlanticoLanguage}&month=${monthStart}`)
+          if (limitsResponse.ok) {
+            const limitsData = await limitsResponse.json()
+            if (limitsData.ok) {
+              if (limitsData.calendarMode) {
+                calendarMode = limitsData.calendarMode
+              }
+              if (limitsData.requiresSessionTime !== undefined) {
+                requiresSessionTime = limitsData.requiresSessionTime
+              }
+              if (process.env.NODE_ENV === 'development') {
+                console.log('[CHECKOUT] Loaded limits:', {
+                  calendarMode,
+                  requiresSessionTime,
+                  eventId: item.t_id,
+                })
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('[CHECKOUT] Failed to load limits, using defaults:', error)
+        }
+      }
 
-      // Build payment payload
-      // Note: userId will be set by server from ATLANTICO_USER_ID env var
-      const payload = {
+      // Determine sesTime and tourDate based on calendarMode
+      let sesTime: string | null = null
+      let tourDate: string | null = null
+      
+      if (calendarMode === 'none') {
+        // For calendarMode === 'none': send null (on-request booking)
+        sesTime = null
+        tourDate = null
+      } else if (requiresSessionTime === false) {
+        // If requiresSessionTime === false => omit sesTime entirely (do NOT send "00:00")
+        sesTime = null
+        tourDate = item.tourDate
+      } else {
+        // If requiresSessionTime === true => set sesTime = selectedTime (from sessionsByDay). Never "00:00".
+        tourDate = item.tourDate
+        sesTime = item.sesTime && item.sesTime !== '' && item.sesTime !== '00:00' ? item.sesTime : null
+        
+        // If still null but requiresSessionTime is true, this is an error
+        if (!sesTime) {
+          throw new Error('Session time is required but not available for this date')
+        }
+      }
+
+      // Block payment if sesTime is "00:00" - must have valid time or be omitted
+      if (sesTime === '00:00') {
+        alert('Please select a valid time')
+        setProcessing(false)
+        return
+      }
+
+      // Build payment payload (same shape as /booking/confirm, but sent directly to /payment/)
+      const paymentPayload = {
         t_id: item.t_id,
         t_group: item.t_group,
         language: atlanticoLanguage,
-        tourDate: item.tourDate,
-        sesTime: sesTime,
+        tourDate: tourDate, // null for calendarMode === 'none'
+        sesTime: sesTime, // null for calendarMode === 'none'
         adults: item.adults,
         childs: item.childs,
         infants: item.infants,
-        currency: item.currency,
-        originalPriceSnapshot: finalPriceSnapshot, // Send original price for revalidation
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -328,81 +399,47 @@ export default function CheckoutPage() {
         ...(notes.trim() && { notes: notes.trim() }),
       }
 
-      const response = await fetch('/api/atlantico/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      // Submit payment via native HTML form to avoid CORS issues
+      // Browser will navigate to the payment gateway HTML page
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/api/atlantico/booking/payment'
+      form.style.display = 'none'
+
+      // Add all payload fields as hidden inputs
+      Object.entries(paymentPayload).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = String(value)
+          form.appendChild(input)
+        }
       })
 
-      const data = await response.json()
-
-      // Handle 409 (revalidation errors)
-      if (response.status === 409) {
-        if (data.code === 'PRICE_CHANGED') {
-          // Price changed - show new price and ask for confirmation
-          const newPrice = data.newPrice || total
-          const priceDiff = newPrice - total
-          const confirmed = window.confirm(
-            `Price has changed.\n\nOriginal: ${total.toFixed(2)} ${currency}\nNew: ${newPrice.toFixed(2)} ${currency}\nDifference: ${priceDiff > 0 ? '+' : ''}${priceDiff.toFixed(2)} ${currency}\n\nDo you want to continue with the new price?`
-          )
-          if (confirmed) {
-            // Recalculate price snapshot with new prices
-            const prices = await fetch(`/api/atlantico/prices/${item.t_id}?date=${item.tourDate}`)
-              .then(r => r.json())
-              .catch(() => null)
-            
-            const newPriceSnapshot = prices ? {
-              adult: prices.adult || 0,
-              child: prices.child || 0,
-              infant: prices.infant || 0,
-              total: newPrice,
-            } : {
-              ...item.priceSnapshot,
-              total: newPrice,
-            }
-            
-            // Update cart with new price and retry
-            updateItem(item.itemKey, {
-              priceSnapshot: newPriceSnapshot,
-            })
-            // Retry payment
-            handleSubmit(e)
-            return
-          } else {
-            setProcessing(false)
-            return
-          }
-        } else if (data.code === 'SLOT_UNAVAILABLE') {
-          // Slot unavailable - redirect to cart to reselect
-          alert(data.message || t('availabilityIssueDesc'))
-          router.push('/cart')
-          setProcessing(false)
-          return
-        }
-      }
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || t('errors.paymentFailed'))
-      }
-
-      // Handle redirect URL (redirect to Atlantico payment gateway)
-      if (data.redirectUrl) {
-        window.location.assign(data.redirectUrl)
-        return
-      }
-
-      // Handle HTML response (form auto-submit)
-      if (data.html) {
-        // Store HTML in sessionStorage and redirect to processing page
-        sessionStorage.setItem('ATLANTICO_PAYMENT_HTML', data.html)
-        router.push('/checkout/processing')
-        return
-      }
-
-      throw new Error('No redirect URL or HTML received')
+      // Append form to body and submit
+      document.body.appendChild(form)
+      form.submit()
+      
+      // Note: Form submission will navigate the browser to the payment gateway
+      // No need to handle response here - browser handles HTML rendering automatically
+      return
     } catch (error) {
       console.error('[CHECKOUT] Payment error:', error)
-      const errorMessage = error instanceof Error ? error.message : t('errors.paymentFailed')
+      let errorMessage = error instanceof Error ? error.message : t('errors.paymentFailed')
+      
+      // Improve error message for MISSING_ATLANTICO_USER_ID
+      if (errorMessage.includes('MISSING_ATLANTICO_USER_ID')) {
+        errorMessage = 'Server configuration error: ATLANTICO_USER_ID is missing. Please contact support.'
+      }
+      
+      // DEV: Show raw error details in console
+      if (process.env.NODE_ENV === 'development' && error instanceof Error) {
+        console.error('[CHECKOUT] Error details:', {
+          message: error.message,
+          stack: error.stack,
+        })
+      }
       
       // Show real error message - no generic messages
       alert(errorMessage)
@@ -654,7 +691,7 @@ export default function CheckoutPage() {
               {revalidatedItems
                 .filter(item => !item.available && item.availableTimes && item.availableTimes.length > 0)
                 .map((item) => {
-                  const currentRecoveryTime = selectedRecoveryTimes[item.itemKey] || item.sesTime
+                  const currentRecoveryTime = selectedRecoveryTimes[item.itemKey] || item.sesTime || ''
                   
                   return (
                     <div key={item.itemKey} className="bg-white border border-red-300 rounded-lg p-4">
@@ -664,7 +701,7 @@ export default function CheckoutPage() {
                       
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-red-800">
-                          Select a new time for {item.tourDate}:
+                          Select a new time for {item.tourDate || 'selected date'}:
                         </label>
                         <select
                           value={currentRecoveryTime}

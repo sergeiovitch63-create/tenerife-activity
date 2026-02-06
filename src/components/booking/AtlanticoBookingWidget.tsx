@@ -620,30 +620,30 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
     errorMessage: null,
   })
 
-  // Helper function to fetch dates from loadLimits endpoint for a single month
+  // Helper function to fetch dates from limits endpoint for a single month
   const fetchLoadLimitsForMonth = async (monthStart: string): Promise<{ success: boolean; data?: any; error?: string }> => {
     if (!idExc) {
       return { success: false, error: 'No idExc available for this activity' }
     }
 
     // Check cache
-    const cacheKey = `loadLimits:${idExc}:${calendarLang}:${monthStart}`
+    const cacheKey = `limits:${idExc}:${calendarLang}:${monthStart}`
     if (availabilityCache.has(cacheKey)) {
       const cached = availabilityCache.get(cacheKey)
       if (process.env.NODE_ENV === 'development') {
-        console.log('[BOOKING_WIDGET] Using cached loadLimits:', { cacheKey, nbDates: cached?.dates?.length || 0 })
+        console.log('[BOOKING_WIDGET] Using cached limits:', { cacheKey, nbDates: cached?.availableDates?.length || 0 })
       }
       return { success: true, data: cached }
     }
 
-    const fetchUrl = `/api/atlantico/loadLimits/${idExc}/${calendarLang}?date=${monthStart}`
+    const fetchUrl = `/api/atlantico/limits?eventId=${encodeURIComponent(idExc)}&lang=${encodeURIComponent(calendarLang)}&month=${encodeURIComponent(monthStart)}`
     
     // DEV log
     if (process.env.NODE_ENV === 'development') {
-      console.log('[BOOKING_WIDGET] Fetching loadLimits:', {
+      console.log('[BOOKING_WIDGET] Fetching limits:', {
         idExc,
         lang: calendarLang,
-        date: monthStart,
+        month: monthStart,
         url: fetchUrl,
       })
     }
@@ -660,32 +660,43 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
       
       // DEV log response structure
       if (process.env.NODE_ENV === 'development') {
-        console.log('[BOOKING_WIDGET] loadLimits response:', {
+        console.log('[BOOKING_WIDGET] limits response:', {
           idExc,
           lang: calendarLang,
-          dateUsed: data.dateUsed,
-          nbDates: data.dates?.length || 0,
+          monthStart: data.monthStart,
+          nbDates: data.availableDates?.length || 0,
           ok: data.ok,
-          sampleDates: data.dates?.slice(0, 5) || [],
+          sampleDates: data.availableDates?.slice(0, 5) || [],
         })
       }
       
       if (data.ok === false) {
-        throw new Error(data.message || 'Failed to fetch loadLimits')
+        throw new Error(data.message || data.error || 'Failed to fetch limits')
+      }
+
+      // Transform response to match expected format (sessionsByDate instead of sessionsByDay)
+      const transformedData = {
+        ok: true,
+        idExc,
+        lang: calendarLang,
+        dateUsed: monthStart,
+        dates: data.availableDates || [],
+        sessionsByDate: data.sessionsByDay || {},
+        raw: data,
       }
 
       // Cache the result
       setAvailabilityCache((prev) => {
         const next = new Map(prev)
-        next.set(cacheKey, data)
+        next.set(cacheKey, transformedData)
         return next
       })
 
-      return { success: true, data }
+      return { success: true, data: transformedData }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to load limits'
       if (process.env.NODE_ENV === 'development') {
-        console.error('[BOOKING_WIDGET] loadLimits fetch error:', {
+        console.error('[BOOKING_WIDGET] limits fetch error:', {
           idExc,
           lang: calendarLang,
           monthStart,
@@ -1196,6 +1207,32 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
     ? availability.sessionsByDate[selectedDate] || []
     : []
 
+  // Auto-select first available time when date is selected
+  useEffect(() => {
+    if (selectedDate && sessionsForDate.length > 0) {
+      // Get unique valid times: non-empty, != "00:00", sorted
+      const validTimes = Array.from(new Set(
+        sessionsForDate
+          .map((s: any) => s.time)
+          .filter((t: string) => t && t !== '' && t !== '00:00' && t !== '-')
+      )).sort()
+
+      if (validTimes.length > 0) {
+        // Select earliest time
+        const earliestTime = validTimes[0]
+        if (selectedTime !== earliestTime) {
+          setSelectedTime(earliestTime)
+        }
+      } else {
+        // No valid times found - clear selection
+        setSelectedTime('')
+      }
+    } else {
+      // No date selected or no sessions - clear selection
+      setSelectedTime('')
+    }
+  }, [selectedDate, sessionsForDate])
+
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
   }
@@ -1603,42 +1640,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
         {/* The "Your Information" form (Name, Email, Phone) will be shown later at checkout/confirmation step, not on the activity page */}
         {/* This ensures consistency with other VIP activities like Gomera VIP Tour */}
         
-        {/* Time selector - only show if date selected and sessions available */}
-        {selectedDate && sessionsForDate.length > 0 && (() => {
-          const validSessions = sessionsForDate.filter((s: any) => 
-            s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
-          )
-          
-          if (validSessions.length === 0) {
-            return null // No valid sessions, no selector needed
-          }
-
-          return (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-glass-900 mb-3">Select a Time</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {validSessions.map((session: any) => (
-                  <button
-                    key={session.time}
-                    onClick={() => setSelectedTime(session.time)}
-                    className={`px-4 py-2 rounded border text-sm ${
-                      selectedTime === session.time
-                        ? 'bg-ocean-600 text-white border-ocean-600'
-                        : 'bg-white border-glass-200 hover:border-ocean-300'
-                    }`}
-                  >
-                    {session.time}
-                    {session.available !== undefined && (
-                      <span className="ml-2 text-xs opacity-75">
-                        ({session.available} left)
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )
-        })()}
+        {/* Time selector - HIDDEN: time is automatically selected */}
 
         {/* Customer Info Form (required for payment) - For non-VIP activities */}
         {!isVipActivity(slug) && selectedDate && (
@@ -1800,19 +1802,35 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
                   const t_group = getTGroup()
                   const language = calendarLang.toUpperCase()
                   
-                  // Extract sesTime from sessions - use selectedTime if available, otherwise '00:00' only if no sessions
+                  // Extract sesTime from sessions - automatically select earliest time
                   const validSessions = sessionsForDate.filter((s: any) => 
                     s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
                   )
-                  const sesTime = validSessions.length > 0 
-                    ? (selectedTime || validSessions[0].time)
-                    : '00:00'
                   
-                  if (validSessions.length > 0 && !selectedTime) {
-                    setBookingError('Please select a time')
+                  // Get unique valid times, sorted
+                  const validTimes = Array.from(new Set(
+                    validSessions.map((s: any) => s.time).filter((t: string) => t && t !== '' && t !== '00:00' && t !== '-')
+                  )).sort()
+                  
+                  // CRITICAL: Never send '00:00' - block booking if no valid time
+                  if (validTimes.length === 0) {
+                    setBookingError('No times available for this date')
                     setIsBooking(false)
+                    
+                    // DEV log for debugging
+                    if (process.env.NODE_ENV === 'development') {
+                      console.warn('[BOOKING] No times available - booking blocked:', {
+                        eventId: t_id,
+                        date: selectedDate,
+                        sessionsCount: sessionsForDate.length,
+                        sampleSessions: sessionsForDate.slice(0, 3),
+                        sessionsByDayKeys: Object.keys(availability?.sessionsByDate || {}),
+                      })
+                    }
                     return
                   }
+                  
+                  const sesTime = validTimes[0] // Use earliest time
                   
                   // DEV log
                   if (process.env.NODE_ENV === 'development') {
@@ -1918,23 +1936,57 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
               const userId = getUserId()
               const language = calendarLang.toUpperCase()
               
-              // Extract sesTime from sessions - use selectedTime if available, otherwise '00:00' only if no sessions
+              // Extract sesTime from sessions - automatically select earliest time
               const validSessions = sessionsForDate.filter((s: any) => 
                 s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
               )
-              const sesTime = validSessions.length > 0 
-                ? (selectedTime || validSessions[0].time)
-                : '00:00'
               
-              if (validSessions.length > 0 && !selectedTime) {
-                setBookingError('Please select a time')
+              // Get unique valid times, sorted
+              const validTimes = Array.from(new Set(
+                validSessions.map((s: any) => s.time).filter((t: string) => t && t !== '' && t !== '00:00' && t !== '-')
+              )).sort()
+              
+              // CRITICAL: Never send '00:00' - block booking if no valid time
+              if (validTimes.length === 0) {
+                setBookingError('No times available for this date')
                 setIsBooking(false)
+                
+                // DEV log for debugging
+                if (process.env.NODE_ENV === 'development') {
+                  console.warn('[BOOKING] No times available - booking blocked:', {
+                    eventId: t_id,
+                    date: selectedDate,
+                    sessionsCount: sessionsForDate.length,
+                    sampleSessions: sessionsForDate.slice(0, 3),
+                    sessionsByDayKeys: Object.keys(availability?.sessionsByDate || {}),
+                  })
+                }
                 return
               }
+              
+              const sesTime = validTimes[0] // Use earliest time
               
               // Warning if userId is placeholder in DEV
               if (process.env.NODE_ENV === 'development' && userId === '0') {
                 console.warn('[BOOKING] Using placeholder userId "0" - payment may fail. Set ATLANTICO_USER_ID env var.')
+              }
+              
+              // CRITICAL: sesTime must be set from validTimes above, never '00:00'
+              // If we reach here, sesTime should already be validated
+              if (!sesTime || sesTime === '00:00') {
+                setBookingError('No times available for this date')
+                setIsBooking(false)
+                
+                if (process.env.NODE_ENV === 'development') {
+                  console.warn('[BOOKING] Payment blocked - no valid sesTime:', {
+                    eventId: t_id,
+                    date: selectedDate,
+                    sesTime,
+                    sessionsCount: sessionsForDate.length,
+                    sampleSessions: sessionsForDate.slice(0, 3),
+                  })
+                }
+                return
               }
               
               // DEV log
@@ -1945,7 +1997,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
                   userId,
                   language,
                   tourDate: selectedDate,
-                  sesTime: '00:00',
+                  sesTime,
                   adults: pax.adults,
                   childs: pax.children,
                   infants: pax.infants,
@@ -1962,7 +2014,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
               formData.append('t_group', t_group)
               formData.append('language', language)
               formData.append('tourDate', selectedDate!)
-              formData.append('sesTime', '00:00')
+              formData.append('sesTime', sesTime)
               formData.append('adults', String(pax.adults))
               formData.append('childs', String(pax.children || 0))
               formData.append('infants', String(pax.infants || 0))

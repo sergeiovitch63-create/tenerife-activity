@@ -182,3 +182,6 @@ UI Components (BookingWidget, ActivityDetailClient, CalendarWidget)
 
 **Fin du document**
 
+
+
+

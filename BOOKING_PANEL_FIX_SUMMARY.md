@@ -134,3 +134,6 @@ If other pages (catalog, vibe) need the same booking panel:
 
 
 
+
+
+

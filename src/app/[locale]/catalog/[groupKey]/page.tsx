@@ -383,6 +383,7 @@ export default function CatalogDetailPage() {
                 groupDetails={details}
                 lang={lang}
                 locale={locale}
+                activityName={title}
               />
             </div>
           </div>

@@ -18,8 +18,8 @@ interface AddToCartButtonProps {
   t_group: string
   t_id: string
   language: string
-  tourDate: string
-  sesTime: string // HH:mm or "00:00"
+  tourDate: string | null // YYYY-MM-DD or null for calendarMode === 'none'
+  sesTime: string | null // HH:mm or null for calendarMode === 'none'
   adults: number
   childs?: number
   infants?: number

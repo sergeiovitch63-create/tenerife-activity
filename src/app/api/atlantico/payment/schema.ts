@@ -20,8 +20,8 @@ export interface PaymentRequest {
   t_group: string
   t_id: string
   language: string
-  tourDate: string // YYYY-MM-DD
-  sesTime: string // HH:mm
+  tourDate: string | null // YYYY-MM-DD or null for calendarMode === 'none'
+  sesTime: string | null // HH:mm or null for calendarMode === 'none'
   adults: number
   childs?: number
   infants?: number
@@ -64,12 +64,13 @@ export function validatePaymentRequest(data: any): { valid: boolean; errors?: Va
   if (!data.language || typeof data.language !== 'string' || data.language.trim() === '') {
     errors.push({ field: 'language', message: 'language is required' })
   }
-  if (!data.tourDate || !/^\d{4}-\d{2}-\d{2}$/.test(data.tourDate)) {
-    errors.push({ field: 'tourDate', message: 'tourDate must be YYYY-MM-DD' })
+  // tourDate can be null for calendarMode === 'none' (on-request booking)
+  if (data.tourDate !== null && (!data.tourDate || !/^\d{4}-\d{2}-\d{2}$/.test(data.tourDate))) {
+    errors.push({ field: 'tourDate', message: 'tourDate must be YYYY-MM-DD or null' })
   }
-  // sesTime is optional - defaults to "00:00" if missing
-  if (data.sesTime && !/^\d{2}:\d{2}$/.test(data.sesTime)) {
-    errors.push({ field: 'sesTime', message: 'sesTime must be HH:mm format' })
+  // sesTime can be null for calendarMode === 'none' (on-request booking)
+  if (data.sesTime !== null && data.sesTime && !/^\d{2}:\d{2}$/.test(data.sesTime)) {
+    errors.push({ field: 'sesTime', message: 'sesTime must be HH:mm format or null' })
   }
   if (typeof data.adults !== 'number' || data.adults < 1) {
     errors.push({ field: 'adults', message: 'adults must be >= 1' })

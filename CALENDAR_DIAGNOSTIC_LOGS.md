@@ -314,3 +314,6 @@ sessionsByDay[ymd] = sessions  // Stocke avec clé YYYY-MM-DD
 
 **Fin du document**
 
+
+
+

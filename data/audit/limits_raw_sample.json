@@ -1,0 +1,632 @@
+[
+  {
+    "eventId": "1686",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1686",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "993",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "993",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "992",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "992",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "992",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "992",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1686",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1686",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "993",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "993",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1687",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1687",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1831",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1831",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1832",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1832",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1687",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1687",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1832",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1832",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "1831",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "1831",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2693",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2693",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2695",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2695",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2694",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2694",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2693",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2693",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2694",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2694",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2695",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2695",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          0,
+          0,
+          0,
+          5,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2720",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2720",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2716",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2716",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2719",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2719",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2720",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2720",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2719",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2719",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2716",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2716",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2721",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2721",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2723",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2723",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2722",
+    "month": "2026-01-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2722",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2721",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2721",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2722",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2722",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  },
+  {
+    "eventId": "2723",
+    "month": "2026-02-01",
+    "httpStatus": 200,
+    "rawResponseOrError": {
+      "id": "2723",
+      "code": 0,
+      "quote": -1,
+      "dates": {
+        "wdays": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    }
+  }
+]

@@ -36,8 +36,8 @@ interface BookingReadinessState {
 function getBookingReadinessState(
   t_group: string | null,
   selectedEventId: string | null,
-  tourDate: string,
-  sesTime: string,
+  tourDate: string | null,
+  sesTime: string | null,
   hasSessions: boolean,
   adults: number,
   childs: number,

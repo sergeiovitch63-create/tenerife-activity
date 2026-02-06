@@ -18,8 +18,9 @@ export interface CartItem {
   
   // Language and date/time
   language: string // Language code (e.g., 'ENG', 'ESP')
-  tourDate: string // YYYY-MM-DD format
-  sesTime: string // HH:mm format or "00:00" if no session (obligatoire si sessions existent)
+  tourDate: string | null // YYYY-MM-DD format or null for calendarMode === 'none'
+  sesTime: string | null // HH:mm format or null for calendarMode === 'none'
+  calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none' // Calendar mode from limits
   
   // Session identifiers (from loadLimits.sessionsByDate)
   sessionId?: string // Session identifier from Atlantico API
@@ -52,9 +53,12 @@ export interface CartItem {
 
 /**
  * Generate a unique key for a cart item
+ * Handles null tourDate/sesTime for calendarMode === 'none'
  */
 export function generateCartItemKey(item: Pick<CartItem, 't_group' | 't_id' | 'tourDate' | 'sesTime'>): string {
-  return `${item.t_group}-${item.t_id}-${item.tourDate}-${item.sesTime}`
+  const tourDate = item.tourDate ?? 'null'
+  const sesTime = item.sesTime ?? 'null'
+  return `${item.t_group}-${item.t_id}-${tourDate}-${sesTime}`
 }
 
 /**

@@ -21,7 +21,9 @@
     "smoke:atlantico": "node scripts/smoke-atlantico.mjs",
     "sniff:gomera": "tsx scripts/sniff-atlantico-gomera.ts",
     "test:gomera-dump": "tsx scripts/test-gomera-limits-dump.ts",
-    "atl:limits:probe": "tsx scripts/probe-limits.ts"
+    "atl:limits:probe": "tsx scripts/probe-limits.ts",
+    "audit:limits": "tsx scripts/audit-atlantico-limits.ts",
+    "audit2:dump": "tsx scripts/audit2-dump-raw.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",

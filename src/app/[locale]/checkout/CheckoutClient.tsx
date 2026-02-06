@@ -140,10 +140,16 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
       return
     }
 
+    // CRITICAL: Validate sesTime before proceeding
+    const item = validItems[0]
+    if (!item.sesTime || item.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(item.sesTime)) {
+      alert(t('errors.invalidTime') || 'No valid time available for this booking. Please remove this item and select a different date.')
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      const item = validItems[0]
       const priceSnapshot = revalidationResult?.items[0]?.newPriceSnapshot || item.priceSnapshot
 
       // Build payment payload

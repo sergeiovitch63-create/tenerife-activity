@@ -1,0 +1,1583 @@
+[
+  {
+    "eventId": "993",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Diamond Tour Resident"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Diamond Tour Resident"
+      }
+    ]
+  },
+  {
+    "eventId": "992",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Diamond Tour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Diamond Tour"
+      }
+    ]
+  },
+  {
+    "eventId": "1686",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "VIP - Private Tour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "VIP - Private Tour"
+      }
+    ]
+  },
+  {
+    "eventId": "1831",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide de Noche VIP"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide de Noche VIP"
+      }
+    ]
+  },
+  {
+    "eventId": "1687",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "VIP - Private Tour (Extra person)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "VIP - Private Tour (Extra person)"
+      }
+    ]
+  },
+  {
+    "eventId": "1832",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide de Noche VIP"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide de Noche VIP"
+      }
+    ]
+  },
+  {
+    "eventId": "2693",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona sur"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona sur"
+      }
+    ]
+  },
+  {
+    "eventId": "2695",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona Santa Cruz y Candelaria"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona Santa Cruz y Candelaria"
+      }
+    ]
+  },
+  {
+    "eventId": "2694",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona norte"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "desde zona norte"
+      }
+    ]
+  },
+  {
+    "eventId": "2720",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "30 minutos"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "30 minutos"
+      }
+    ]
+  },
+  {
+    "eventId": "2716",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual"
+      }
+    ]
+  },
+  {
+    "eventId": "2719",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Doble"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Doble"
+      }
+    ]
+  },
+  {
+    "eventId": "2721",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "1 hora"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "1 hora"
+      }
+    ]
+  },
+  {
+    "eventId": "2723",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Básico"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Básico"
+      }
+    ]
+  },
+  {
+    "eventId": "2722",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "20 minutos"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "20 minutos"
+      }
+    ]
+  },
+  {
+    "eventId": "2733",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual - 1 hour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual - 1 hour"
+      }
+    ]
+  },
+  {
+    "eventId": "2734",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Double - 1 hour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Double - 1 hour"
+      }
+    ]
+  },
+  {
+    "eventId": "2735",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual - 2 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Individual - 2 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2738",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide 3 Hours – Double"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide 3 Hours – Double"
+      }
+    ]
+  },
+  {
+    "eventId": "2737",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide 3 Hours - Individual"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide 3 Hours - Individual"
+      }
+    ]
+  },
+  {
+    "eventId": "2736",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Double - 2 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Double - 2 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2741",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Desde Playa Paraíso y Los Gigantes"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Desde Playa Paraíso y Los Gigantes"
+      }
+    ]
+  },
+  {
+    "eventId": "2739",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Sunset 3 Hours - Individual"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Sunset 3 Hours - Individual"
+      }
+    ]
+  },
+  {
+    "eventId": "2740",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Sunset 3 Hours – Double"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Sunset 3 Hours – Double"
+      }
+    ]
+  },
+  {
+    "eventId": "2747",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the South "
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the South "
+      }
+    ]
+  },
+  {
+    "eventId": "2748",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the South area"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the South area"
+      }
+    ]
+  },
+  {
+    "eventId": "2749",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the North area"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 66,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "From the North area"
+      }
+    ]
+  },
+  {
+    "eventId": "2754",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide in the Morning - Individual"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide in the Morning - Individual"
+      }
+    ]
+  },
+  {
+    "eventId": "2756",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide in the Morning - Double"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Teide in the Morning - Double"
+      }
+    ]
+  },
+  {
+    "eventId": "2755",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Puerto de la Cruz through the La Orotava Valley with Off-Road Adventure - Individual"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Puerto de la Cruz through the La Orotava Valley with Off-Road Adventure - Individual"
+      }
+    ]
+  },
+  {
+    "eventId": "2772",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour for 5 people"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour for 5 people"
+      }
+    ]
+  },
+  {
+    "eventId": "2773",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra hour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra hour"
+      }
+    ]
+  },
+  {
+    "eventId": "2757",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Puerto de la Cruz through the La Orotava Valley with Off-Road Adventure - Double"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Puerto de la Cruz through the La Orotava Valley with Off-Road Adventure - Double"
+      }
+    ]
+  },
+  {
+    "eventId": "2776",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Fishing Excursion (3 hours)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Fishing Excursion (3 hours)"
+      }
+    ]
+  },
+  {
+    "eventId": "2774",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra person (up to 5 people)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra person (up to 5 people)"
+      }
+    ]
+  },
+  {
+    "eventId": "2777",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Fishing Excursion (6 hours)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Fishing Excursion (6 hours)"
+      }
+    ]
+  },
+  {
+    "eventId": "2780",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra Hour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Extra Hour"
+      }
+    ]
+  },
+  {
+    "eventId": "2778",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Leisure Excursion (3 hours)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Leisure Excursion (3 hours)"
+      }
+    ]
+  },
+  {
+    "eventId": "2779",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Leisure Excursion (6 hours)"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Leisure Excursion (6 hours)"
+      }
+    ]
+  },
+  {
+    "eventId": "2783",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Buceo con licencia"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Buceo con licencia"
+      }
+    ]
+  },
+  {
+    "eventId": "2782",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Bautismo de Buceo"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Bautismo de Buceo"
+      }
+    ]
+  },
+  {
+    "eventId": "2784",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Curso Open Water Diver"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Curso Open Water Diver"
+      }
+    ]
+  },
+  {
+    "eventId": "2785",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Discover Scuba Diver"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Discover Scuba Diver"
+      }
+    ]
+  },
+  {
+    "eventId": "2786",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Snorkeling"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 69,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Snorkeling"
+      }
+    ]
+  },
+  {
+    "eventId": "2787",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "2 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "2 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2790",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "8 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "8 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2788",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "3 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "3 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2789",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "4 hours"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 68,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "4 hours"
+      }
+    ]
+  },
+  {
+    "eventId": "2808",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      }
+    ]
+  },
+  {
+    "eventId": "2810",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      }
+    ]
+  },
+  {
+    "eventId": "2809",
+    "months": [
+      {
+        "month": "2026-01-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      },
+      {
+        "month": "2026-02-01",
+        "httpStatus": 200,
+        "errorType": null,
+        "sessionsKeysCount": null,
+        "hasDatesArray": false,
+        "datesCount": null,
+        "hasLimitArray": false,
+        "hasUsedArray": false,
+        "responseSizeBytes": 67,
+        "eventDetailsStatus": 200,
+        "eventDetailsName": "Tour"
+      }
+    ]
+  }
+]

@@ -21,6 +21,27 @@ export interface LimitsResponse {
     raw?: any
   }>>
   availableDates: string[] // YYYY-MM-DD[]
+  calendarMode: 'sessions' | 'dates' | 'wdays_only' | 'none'
+  projectedAvailableDates?: string[] // Only for wdays_only mode
+  requiresSessionTime: boolean // true when sessions exist and we can pick an actual time, false when only dates or wdays_only
+  availabilityMode?: 'NORMAL' | 'NO_SCHEDULE_PUBLISHED' // Deprecated: use calendarMode instead
+  // Debug fields (only when debug=1)
+  debug?: {
+    upstreamUrl: string
+    hasUpstreamSessions: boolean
+    fallbackTimesCount: number | null
+    sampleSessionsByDayKeys: string[]
+    sampleFirst3RawDates: string[]
+    sampleFirst3ComputedAvailableDates: string[]
+    hasWdays: boolean
+    hasDatesArray: boolean
+    hasSessionsByDate: boolean
+    counts: {
+      totalDates: number
+      availableDates: number
+      datesWithSessions: number
+    }
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -41,9 +62,117 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Check for debug parameters
+    const debug = searchParams.get('debug') === '1'
+    const rawMode = searchParams.get('raw') === '1'
+
+    // Verify eventId exists in Atlantico (optional check, only if raw mode)
+    if (rawMode) {
+      try {
+        const { getBaseUrl } = await import('@/lib/atlantico/client')
+        const baseUrl = getBaseUrl()
+        const eventDetailsUrl = `${baseUrl}/eventDetails/${eventId}/ENG`
+        const eventDetailsResponse = await fetch(eventDetailsUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': '*/*',
+          },
+          cache: 'no-store',
+        })
+        
+        if (!eventDetailsResponse.ok) {
+          return NextResponse.json(
+            {
+              ok: false,
+              error: 'Invalid event ID',
+              reason: 'INVALID_EVENT_ID_FOR_ATLANTICO',
+              message: `Event ID ${eventId} not found in Atlantico (eventDetails returned ${eventDetailsResponse.status})`,
+            },
+            { status: 404 }
+          )
+        }
+      } catch (error) {
+        // If eventDetails check fails, continue anyway (might be network issue)
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[ATLANTICO_LIMITS] EventDetails check failed:', error)
+        }
+      }
+    }
+
     // Use shared normalizeLimits function (single source of truth)
-    const { normalized, upstreamStatus, upstreamUrl } = await normalizeLimits(eventId, lang, monthParam || '')
-    const { quote, sessionsByDay } = normalized
+    const { normalized, upstreamStatus, upstreamUrl, raw } = await normalizeLimits(eventId, lang, monthParam || '')
+    const { quote, sessionsByDay, dates, calendarMode: normalizedCalendarMode, projectedAvailableDates, requiresSessionTime: normalizedRequiresSessionTime } = normalized
+
+    // CRITICAL: calendarMode MUST be a non-null string (fallback to 'none' if missing)
+    const calendarMode: 'sessions' | 'dates' | 'wdays_only' | 'none' = normalizedCalendarMode || 'none'
+    
+    // CRITICAL: requiresSessionTime MUST be calculated from calendarMode (rule: only 'sessions' requires time)
+    const requiresSessionTime: boolean = normalizedRequiresSessionTime !== undefined 
+      ? normalizedRequiresSessionTime 
+      : (calendarMode === 'sessions')
+
+    // If wdays_only mode, return with projected dates
+    if (calendarMode === 'wdays_only') {
+      const monthStart = monthParam || (() => {
+        const now = new Date()
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+      })()
+      
+      const hasDatesDate = Array.isArray(raw?.dates?.date) && raw.dates.date.length > 0
+      const hasSessions = raw?.dates?.sessions && typeof raw.dates.sessions === 'object'
+      const projectedCount = projectedAvailableDates?.length || 0
+      
+      // DEV log
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[LIMITS]', {
+          eventId,
+          calendarMode,
+          hasDatesDate,
+          hasSessions,
+          projectedCount,
+          upstreamStatus,
+        })
+      }
+      
+      const debugInfo = debug ? {
+        upstreamUrl,
+        hasUpstreamSessions: false,
+        fallbackTimesCount: null,
+        sampleSessionsByDayKeys: [],
+        sampleFirst3RawDates: [],
+        sampleFirst3ComputedAvailableDates: projectedAvailableDates?.slice(0, 3) || [],
+        hasWdays: Array.isArray(raw?.dates?.wdays) && raw.dates.wdays.length > 0,
+        hasDatesArray: hasDatesDate,
+        hasSessionsByDate: false,
+        hasSessionsByDay: false,
+        hasDates: false,
+        counts: {
+          totalDates: 0,
+          availableDates: projectedCount,
+          datesWithSessions: 0,
+        },
+      } : undefined
+      
+      return NextResponse.json<LimitsResponse>(
+        {
+          ok: true,
+          quote: quote,
+          monthStart,
+          sessionsByDay: {},
+          availableDates: projectedAvailableDates || [],
+          calendarMode: 'wdays_only',
+          projectedAvailableDates: projectedAvailableDates || [],
+          requiresSessionTime: false, // wdays_only never requires session time
+          availabilityMode: 'NO_SCHEDULE_PUBLISHED', // Deprecated, use calendarMode
+          ...(debugInfo ? { debug: debugInfo } : {}),
+        },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+          },
+        }
+      )
+    }
 
     // Filter sessions: remove invalid times ("-" and ""), keep "00:00" if upstream provides it
     const filteredSessionsByDay: Record<string, Array<{
@@ -72,37 +201,173 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Extract available dates from sessionsByDay keys
-    const availableDates = Object.keys(filteredSessionsByDay).sort()
+    // Calculate availableDates from dates array where (limit - used) > 0
+    const availableDatesFromLimits = dates
+      .filter(d => {
+        const limit = d.limit || 0
+        const used = d.used || 0
+        return (limit - used) > 0
+      })
+      .map(d => d.date)
+      .sort()
 
-    // DEV: Log response (server-side only)
+    // Also include dates from sessionsByDay (in case they have sessions but no explicit limit/used)
+    const availableDatesFromSessions = Object.keys(filteredSessionsByDay)
+    
+    // Merge and deduplicate
+    const availableDatesSet = new Set([...availableDatesFromLimits, ...availableDatesFromSessions])
+    const availableDates = Array.from(availableDatesSet).sort()
+
+    // Calculate debug info
+    const hasDatesDate = Array.isArray(raw?.dates?.date) && raw.dates.date.length > 0
+    const hasSessions = raw?.dates?.sessions && typeof raw.dates.sessions === 'object'
+    const hasWdays = Array.isArray(raw?.dates?.wdays) && raw.dates.wdays.length > 0
+    const hasSessionsByDate = typeof raw?.sessionsByDate === 'object' && raw.sessionsByDate !== null && Object.keys(raw.sessionsByDate).length > 0
+    
+    // Fallback: if sessionsByDay is empty but we have availableDates, fetch times from event-details
+    const hasUpstreamSessions = Object.keys(filteredSessionsByDay).length > 0
+    let fallbackTimesCount: number | null = null
+    
+    if (!hasUpstreamSessions && availableDates.length > 0) {
+      try {
+        // Build internal API URL (use request URL as base)
+        const baseUrl = request.nextUrl.origin
+        const eventDetailsUrl = `${baseUrl}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=${encodeURIComponent(lang)}`
+        
+        // Fetch event details to get times
+        const eventDetailsResponse = await fetch(eventDetailsUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          cache: 'no-store',
+        })
+        
+        if (eventDetailsResponse.ok) {
+          const eventDetails = await eventDetailsResponse.json()
+          const times = Array.isArray(eventDetails.times) ? eventDetails.times : []
+          
+          // Filter invalid times: null, "", "00:00"
+          const validTimes = times
+            .map(t => String(t || '').trim())
+            .filter(t => t !== '' && t !== '00:00' && t !== 'null')
+            .slice(0, 20) // Limit to 20 times max per date
+          
+          fallbackTimesCount = validTimes.length
+          
+          if (validTimes.length > 0) {
+            // Map each available date to these times
+            // Use available count from dates array if available
+            for (const date of availableDates) {
+              const dateData = dates.find(d => d.date === date)
+              const available = dateData ? (dateData.limit || 0) - (dateData.used || 0) : 0
+              
+              // Only add if available > 0
+              if (available > 0) {
+                filteredSessionsByDay[date] = validTimes.map(time => ({
+                  time,
+                  available,
+                }))
+              }
+            }
+          }
+        }
+      } catch (error) {
+        // Silently fail - sessionsByDay stays empty, but availableDates remains correct
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[ATLANTICO_LIMITS] Fallback to event-details failed:', error)
+        }
+      }
+    }
+
+    // CRITICAL: monthStart MUST be a valid YYYY-MM-01 string (never empty)
+    const monthStart = (() => {
+      if (normalized.dates && normalized.dates.length > 0 && normalized.dates[0]?.date) {
+        const firstDate = normalized.dates[0].date
+        if (firstDate && firstDate.length >= 7) {
+          return firstDate.substring(0, 7) + '-01'
+        }
+      }
+      if (monthParam) {
+        return monthParam
+      }
+      // Fallback: current month
+      const now = new Date()
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+    })()
+
+    // Prepare debug information if requested
+    const debugInfo = debug ? {
+      upstreamUrl,
+      hasUpstreamSessions,
+      fallbackTimesCount,
+      sampleSessionsByDayKeys: Object.keys(filteredSessionsByDay).slice(0, 3),
+      sampleFirst3RawDates: (() => {
+        // Get raw dates from upstream response
+        if (raw?.dates && typeof raw.dates === 'object' && Array.isArray(raw.dates.date)) {
+          return raw.dates.date.slice(0, 3).map(d => String(d))
+        }
+        // Fallback: convert normalized dates back to YYYYMMDD
+        return dates.slice(0, 3).map(d => d.date.replace(/-/g, ''))
+      })(),
+      sampleFirst3ComputedAvailableDates: availableDates.slice(0, 3),
+      hasWdays,
+      hasDatesArray,
+      hasSessionsByDate,
+      counts: {
+        totalDates: dates.length,
+        availableDates: availableDates.length,
+        datesWithSessions: Object.keys(filteredSessionsByDay).length,
+      },
+    } : undefined
+
+    // DEV log
     if (process.env.NODE_ENV === 'development') {
-      console.log('[ATLANTICO_LIMITS] Response:', {
+      const projectedCount = projectedAvailableDates?.length || 0
+      console.log('[LIMITS]', {
         eventId,
-        lang,
-        monthStart: normalized.dates[0]?.date ? 
-          normalized.dates[0].date.substring(0, 7) + '-01' : 
-          monthParam,
-        upstreamStatus,
-        upstreamUrl,
-        sessionsByDayKeys: Object.keys(filteredSessionsByDay).length,
+        calendarMode,
+        hasDatesDate,
+        hasSessions,
+        projectedCount,
         availableDatesCount: availableDates.length,
-        sampleDates: availableDates.slice(0, 3),
+        sessionsByDayCount: Object.keys(filteredSessionsByDay).length,
+        upstreamStatus,
       })
     }
 
-    const monthStart = normalized.dates[0]?.date ? 
-      normalized.dates[0].date.substring(0, 7) + '-01' : 
-      monthParam || ''
-
-    return NextResponse.json<LimitsResponse>(
-      {
-        ok: true,
+    // Build response
+    // CRITICAL: Both calendarMode and requiresSessionTime MUST be present (never undefined/null)
+    // calendarMode is already guaranteed to be non-null (set at top of function)
+    // requiresSessionTime is already calculated from calendarMode (set at top of function)
+    
+    const responseData: LimitsResponse & { rawAtlantico?: any; normalized?: any } = {
+      ok: true,
+      quote: quote ?? null,
+      monthStart: monthStart, // ALWAYS valid YYYY-MM-01 string (calculated above with fallbacks)
+      sessionsByDay: filteredSessionsByDay,
+      availableDates: availableDates || [],
+      calendarMode: calendarMode, // ALWAYS present, never null/undefined (guaranteed at top with fallback to 'none')
+      requiresSessionTime: requiresSessionTime, // ALWAYS present, never undefined (calculated from calendarMode: only 'sessions' = true)
+      ...(projectedAvailableDates ? { projectedAvailableDates } : {}),
+      availabilityMode: calendarMode === 'wdays_only' || calendarMode === 'none' ? 'NO_SCHEDULE_PUBLISHED' : 'NORMAL', // Deprecated, use calendarMode
+      ...(debugInfo ? { debug: debugInfo } : {}),
+    }
+    
+    // If raw mode, include raw Atlantico response and normalized data
+    if (rawMode) {
+      responseData.rawAtlantico = raw
+      responseData.normalized = {
         quote,
         monthStart,
         sessionsByDay: filteredSessionsByDay,
         availableDates,
-      },
+        dates,
+      }
+    }
+
+    return NextResponse.json<LimitsResponse>(
+      responseData,
       {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
@@ -115,13 +380,28 @@ export async function GET(request: NextRequest) {
       console.error('[ATLANTICO_LIMITS] Error:', error)
     }
 
-    return NextResponse.json(
+    // CRITICAL: Even on error, return a valid response structure with calendarMode and requiresSessionTime
+    // This prevents "Failed to fetch limits" from blocking the frontend
+    const { searchParams } = request.nextUrl
+    const monthParam = searchParams.get('month')
+    const fallbackMonthStart = monthParam || (() => {
+      const now = new Date()
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+    })()
+
+    // Return a valid response with safe defaults (prevents frontend blocking)
+    return NextResponse.json<LimitsResponse>(
       {
-        ok: false,
-        error: 'Failed to fetch limits',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        ok: true,
+        quote: null,
+        monthStart: fallbackMonthStart,
+        sessionsByDay: {},
+        availableDates: [],
+        calendarMode: 'none', // Safe default - ALWAYS present, never null
+        requiresSessionTime: false, // 'none' mode never requires session time - ALWAYS present
+        availabilityMode: 'NO_SCHEDULE_PUBLISHED',
       },
-      { status: 500 }
+      { status: 200 } // Return 200 even on error to prevent frontend blocking
     )
   }
 }

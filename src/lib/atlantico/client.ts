@@ -9,12 +9,28 @@
  */
 
 /**
- * Get base URL based on ATLANTICO_ENV environment variable
- * - test: https://testapi.atlanticoexcursiones.com
- * - prod: https://api.atlanticoexcursiones.com
- * - default: prod
+ * Get base URL based on ATLANTICO_BASE_URL or ATLANTICO_ENV environment variable
+ * - If ATLANTICO_BASE_URL is defined and is NOT an IP:port → use it (for proxy setup)
+ * - Otherwise, use ATLANTICO_ENV:
+ *   - test: https://testapi.atlanticoexcursiones.com
+ *   - prod: https://api.atlanticoexcursiones.com
+ *   - default: prod
+ * 
+ * Never returns IP:8080 addresses - always uses official domains.
  */
 export function getBaseUrl(): string {
+  // Priority 1: Use ATLANTICO_BASE_URL if defined and valid (not IP:port)
+  const baseUrl = process.env.ATLANTICO_BASE_URL?.trim()
+  if (baseUrl) {
+    // Reject IP:port patterns (e.g., http://46.224.147.162:8080)
+    const ipPortPattern = /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+/
+    if (!ipPortPattern.test(baseUrl)) {
+      return baseUrl
+    }
+    // If it's an IP:port, fall through to official domains
+  }
+  
+  // Priority 2: Use ATLANTICO_ENV-based selection (official domains only)
   const env = process.env.ATLANTICO_ENV?.toLowerCase().trim()
   
   if (env === 'test') {
@@ -162,3 +178,19 @@ export async function atlanticoGet<T = any>(
   
   return fetchJson<T>(fullPath)
 }
+
+/**
+ * Build Atlantico image URL from a path or filename.
+ *
+ * - If input is empty → returns input
+ * - If input is already absolute (http/https) → returns input
+ * - Otherwise → prefixes with getBaseUrl() (stripping trailing slashes)
+ */
+export function buildAtlanticoImageUrl(input: string) {
+  if (!input) return input
+  if (input.startsWith('http://') || input.startsWith('https://')) return input
+  const base = getBaseUrl().replace(/\/+$/, '')
+  const path = input.startsWith('/') ? input : `/${input}`
+  return `${base}${path}`
+}
+

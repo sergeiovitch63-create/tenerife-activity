@@ -48,8 +48,68 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always',
 })
 
+/**
+ * Check if maintenance mode is enabled
+ * Checks for NEXT_PUBLIC_MAINTENANCE_MODE environment variable (set to 'true' or '1')
+ * 
+ * To enable maintenance mode:
+ * - Set NEXT_PUBLIC_MAINTENANCE_MODE=true in your .env file or hosting environment
+ * - Or create a maintenance.enabled file in the project root (for file-based approach)
+ * 
+ * Note: Edge Runtime doesn't support file system access, so file-based approach
+ * would require a different implementation (e.g., API route or build-time check)
+ */
+function isMaintenanceModeEnabled(): boolean {
+  // Check environment variable
+  const envMaintenance = process.env.NEXT_PUBLIC_MAINTENANCE_MODE
+  return envMaintenance === 'true' || envMaintenance === '1'
+}
+
+/**
+ * Check if the request is from localhost
+ * Supports both IPv4 (127.0.0.1) and IPv6 (::1) localhost addresses
+ */
+function isLocalhost(request: NextRequest): boolean {
+  const ip = request.ip || 
+             request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+             request.headers.get('x-real-ip') ||
+             'unknown'
+  
+  // Check for localhost IPs
+  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') {
+    return true
+  }
+  
+  // Check hostname for localhost
+  const hostname = request.headers.get('host') || ''
+  if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+    return true
+  }
+  
+  return false
+}
+
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+
+  // MAINTENANCE MODE CHECK - Must be first, before any other processing
+  // Skip maintenance check for asset paths, API routes, and the maintenance page itself
+  if (!isAssetPath(pathname) && !pathname.startsWith('/api') && pathname !== '/maintenance') {
+    const maintenanceEnabled = isMaintenanceModeEnabled()
+    const isLocal = isLocalhost(request)
+    
+    if (maintenanceEnabled && !isLocal) {
+      // Maintenance mode is enabled and request is NOT from localhost
+      // Return maintenance page with 503 status
+      const maintenanceUrl = new URL('/maintenance', request.url)
+      const response = NextResponse.rewrite(maintenanceUrl)
+      response.status = 503
+      response.headers.set('Retry-After', '3600')
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+      return response
+    }
+    // If maintenance is disabled OR request is from localhost, continue normally
+  }
 
   // Early exit for asset paths - don't process locale normalization
   if (isAssetPath(pathname)) {

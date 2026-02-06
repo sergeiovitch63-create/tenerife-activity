@@ -44,23 +44,19 @@ function sanitizeForLog(data: any): any {
 async function checkSessionAvailability(
   eventCode: string,
   language: string,
-  tourDate: string,
-  sesTime: string
+  tourDate: string | null,
+  sesTime: string | null
 ): Promise<{ available: boolean; error?: string }> {
+  // For calendarMode === 'none': tourDate and sesTime are null (on-request booking)
+  if (tourDate === null || sesTime === null) {
+    return { available: true } // On-request bookings are always available
+  }
   try {
     const limits = await loadLimits(eventCode, language, tourDate)
     
-    // If no sessions required (sesTime is "00:00"), just check if date is available
-    if (sesTime === '00:00' || !sesTime) {
-      const dateStr = tourDate.replace(/-/g, '') // YYYYMMDD format
-      const hasDate = JSON.stringify(limits).includes(dateStr) || 
-                      JSON.stringify(limits).includes(tourDate)
-      
-      if (!hasDate) {
-        return { available: false, error: `Date ${tourDate} not available` }
-      }
-      
-      return { available: true }
+    // CRITICAL: Reject '00:00' - must have valid session time
+    if (sesTime === '00:00' || !sesTime || !/^\d{2}:\d{2}$/.test(sesTime)) {
+      return { available: false, error: 'Invalid or missing session time (00:00 not allowed)' }
     }
     
     // Check for specific session time
@@ -97,37 +93,16 @@ async function revalidateBeforePayment(
   item: PaymentRequest
 ): Promise<{ valid: boolean; code?: 'PRICE_CHANGED' | 'SLOT_UNAVAILABLE'; newPrice?: number; error?: string }> {
   try {
-    // Ensure sesTime defaults to "00:00" for availability check
-    const sesTimeForCheck = item.sesTime && item.sesTime.trim() !== '' ? item.sesTime : '00:00'
-    
-    // IMPORTANT: If sesTime is "00:00", verify that no sessions exist (sessionless events OK)
-    if (sesTimeForCheck === '00:00') {
-      try {
-        const limits = await loadLimits(item.t_id, item.language, item.tourDate)
-        const dateKey = item.tourDate.replace(/-/g, '') // YYYYMMDD
-        
-        // Check if sessions exist (support both formats)
-        const sessionsObj = limits.sessions ?? limits.sessionsByDate ?? null
-        const hasSessions = sessionsObj && typeof sessionsObj === 'object' && Object.keys(sessionsObj).length > 0
-        
-        if (hasSessions) {
-          const sessions = sessionsObj[dateKey] ?? sessionsObj[item.tourDate]
-          
-          if (Array.isArray(sessions) && sessions.length > 0) {
-            // Sessions exist but sesTime is "00:00" - this is invalid (not a sessionless event)
-            return {
-              valid: false,
-              code: 'SLOT_UNAVAILABLE',
-              error: 'A session time must be selected. Sessions are available for this date.',
-            }
-          }
-        }
-        // If no sessions exist, "00:00" is valid (sessionless event)
-      } catch (error) {
-        // If we can't check, continue with availability check (graceful degradation)
-        console.error('[PAYMENT] Error checking sessions in revalidation:', error)
+    // CRITICAL: Reject '00:00' - must have valid session time
+    if (!item.sesTime || item.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(item.sesTime)) {
+      return {
+        valid: false,
+        code: 'SLOT_UNAVAILABLE',
+        error: 'Invalid or missing session time (00:00 not allowed)',
       }
     }
+    
+    const sesTimeForCheck = item.sesTime
     
     // 1. Check availability
     const availability = await checkSessionAvailability(
@@ -145,7 +120,11 @@ async function revalidateBeforePayment(
       }
     }
     
-    // 2. Recalculate prices
+    // 2. Recalculate prices (skip if tourDate is null for calendarMode === 'none')
+    if (!item.tourDate) {
+      // For calendarMode === 'none': skip price recalculation
+      return { valid: true }
+    }
     const prices = await loadPrices(item.t_id, item.tourDate)
     const adultPrice = prices.adult || 0
     const childPrice = prices.child || 0
@@ -349,42 +328,18 @@ export async function POST(request: NextRequest) {
     // The language in validatedBody should already be mapped by checkout page
     const normalizedLang = validatedBody.language
 
-    // IMPORTANT: Never send sesTime="00:00" if loadLimits provides sessions
-    // Check if sessions exist for this date (sessionless events are allowed with "00:00")
-    let sesTime = validatedBody.sesTime && validatedBody.sesTime.trim() !== '' 
-      ? validatedBody.sesTime 
-      : '00:00'
-    
-    // If sesTime is "00:00", verify that no sessions exist for this date (sessionless events OK)
-    if (sesTime === '00:00') {
-      try {
-        const limits = await loadLimits(validatedBody.t_id, normalizedLang, validatedBody.tourDate)
-        const dateKey = validatedBody.tourDate.replace(/-/g, '') // YYYYMMDD
-        
-        // Check if sessions exist (support both formats)
-        const sessionsObj = limits.sessions ?? limits.sessionsByDate ?? null
-        const hasSessions = sessionsObj && typeof sessionsObj === 'object' && Object.keys(sessionsObj).length > 0
-        
-        if (hasSessions) {
-          const sessions = sessionsObj[dateKey] ?? sessionsObj[validatedBody.tourDate]
-          
-          if (Array.isArray(sessions) && sessions.length > 0) {
-            // Sessions exist but sesTime is "00:00" - this is invalid (not a sessionless event)
-            return NextResponse.json(
-              {
-                error: 'Invalid session time',
-                message: 'A session time must be selected. Sessions are available for this date.',
-              },
-              { status: 400 }
-            )
-          }
-        }
-        // If no sessions exist, "00:00" is valid (sessionless event)
-      } catch (error) {
-        // If we can't check, allow "00:00" (graceful degradation)
-        console.error('[PAYMENT] Error checking sessions:', error)
-      }
+    // CRITICAL: Reject '00:00' - must have valid session time
+    if (!validatedBody.sesTime || validatedBody.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(validatedBody.sesTime)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid session time',
+          message: 'Invalid or missing session time (00:00 not allowed)',
+        },
+        { status: 400 }
+      )
     }
+
+    const sesTime = validatedBody.sesTime
 
     // DEV log - payment request details (sanitized)
     if (process.env.NODE_ENV === 'development') {
@@ -407,8 +362,10 @@ export async function POST(request: NextRequest) {
     formData.append('t_id', String(validatedBody.t_id))
     formData.append('t_group', String(validatedBody.t_group))
     formData.append('language', normalizedLang)
-    formData.append('tourDate', validatedBody.tourDate)
-    formData.append('sesTime', sesTime)
+    // For calendarMode === 'none': tourDate and sesTime are null (on-request booking)
+    // Only append if not null
+    if (validatedBody.tourDate) formData.append('tourDate', validatedBody.tourDate)
+    if (sesTime) formData.append('sesTime', sesTime)
     formData.append('adults', String(validatedBody.adults))
     formData.append('childs', String(validatedBody.childs || 0))
     formData.append('infants', String(validatedBody.infants || 0))

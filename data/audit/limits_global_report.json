@@ -1,0 +1,37 @@
+{
+  "scannedToursCount": 181,
+  "scannedEventIdsCount": 51,
+  "monthsTested": [
+    "2026-01-01",
+    "2026-02-01"
+  ],
+  "okEventsCount": 51,
+  "eventsWithSessionsCount": 0,
+  "eventsWithDatesArrayCount": 0,
+  "eventsAlwaysEmptyCount": 51,
+  "eventsAlwaysErrorCount": 0,
+  "top10MostCommonErrorTypes": [],
+  "sampleAlwaysEmptyEventIds": [
+    "993",
+    "992",
+    "1686",
+    "1831",
+    "1687",
+    "1832",
+    "2693",
+    "2695",
+    "2694",
+    "2720",
+    "2716",
+    "2719",
+    "2721",
+    "2723",
+    "2722",
+    "2733",
+    "2734",
+    "2735",
+    "2738",
+    "2737"
+  ],
+  "sampleAlwaysErrorEventIds": []
+}

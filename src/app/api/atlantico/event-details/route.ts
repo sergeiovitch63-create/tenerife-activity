@@ -12,7 +12,7 @@ interface EventDetailsResponse {
   id: string
   code: string
   name: string
-  days: number | null
+  days: number | number[] | null
   times: string[]
   pProd: '0' | '1' | '2' | '3' | null
   route: string | null
@@ -24,11 +24,24 @@ interface EventDetailsResponse {
  * Normalize Atlantico event details response
  */
 function normalizeEventDetails(raw: any, eventId: string): EventDetailsResponse {
+  // Handle days: can be number, array of numbers, or string
+  let days: number | number[] | null = null
+  if (raw.days !== undefined && raw.days !== null) {
+    if (Array.isArray(raw.days)) {
+      days = raw.days.map((d: any) => typeof d === 'number' ? d : parseInt(String(d), 10)).filter((d: number) => !isNaN(d))
+    } else if (typeof raw.days === 'number') {
+      days = raw.days
+    } else if (typeof raw.days === 'string') {
+      const parsed = parseInt(raw.days, 10)
+      days = isNaN(parsed) ? null : parsed
+    }
+  }
+  
   return {
     id: String(raw.id || raw.code || eventId),
     code: String(raw.code || raw.id || eventId),
     name: String(raw.name || raw.title || raw.nombre || ''),
-    days: typeof raw.days === 'number' ? raw.days : typeof raw.days === 'string' ? parseInt(raw.days, 10) || null : null,
+    days,
     times: Array.isArray(raw.times) ? raw.times.map(String) : typeof raw.times === 'string' ? [raw.times] : [],
     pProd: raw.pProd !== undefined ? String(raw.pProd) as '0' | '1' | '2' | '3' : null,
     route: raw.route ? String(raw.route) : null,

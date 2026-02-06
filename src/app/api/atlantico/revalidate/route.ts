@@ -24,6 +24,7 @@ interface RevalidatedItem extends CartItem {
   availableTimes?: string[]
   availableDates?: string[] // For no_sessions recovery: alternative dates with availability
   newPriceSnapshot?: PriceSnapshot
+  calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none' // Calendar mode from limits
 }
 
 interface ValidationError {
@@ -83,7 +84,8 @@ function normalizeSessionTime(sesTime: string | null | undefined): string {
  * Returns array of time strings
  * IMPORTANT: Always access sessions via sessions[toYYYYMMDD(tourDate)]
  */
-function extractAvailableTimes(limits: any, tourDate: string): string[] {
+function extractAvailableTimes(limits: any, tourDate: string | null): string[] {
+  if (!tourDate) return []
   const sessionsKey = toYYYYMMDD(tourDate) // Always use YYYYMMDD format
   const times: string[] = []
   
@@ -113,7 +115,8 @@ function extractAvailableTimes(limits: any, tourDate: string): string[] {
  * Extract session details (sessionId, TipoReservaId, rcId) for a specific time
  * IMPORTANT: Always access sessions via sessions[toYYYYMMDD(tourDate)]
  */
-function extractSessionDetails(limits: any, tourDate: string, sesTime: string): { sessionId?: string; TipoReservaId?: string; rcId?: string } {
+function extractSessionDetails(limits: any, tourDate: string | null, sesTime: string | null): { sessionId?: string; TipoReservaId?: string; rcId?: string } {
+  if (!tourDate || !sesTime) return {}
   const sessionsKey = toYYYYMMDD(tourDate) // Always use YYYYMMDD format
   const normalizedSesTime = normalizeSessionTime(sesTime)
   
@@ -257,10 +260,15 @@ async function fetchAvailableDates(
 async function checkSessionAvailability(
   eventCode: string,
   language: string,
-  tourDate: string,
-  sesTime: string
+  tourDate: string | null,
+  sesTime: string | null
 ): Promise<{ available: boolean; error?: string; reason?: 'time_not_found' | 'no_capacity' | 'no_sessions' | 'date_not_available'; availableTimes?: string[]; availableDates?: string[]; sessionId?: string; TipoReservaId?: string; rcId?: string; selectedSesTime?: string }> {
   try {
+    // For calendarMode === 'none': tourDate and sesTime are null (on-request booking)
+    if (tourDate === null || sesTime === null) {
+      return { available: true } // On-request bookings are always available
+    }
+    
     // Calculate monthStart from tourDate (YYYY-MM-DD -> YYYY-MM-01)
     const monthStart = tourDate.substring(0, 7) + '-01'
     
@@ -276,8 +284,13 @@ async function checkSessionAvailability(
     const sessionsObj = limits.sessions ?? limits.sessionsByDate ?? null
     const hasSessions = sessionsObj && typeof sessionsObj === 'object' && Object.keys(sessionsObj).length > 0
     
-    // Check date availability from dates.date array
+    // Check for wdays_only mode: has wdays but no dates.date and no sessions
+    const hasWdays = Array.isArray(limits?.dates?.wdays) && limits.dates.wdays.length > 0
     const dateList = limits?.dates?.date ?? []
+    const hasDatesArray = Array.isArray(dateList) && dateList.length > 0
+    const isWdaysOnly = hasWdays && !hasDatesArray && !hasSessions
+    
+    // Check date availability from dates.date array
     const isDateInList = Array.isArray(dateList) && dateList.includes(sessionsKey)
     
     // Build availableDateKeys for logging
@@ -391,7 +404,30 @@ async function checkSessionAvailability(
       }
     }
     
-    // CAS B: hasSessions === false (sessionless events)
+    // CAS B: wdays_only mode - allow if sesTime is valid (not "00:00")
+    if (isWdaysOnly) {
+      // For wdays_only: validate only that sesTime is present and valid
+      if (!normalizedSesTime || normalizedSesTime === '00:00') {
+        return {
+          available: false,
+          error: `Time is required for this booking`,
+          reason: 'time_not_found',
+          availableTimes: [],
+          availableDates: [],
+          selectedSesTime: '00:00',
+        }
+      }
+      
+      // sesTime is valid -> allow (availability to be confirmed)
+      return {
+        available: true,
+        availableTimes: [], // No times from loadLimits in wdays_only
+        selectedSesTime: normalizedSesTime,
+        // No session details for wdays_only
+      }
+    }
+    
+    // CAS C: hasSessions === false (sessionless events)
     // Check if date is in dates.date array
     if (!isDateInList) {
       return {
@@ -497,8 +533,11 @@ export async function POST(request: NextRequest) {
         let availableDates: string[] = []
         if (!availability.available && (availability.reason === 'no_sessions' || availability.reason === 'date_not_available')) {
           try {
-            // For date_not_available (sessionless), get dates from dates.date
-            if (availability.reason === 'date_not_available') {
+            // For calendarMode === 'none': skip availability recovery (on-request booking)
+            if (!item.tourDate) {
+              // Skip recovery for on-request bookings
+            } else if (availability.reason === 'date_not_available') {
+              // For date_not_available (sessionless), get dates from dates.date
               const limits = await loadLimits(item.t_id, item.language, item.tourDate)
               const dateList = limits?.dates?.date ?? []
               if (Array.isArray(dateList) && dateList.length > 0) {
@@ -517,8 +556,8 @@ export async function POST(request: NextRequest) {
                   .filter((d): d is string => d !== null)
                   .sort()
               }
-            } else {
-              // For no_sessions, use existing logic
+            } else if (item.tourDate) {
+              // For no_sessions, use existing logic (only if tourDate is not null)
               availableDates = await fetchAvailableDates(item.t_id, item.language, item.tourDate)
             }
             
@@ -552,32 +591,37 @@ export async function POST(request: NextRequest) {
         let priceDiff = 0
         
         try {
-          const prices = await loadPrices(item.t_id, item.tourDate)
-          
-          // Calculate new total
-          const adultPrice = prices.adult || 0
-          const childPrice = prices.child || 0
-          const infantPrice = prices.infant || 0
-          
-          const newTotal = 
-            adultPrice * item.adults +
-            childPrice * item.childs +
-            infantPrice * item.infants
-          
-          newPriceSnapshot = {
-            adult: adultPrice,
-            child: childPrice,
-            infant: infantPrice,
-            total: newTotal,
-          }
-          
-          // Compare with original
-          const originalTotal = item.priceSnapshot.total
-          priceDiff = newTotal - originalTotal
-          priceChanged = Math.abs(priceDiff) > 0.01 // Allow small floating point differences
-          
-          if (priceChanged) {
-            hasPriceChanges = true
+          // For calendarMode === 'none': skip price recalculation (on-request booking)
+          if (!item.tourDate) {
+            // Skip price recalculation for on-request bookings
+          } else {
+            const prices = await loadPrices(item.t_id, item.tourDate)
+            
+            // Calculate new total
+            const adultPrice = prices.adult || 0
+            const childPrice = prices.child || 0
+            const infantPrice = prices.infant || 0
+            
+            const newTotal = 
+              adultPrice * item.adults +
+              childPrice * (item.childs || 0) +
+              infantPrice * (item.infants || 0)
+            
+            newPriceSnapshot = {
+              adult: adultPrice,
+              child: childPrice,
+              infant: infantPrice,
+              total: newTotal,
+            }
+            
+            // Compare with original
+            const originalTotal = item.priceSnapshot.total
+            priceDiff = newTotal - originalTotal
+            priceChanged = Math.abs(priceDiff) > 0.01 // Allow small floating point differences
+            
+            if (priceChanged) {
+              hasPriceChanges = true
+            }
           }
         } catch (priceError) {
           errors.push({

@@ -19,6 +19,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
 import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { buildWhatsAppUrl, buildCallUrl } from '@/lib/booking/contactHelpers'
 
 type EventOption = {
   eventId: string
@@ -122,7 +123,17 @@ export function ActivityDetailClient({
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   })
   const [selectedDate, setSelectedDate] = useState<string>('')
-  // Removed: selectedTime, availableDates, sessionsByDay, loadingCalendar - calendar is now dummy/static
+  const [selectedTime, setSelectedTime] = useState<string>('')
+
+  // Calendar state (from /api/atlantico/limits)
+  const [sessionsByDay, setSessionsByDay] = useState<Record<string, Array<{ time: string; available: number; sessionId?: string }>>>({})
+  const [availableDates, setAvailableDates] = useState<string[]>([])
+  const [loadingCalendar, setLoadingCalendar] = useState(false)
+  const [availabilityMode, setAvailabilityMode] = useState<'NORMAL' | 'NO_SCHEDULE_PUBLISHED' | null>(null)
+  const [calendarMode, setCalendarMode] = useState<'sessions' | 'dates' | 'wdays_only' | 'none' | null>(null)
+  const [requiresSessionTime, setRequiresSessionTime] = useState<boolean>(true) // Default to true for backward compatibility
+  const [projectedAvailableDates, setProjectedAvailableDates] = useState<string[]>([])
+  const [eventDetailsTimes, setEventDetailsTimes] = useState<string[]>([]) // For wdays_only mode
 
   const [pricesData, setPricesData] = useState<PricesResponseOk | PricesResponseError | null>(null)
   const [priceStatus, setPriceStatus] = useState<PriceStatus>('idle')
@@ -182,48 +193,92 @@ export function ActivityDetailClient({
     })()
 
     fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}&month=${encodeURIComponent(normalizedMonth)}`)
-      .then((res) => res.json())
-      .then(async (data: { ok: boolean; sessionsByDay?: Record<string, Array<{ time: string; available: number; sessionId?: string }>>; availableDates?: string[]; error?: string }) => {
-        if (!data.ok) {
+      .then(async (res) => {
+        // Check HTTP status first - if 200, process the response even if data.ok === false
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Failed to fetch limits' }))
           setSessionsByDay({})
           setAvailableDates([])
+          setAvailabilityMode(null)
+          setCalendarMode(null)
+          setProjectedAvailableDates([])
+          return
+        }
+        
+        const data = await res.json() as { ok: boolean; sessionsByDay?: Record<string, Array<{ time: string; available: number; sessionId?: string }>>; availableDates?: string[]; calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none'; projectedAvailableDates?: string[]; availabilityMode?: 'NORMAL' | 'NO_SCHEDULE_PUBLISHED'; error?: string }
+        
+        // If HTTP 200, process the response even if data.ok === false (might be wdays_only with empty data)
+        // Only set error if it's a real error (not just empty data)
+        if (!data.ok && data.error) {
+          // Only treat as error if it's a validation error (not empty data)
+          if (data.error.includes('Missing parameters') || data.error.includes('Invalid event ID')) {
+            setSessionsByDay({})
+            setAvailableDates([])
+            setAvailabilityMode(null)
+            setCalendarMode(null)
+            setProjectedAvailableDates([])
+            return
+          }
+          // Otherwise, continue processing (might be wdays_only with empty data)
+          // Set default values if data.ok === false but no validation error
+          if (!data.calendarMode && !data.availabilityMode) {
+            setCalendarMode('none')
+            setAvailabilityMode('NO_SCHEDULE_PUBLISHED')
+            setSessionsByDay({})
+            setAvailableDates([])
+            setProjectedAvailableDates([])
+            return
+          }
+        }
+
+        // Set calendarMode (default to 'sessions' if not specified)
+        const mode = data.calendarMode || (data.availabilityMode === 'NO_SCHEDULE_PUBLISHED' ? 'none' : 'sessions')
+        setCalendarMode(mode)
+        
+        // Set requiresSessionTime (default to true if not specified for backward compatibility)
+        const requiresTime = data.requiresSessionTime ?? (mode === 'sessions')
+        setRequiresSessionTime(requiresTime)
+
+        // Check for wdays_only mode
+        if (mode === 'wdays_only') {
+          setAvailabilityMode('NO_SCHEDULE_PUBLISHED')
+          setSessionsByDay({})
+          setAvailableDates(data.projectedAvailableDates || [])
+          setProjectedAvailableDates(data.projectedAvailableDates || [])
+          
+          // Fetch eventDetails to get times
+          if (selectedEventId) {
+            try {
+              const eventDetailsRes = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}`)
+              if (eventDetailsRes.ok) {
+                const eventDetails = await eventDetailsRes.json()
+                const times = Array.isArray(eventDetails.times) ? eventDetails.times.filter((t: string) => t && t !== '00:00' && t !== '') : []
+                setEventDetailsTimes(times)
+              }
+            } catch (e) {
+              // Ignore errors
+            }
+          }
           return
         }
 
-        const hasAvailability = (data.availableDates && data.availableDates.length > 0) || 
-                                (data.sessionsByDay && Object.keys(data.sessionsByDay).length > 0)
-
-        if (hasAvailability) {
-          // Month has availability, use it
-          setSessionsByDay(data.sessionsByDay || {})
-          setAvailableDates(data.availableDates || [])
-        } else {
-          // Month is empty, find next available month
-          const { findNextAvailableMonth } = await import('@/lib/atlantico/findNextAvailableMonth')
-          const nextMonth = await findNextAvailableMonth(selectedEventId, lang, normalizedMonth, 12)
-          
-          if (nextMonth) {
-            // Found next available month, fetch it
-            setAutoSwitchedMonth(nextMonth)
-            
-            const nextResponse = await fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}&month=${encodeURIComponent(nextMonth)}`)
-            
-            if (nextResponse.ok) {
-              const nextData = await nextResponse.json()
-              if (nextData.ok) {
-                setSessionsByDay(nextData.sessionsByDay || {})
-                setAvailableDates(nextData.availableDates || [])
-                // Update currentMonth to the found month
-                setCurrentMonth(nextMonth)
-              }
-            }
-          } else {
-            // No availability found in next 12 months
-            setNoAvailabilityFound(true)
-            setSessionsByDay({})
-            setAvailableDates([])
-          }
+        // Check for NO_SCHEDULE_PUBLISHED mode (none)
+        if (mode === 'none' || data.availabilityMode === 'NO_SCHEDULE_PUBLISHED') {
+          setAvailabilityMode('NO_SCHEDULE_PUBLISHED')
+          setSessionsByDay({})
+          setAvailableDates([])
+          setProjectedAvailableDates([])
+          return
         }
+
+        setAvailabilityMode('NORMAL')
+        // Always use the data for the requested month (no auto-switch)
+        // If month is empty, just show empty calendar (user can navigate to next month)
+        setSessionsByDay(data.sessionsByDay || {})
+        setAvailableDates(data.availableDates || [])
+        setProjectedAvailableDates([])
+        setNoAvailabilityFound(false)
+        setAutoSwitchedMonth(null)
       })
       .catch((error) => {
         console.error('[ActivityDetail] Error fetching calendar:', error)
@@ -235,15 +290,47 @@ export function ActivityDetailClient({
       })
   }, [selectedEventId, lang, currentMonth])
 
-  // Auto-select first time when date changes
+  // Check if there are valid times for selected date
+  const hasValidTimes = useMemo(() => {
+    if (!selectedDate) return false
+    
+    // If requiresSessionTime === false, don't require times
+    if (!requiresSessionTime) {
+      return true // Allow booking without time selection
+    }
+    
+    // If requiresSessionTime === true, check sessionsByDay
+    
+    // For other modes, check sessionsByDay
+    if (!sessionsByDay[selectedDate]) return false
+    const sessions = sessionsByDay[selectedDate]
+    const validSessions = sessions.filter(s => 
+      s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
+    )
+    const validTimes = Array.from(new Set(
+      validSessions.map(s => s.time).filter(t => t && t !== '' && t !== '00:00' && t !== '-')
+    ))
+    return validTimes.length > 0
+  }, [selectedDate, sessionsByDay, calendarMode, eventDetailsTimes])
+
+  // Auto-select first time when date changes (earliest valid time)
   useEffect(() => {
     if (selectedDate && sessionsByDay[selectedDate]) {
       const sessions = sessionsByDay[selectedDate]
-      const allowedTimes = sessions.map(s => s.time).filter(t => t && t !== '00:00' && t !== '-')
-      if (allowedTimes.length > 0 && !selectedTime) {
-        setSelectedTime(allowedTimes[0])
-      } else if (allowedTimes.length === 0) {
-        setSelectedTime('00:00')
+      const validSessions = sessions.filter(s => 
+        s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
+      )
+      
+      // Get unique valid times, sorted
+      const validTimes = Array.from(new Set(
+        validSessions.map(s => s.time).filter(t => t && t !== '' && t !== '00:00' && t !== '-')
+      )).sort()
+      
+      if (validTimes.length > 0) {
+        // Select earliest time
+        setSelectedTime(validTimes[0])
+      } else {
+        setSelectedTime('')
       }
     } else {
       setSelectedTime('')
@@ -251,9 +338,11 @@ export function ActivityDetailClient({
   }, [selectedDate, sessionsByDay])
 
   // Available dates from loadLimits (real availability)
+  // For wdays_only mode, use projectedAvailableDates; otherwise use availableDates
   const availableDatesSet = useMemo(() => {
-    return new Set(availableDates)
-  }, [availableDates])
+    const datesToUse = calendarMode === 'wdays_only' ? projectedAvailableDates : availableDates
+    return new Set(datesToUse)
+  }, [availableDates, projectedAvailableDates, calendarMode])
 
   // Fetch prices (loadPrices) when event + date changes
   useEffect(() => {
@@ -351,7 +440,6 @@ export function ActivityDetailClient({
     return '—'
   }, [selectedEventId, selectedDate, priceStatus, totalPrice])
 
-  const availableDatesSet = useMemo(() => new Set(availableDates), [availableDates])
 
   const changeMonth = (delta: number) => {
     const [yearStr, monthStr] = currentMonth.split('-')
@@ -370,10 +458,49 @@ export function ActivityDetailClient({
       return
     }
 
-    // Use selectedTime if available, otherwise '00:00' only if no sessions
-    const sessions = sessionsByDay[selectedDate] || []
-    const allowedTimes = sessions.map(s => s.time).filter(t => t && t !== '00:00' && t !== '-')
-    const sesTime = allowedTimes.length > 0 ? (selectedTime || allowedTimes[0] || '00:00') : '00:00'
+    // Determine sesTime based on requiresSessionTime
+    let sesTime: string
+    
+    if (requiresSessionTime === false) {
+      // If requiresSessionTime === false => set sesTime = "00:00" ALWAYS (ignore eventDetailsTimes)
+      sesTime = '00:00'
+    } else {
+      // If requiresSessionTime === true => set sesTime = selectedTime (from sessionsByDay). Never "00:00".
+      const sessions = sessionsByDay[selectedDate] || []
+      const validSessions = sessions.filter(s => 
+        s.available > 0 && s.time && s.time !== '00:00' && s.time !== '-'
+      )
+      
+      // Get unique valid times, sorted
+      const validTimes = Array.from(new Set(
+        validSessions.map(s => s.time).filter(t => t && t !== '' && t !== '00:00' && t !== '-')
+      )).sort()
+      
+      // CRITICAL: Never send '00:00' when requiresSessionTime is true - block booking if no valid time
+      if (validTimes.length === 0) {
+        setBookingResult({ 
+          success: false, 
+          message: 'No times available for this date' 
+        })
+        setIsBooking(false)
+        
+        // DEV log for debugging
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[BOOKING] No times available - booking blocked:', {
+            eventId: selectedEventId,
+            date: selectedDate,
+            calendarMode,
+            requiresSessionTime,
+            sessionsCount: sessions.length,
+            sampleSessions: sessions.slice(0, 3),
+            sessionsByDayKeys: Object.keys(sessionsByDay),
+          })
+        }
+        return
+      }
+      
+      sesTime = validTimes[0] // Use earliest time
+    }
 
     setIsBooking(true)
     setBookingResult(null)
@@ -404,7 +531,12 @@ export function ActivityDetailClient({
       if (data.ok && data.reference) {
         setBookingResult({ success: true, message: `Booking confirmed! Reference: ${data.reference}` })
       } else {
-        setBookingResult({ success: false, message: data.reason || data.message || 'Booking failed' })
+        let errorMessage = data.reason || data.message || 'Booking failed'
+        // Improve error message for MISSING_ATLANTICO_USER_ID
+        if (errorMessage.includes('MISSING_ATLANTICO_USER_ID')) {
+          errorMessage = 'Server configuration error: ATLANTICO_USER_ID is missing. Please contact support.'
+        }
+        setBookingResult({ success: false, message: errorMessage })
       }
     } catch (error) {
       setBookingResult({ success: false, message: error instanceof Error ? error.message : 'Booking failed' })
@@ -618,19 +750,54 @@ export function ActivityDetailClient({
               </div>
             )}
 
-            {/* Calendar */}
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Select a Date</h2>
-              {!selectedEventId ? (
-                <p className="text-glass-500">Select an option to see availability.</p>
-              ) : loadingCalendar ? (
-                <p className="text-glass-500">Loading calendar...</p>
-              ) : noAvailabilityFound ? (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
-                  <div className="font-medium mb-2">⚠️ No availability found</div>
-                  <div>No availability found for the next 12 months for this option. Please try a different option.</div>
+            {/* none mode: Show CTA card */}
+            {selectedEventId && calendarMode === 'none' && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold mb-4">Select a Date</h2>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+                  <p className="text-sm text-blue-800 text-center">
+                    Availability on request. Contact us to confirm.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <a
+                      href={buildWhatsAppUrl({
+                        activityName: item.name || 'Activity',
+                        eventId: selectedEventId,
+                        lang: lang,
+                        date: selectedDate || undefined,
+                        adults: bookingForm.adults > 0 ? bookingForm.adults : undefined,
+                        childs: bookingForm.children > 0 ? bookingForm.children : undefined,
+                        infants: bookingForm.infants > 0 ? bookingForm.infants : undefined,
+                      })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-center text-sm"
+                    >
+                      WhatsApp
+                    </a>
+                    <a
+                      href={buildCallUrl()}
+                      className="flex-1 px-4 py-2 bg-white border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors text-center text-sm"
+                    >
+                      Call
+                    </a>
+                  </div>
                 </div>
-              ) : (
+              </div>
+            )}
+
+            {/* Calendar - show for wdays_only mode or normal mode (but hide if none mode) */}
+            {selectedEventId && calendarMode !== 'none' && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold mb-4">Select a Date</h2>
+                {loadingCalendar ? (
+                  <p className="text-glass-500">Loading calendar...</p>
+                ) : noAvailabilityFound ? (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
+                    <div className="font-medium mb-2">⚠️ No availability found</div>
+                    <div>No availability found for the next 12 months for this option. Please try a different option.</div>
+                  </div>
+                ) : (
                 <>
                   {/* Auto-switched month notice */}
                   {autoSwitchedMonth && (
@@ -672,46 +839,51 @@ export function ActivityDetailClient({
                     )
                   })}
                 </div>
-              )}
 
-              {/* Time selector - only show if date selected and sessions available */}
-              {selectedDate && sessionsByDay[selectedDate] && (() => {
-                const sessions = sessionsByDay[selectedDate]
-                const allowedTimes = sessions.map(s => s.time).filter(t => t && t !== '00:00' && t !== '-')
-                
-                if (allowedTimes.length === 0) {
-                  return null // No time selection needed
-                }
-
-                return (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">Select a Time</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      {allowedTimes.map((time) => {
-                        const session = sessions.find(s => s.time === time)
-                        return (
-                          <button
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            className={`px-4 py-2 rounded border text-sm ${
-                              selectedTime === time
-                                ? 'bg-ocean-600 text-white border-ocean-600'
-                                : 'bg-white border-glass-200 hover:border-ocean-300'
-                            }`}
-                          >
-                            {time}
-                            {session && session.available !== undefined && (
-                              <span className="ml-2 text-xs opacity-75">
-                                ({session.available} left)
-                              </span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
+                {/* Time picker - show for wdays_only mode with eventDetailsTimes */}
+                {selectedDate && calendarMode === 'wdays_only' && eventDetailsTimes.length > 0 && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-glass-700 mb-2">
+                      Time
+                      <span className="ml-2 text-xs text-blue-600 font-normal">(Availability to confirm)</span>
+                    </label>
+                    <select
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="w-full px-3 py-2 border border-glass-300 rounded-lg focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500"
+                    >
+                      <option value="">Select time</option>
+                      {eventDetailsTimes.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                )
-              })()}
+                )}
+
+                {/* Time picker - show for normal modes with sessions */}
+                {selectedDate && calendarMode !== 'wdays_only' && calendarMode !== 'none' && sessionsByDay[selectedDate] && sessionsByDay[selectedDate].length > 0 && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-glass-700 mb-2">Time</label>
+                    <select
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="w-full px-3 py-2 border border-glass-300 rounded-lg focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500"
+                    >
+                      <option value="">Select time</option>
+                      {sessionsByDay[selectedDate]
+                        .filter(s => s.time && s.time !== '00:00' && s.time !== '-')
+                        .map((session) => (
+                          <option key={session.time} value={session.time}>
+                            {session.time} {session.available > 0 ? `(${session.available} available)` : '(Sold out)'}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
+                </>
+              )}
             </div>
           </div>
 
@@ -810,13 +982,53 @@ export function ActivityDetailClient({
                   />
                 </div>
 
-                <button
-                  onClick={handleBooking}
-                  disabled={isBooking || !selectedEventId || !selectedDate || bookingForm.adults < 1}
-                  className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isBooking ? 'Booking...' : 'Confirm Booking'}
-                </button>
+                {/* none mode or wdays_only with no times: Show CTA instead of booking button */}
+                {(calendarMode === 'none' || (calendarMode === 'wdays_only' && eventDetailsTimes.length === 0)) ? (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+                    <p className="text-sm text-blue-800 text-center">
+                      Availability on request. Contact us to confirm.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <a
+                        href={buildWhatsAppUrl({
+                          activityName: item.name || 'Activity',
+                          eventId: selectedEventId,
+                          lang: lang,
+                          date: selectedDate || undefined,
+                          adults: bookingForm.adults > 0 ? bookingForm.adults : undefined,
+                          childs: bookingForm.children > 0 ? bookingForm.children : undefined,
+                          infants: bookingForm.infants > 0 ? bookingForm.infants : undefined,
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-center text-sm"
+                      >
+                        WhatsApp
+                      </a>
+                      <a
+                        href={buildCallUrl()}
+                        className="w-full px-4 py-2 bg-white border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors text-center text-sm"
+                      >
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleBooking}
+                    disabled={
+                      isBooking || 
+                      !selectedEventId || 
+                      !selectedDate || 
+                      bookingForm.adults < 1 ||
+                      (calendarMode === 'none') ||
+                      (requiresSessionTime && !hasValidTimes)
+                    }
+                    className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isBooking ? 'Booking...' : 'Confirm Booking'}
+                  </button>
+                )}
 
                 {/* Total price */}
                 <div className="pt-4 border-t border-glass-200">

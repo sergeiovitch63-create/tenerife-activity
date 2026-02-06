@@ -32,8 +32,8 @@ interface ConfirmRequest {
   t_id: string
   t_group: string
   language: string
-  tourDate: string // YYYY-MM-DD
-  sesTime: string // HH:mm or "00:00"
+  tourDate: string | null // YYYY-MM-DD or null for calendarMode === 'none'
+  sesTime: string | null // HH:mm or null for calendarMode === 'none'
   adults: number
   childs?: number
   infants?: number
