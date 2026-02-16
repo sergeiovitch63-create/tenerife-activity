@@ -133,7 +133,7 @@ export function CalendarWidget({
               if (nextData.ok) {
                 const convertedSessionsByDay: Record<string, Session[]> = {}
                 for (const [date, sessions] of Object.entries(nextData.sessionsByDay || {})) {
-                  convertedSessionsByDay[date] = sessions.map(s => ({
+                  convertedSessionsByDay[date] = (sessions as Array<{ time: string; available: number; sessionId?: string }>).map(s => ({
                     time: s.time,
                     available: s.available,
                     precio: null,

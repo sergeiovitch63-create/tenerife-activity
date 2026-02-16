@@ -336,7 +336,7 @@ export function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; interna
   }
   
   // Image: Priority 1 = card config (Astronomic), Priority 2 = VIP Tours local images (loaded dynamically), Priority 3 = API images
-  const groupCode = String(tour.groupCode || tour.code || '')
+  const groupCode = String(tour.code || '')
   const apiImageUrl = tour.displayImage ?? tour.imageOverrideUrl ?? tour.image
   
   // Price: use card config override if available, otherwise get display price (main price, not extra person)

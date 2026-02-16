@@ -449,3 +449,5 @@ if (isAreaZone && !price && !image) {
 
 
 
+
+

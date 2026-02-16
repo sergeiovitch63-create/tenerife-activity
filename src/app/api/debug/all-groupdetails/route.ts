@@ -52,10 +52,11 @@ export async function GET(request: NextRequest) {
 
     const groupsData: GroupDetailsAnalysis[] = []
 
-    for (const [groupId, groupDetails] of groupDetailsList) {
+    for (const [groupId, groupDetailsRaw] of groupDetailsList) {
       try {
-        const groupCode = groupDetails?.code || groupDetails?.Code || groupId
-        const groupName = groupDetails?.name || groupDetails?.title || 'Sans nom'
+        const groupDetails = groupDetailsRaw as Record<string, unknown>
+        const groupCode = (groupDetails?.code as string) || (groupDetails?.Code as string) || groupId
+        const groupName = (groupDetails?.name as string) || (groupDetails?.title as string) || 'Sans nom'
 
         // Extract all keys
         const allKeys = Object.keys(groupDetails || {}).sort()
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
 
         // Also check events array if available
         if (Array.isArray(groupDetails?.events)) {
-          eventCodes = groupDetails.events.map((e: any) => String(e).trim()).filter((e: string) => e && e !== '')
+          eventCodes = (groupDetails.events as unknown[]).map((e: unknown) => String(e).trim()).filter((e: string) => e && e !== '')
         }
 
         groupsData.push({

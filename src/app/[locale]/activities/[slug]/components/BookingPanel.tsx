@@ -148,3 +148,5 @@ export function BookingPanel({ events, defaultPrice }: BookingPanelProps) {
 
 
 
+
+

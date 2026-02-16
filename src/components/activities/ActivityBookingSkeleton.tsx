@@ -156,7 +156,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
       })
       .catch(() => {})
       .finally(() => setLoadingInfo(false))
-  }, [t_group, language, is303])
+  }, [t_group, language])
 
   // Fetch eventDetails when eventId is selected
   useEffect(() => {

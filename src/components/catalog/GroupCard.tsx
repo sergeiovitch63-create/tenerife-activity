@@ -102,10 +102,10 @@ export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: G
         {/* Meta Row */}
         <div className="flex items-center justify-between text-xs text-glass-500 mb-3">
           <div className="flex items-center gap-3 flex-wrap">
-            {duration && (
+            {duration != null && (
               <span className="flex items-center gap-1">
                 <span>⏱</span>
-                <span>{formatDuration(duration)}</span>
+                <span>{formatDuration(duration as string | number | undefined)}</span>
               </span>
             )}
             {hasEvents && (

@@ -76,7 +76,6 @@ async function normalizeEventDetailsToFullTour(
   // Create a single event from eventDetails
   const event: FullEvent = {
     id: code,
-    code: code,
     title: eventDetails.name || eventDetails.title || '',
     price: price > 0 ? {
       adult: price,
@@ -101,8 +100,6 @@ async function normalizeEventDetailsToFullTour(
     currency: (eventDetails as any).currency || 'EUR',
     image: coverImage,
     displayImage: coverImage,
-    imageUrl: coverImage,
-    imageUrls: images,
     events: [event],
     raw: eventDetails,
     vibe_id: assignedVibeId,
@@ -258,7 +255,7 @@ export async function GET(request: NextRequest) {
 
     // DEV: Log success
     if (process.env.NODE_ENV === 'development') {
-      const imagesCount = item.imageUrls?.length || (item.image ? 1 : 0)
+      const imagesCount = (item.image ? 1 : 0)
       console.log('[CATALOG_ITEM_OK]', {
         id: item.id,
         slug: item.slug,

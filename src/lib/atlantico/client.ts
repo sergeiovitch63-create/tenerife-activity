@@ -79,10 +79,10 @@ export async function fetchText(
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
   
   try {
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Accept': '*/*',
       'Content-Type': 'application/x-www-form-urlencoded',
-      ...options.headers,
+      ...(options.headers as Record<string, string> || {}),
     }
     
     // Add token if available
@@ -206,5 +206,18 @@ export function buildAtlanticoImageUrl(input: string) {
   const base = getBaseUrl().replace(/\/+$/, '')
   const path = input.startsWith('/') ? input : `/${input}`
   return `${base}${path}`
+}
+
+/**
+ * Sanitize text by trimming and removing extra whitespace
+ * 
+ * @param text - Text to sanitize
+ * @returns Sanitized text
+ */
+export function sanitizeText(text: string | null | undefined): string {
+  if (!text || typeof text !== 'string') {
+    return ''
+  }
+  return text.trim().replace(/\s+/g, ' ')
 }
 

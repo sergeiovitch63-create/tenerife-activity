@@ -49,6 +49,7 @@ type ErrorResponse = {
   reason: string
   missing?: string[]
   upstreamPreview?: string
+  upstreamStatus?: number
   message?: string
 }
 

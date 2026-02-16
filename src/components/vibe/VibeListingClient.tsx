@@ -144,7 +144,7 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
     }
 
     // Parse event IDs from tour.ids
-    const eventIds = parseEventIds(tour.ids)
+    const eventIds = parseEventIds(tour.ids as string | number | string[] | number[] | undefined)
     if (eventIds.length === 0) {
       return
     }

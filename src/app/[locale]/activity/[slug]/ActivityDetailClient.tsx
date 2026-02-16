@@ -218,7 +218,7 @@ export function ActivityDetailClient({
           return
         }
         
-        const data = await res.json() as { ok: boolean; sessionsByDay?: Record<string, Array<{ time: string; available: number; sessionId?: string }>>; availableDates?: string[]; calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none'; projectedAvailableDates?: string[]; availabilityMode?: 'NORMAL' | 'NO_SCHEDULE_PUBLISHED'; error?: string }
+        const data = await res.json() as { ok: boolean; sessionsByDay?: Record<string, Array<{ time: string; available: number; sessionId?: string }>>; availableDates?: string[]; calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none'; projectedAvailableDates?: string[]; availabilityMode?: 'NORMAL' | 'NO_SCHEDULE_PUBLISHED'; requiresSessionTime?: boolean; error?: string }
         
         // If HTTP 200, process the response even if data.ok === false (might be wdays_only with empty data)
         // Only set error if it's a real error (not just empty data)
@@ -1535,7 +1535,7 @@ export function ActivityDetailClient({
                   <div className="flex flex-col sm:flex-row gap-2">
                     <a
                       href={buildWhatsAppUrl({
-                        activityName: item.name || 'Activity',
+                        activityName: item.title || 'Activity',
                         eventId: selectedEventId,
                         lang: lang,
                         date: selectedDate || undefined,
@@ -1704,7 +1704,7 @@ export function ActivityDetailClient({
                 )}
 
                 {/* Time picker - show for normal modes with sessions */}
-                {selectedDate && calendarMode !== 'wdays_only' && calendarMode !== 'none' && sessionsByDay[selectedDate] && sessionsByDay[selectedDate].length > 0 && (
+                {selectedDate && calendarMode !== 'wdays_only' && calendarMode !== null && (calendarMode === 'sessions' || calendarMode === 'dates') && sessionsByDay[selectedDate] && sessionsByDay[selectedDate].length > 0 && (
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-glass-700 mb-2">Time</label>
                     <select
@@ -1833,7 +1833,7 @@ export function ActivityDetailClient({
                     <div className="flex flex-col gap-2">
                       <a
                         href={buildWhatsAppUrl({
-                          activityName: item.name || 'Activity',
+                          activityName: item.title || 'Activity',
                           eventId: selectedEventId,
                           lang: lang,
                           date: selectedDate || undefined,
@@ -1863,7 +1863,7 @@ export function ActivityDetailClient({
                       !selectedEventId || 
                       !selectedDate || 
                       bookingForm.adults < 1 ||
-                      (calendarMode === 'none') ||
+                      (calendarMode === null || calendarMode === undefined || (calendarMode as string | null) === 'none') ||
                       (requiresSessionTime && !hasValidTimes)
                     }
                     className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

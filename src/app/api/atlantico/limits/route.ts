@@ -249,8 +249,8 @@ export async function GET(request: NextRequest) {
           
           // Filter invalid times: null, "", "00:00"
           const validTimes = times
-            .map(t => String(t || '').trim())
-            .filter(t => t !== '' && t !== '00:00' && t !== 'null')
+            .map((t: unknown) => String(t || '').trim())
+            .filter((t: string) => t !== '' && t !== '00:00' && t !== 'null')
             .slice(0, 20) // Limit to 20 times max per date
           
           fallbackTimesCount = validTimes.length
@@ -264,7 +264,7 @@ export async function GET(request: NextRequest) {
               
               // Only add if available > 0
               if (available > 0) {
-                filteredSessionsByDay[date] = validTimes.map(time => ({
+                filteredSessionsByDay[date] = validTimes.map((time: string) => ({
                   time,
                   available,
                 }))
@@ -305,14 +305,14 @@ export async function GET(request: NextRequest) {
       sampleFirst3RawDates: (() => {
         // Get raw dates from upstream response
         if (raw?.dates && typeof raw.dates === 'object' && Array.isArray(raw.dates.date)) {
-          return raw.dates.date.slice(0, 3).map(d => String(d))
+          return raw.dates.date.slice(0, 3).map((d: unknown) => String(d))
         }
         // Fallback: convert normalized dates back to YYYYMMDD
-        return dates.slice(0, 3).map(d => d.date.replace(/-/g, ''))
+        return dates.slice(0, 3).map((d: { date: string }) => d.date.replace(/-/g, ''))
       })(),
       sampleFirst3ComputedAvailableDates: availableDates.slice(0, 3),
       hasWdays,
-      hasDatesArray,
+      hasDatesArray: hasDatesDate,
       hasSessionsByDate,
       counts: {
         totalDates: dates.length,
@@ -350,7 +350,7 @@ export async function GET(request: NextRequest) {
       calendarMode: calendarMode, // ALWAYS present, never null/undefined (guaranteed at top with fallback to 'none')
       requiresSessionTime: requiresSessionTime, // ALWAYS present, never undefined (calculated from calendarMode: only 'sessions' = true)
       ...(projectedAvailableDates ? { projectedAvailableDates } : {}),
-      availabilityMode: calendarMode === 'wdays_only' || calendarMode === 'none' ? 'NO_SCHEDULE_PUBLISHED' : 'NORMAL', // Deprecated, use calendarMode
+      availabilityMode: (calendarMode === 'none') ? 'NO_SCHEDULE_PUBLISHED' : 'NORMAL', // Deprecated, use calendarMode (wdays_only already handled above)
       ...(debugInfo ? { debug: debugInfo } : {}),
     }
     

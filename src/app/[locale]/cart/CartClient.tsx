@@ -89,7 +89,7 @@ export function CartClient({ locale }: CartClientProps) {
                 </h3>
                 <div className="space-y-1 text-sm text-glass-600">
                   <p>
-                    <strong>{t('date')}:</strong> {formatDate(item.tourDate)}
+                    <strong>{t('date')}:</strong> {item.tourDate ? formatDate(item.tourDate) : t('dateNotSelected')}
                   </p>
                   {item.sesTime && item.sesTime !== '00:00' && (
                     <p>
@@ -155,6 +155,8 @@ export function CartClient({ locale }: CartClientProps) {
     </div>
   )
 }
+
+
 
 
 
