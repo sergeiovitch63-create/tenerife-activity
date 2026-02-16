@@ -17,10 +17,12 @@ const nextConfig = {
   
   // Exclude heavy packages from server components and API routes
   // This reduces bundle size for Vercel Functions (300mb limit)
+  // These packages will be loaded at runtime instead of bundled
   serverExternalPackages: [
     '@supabase/supabase-js',
     'playwright',
     'tsx',
+    '@playwright/test',
   ],
   
   // Exclude debug routes and heavy dependencies from production build
@@ -35,14 +37,35 @@ const nextConfig = {
         ],
         // Exclude heavy dependencies from API routes that don't need them
         // This significantly reduces bundle size for Vercel Functions (300mb limit)
+        // Target: reduce from 396mb to under 300mb (need to save ~100mb)
         '**/api/atlantico/sync/**': [
+          // Exclude Supabase (not used in sync) - saves ~100mb
           '**/node_modules/@supabase/**',
-          '**/node_modules/playwright/**',
-          '**/node_modules/tsx/**',
-          '**/node_modules/@playwright/**',
           '**/node_modules/.pnpm/**/@supabase/**',
+          // Exclude React/React-DOM (not needed in API routes) - saves ~50mb
+          '**/node_modules/react/**',
+          '**/node_modules/react-dom/**',
+          '**/node_modules/.pnpm/**/react/**',
+          '**/node_modules/.pnpm/**/react-dom/**',
+          // Exclude dev dependencies
+          '**/node_modules/playwright/**',
+          '**/node_modules/@playwright/**',
+          '**/node_modules/tsx/**',
           '**/node_modules/.pnpm/**/@playwright/**',
           '**/node_modules/.pnpm/**/playwright/**',
+          '**/node_modules/.pnpm/**/tsx/**',
+          // Exclude TypeScript compiler (not needed at runtime)
+          '**/node_modules/typescript/**',
+          '**/node_modules/.pnpm/**/typescript/**',
+          // Exclude ESLint (dev only)
+          '**/node_modules/eslint/**',
+          '**/node_modules/.pnpm/**/eslint/**',
+          // Exclude Prettier (dev only)
+          '**/node_modules/prettier/**',
+          '**/node_modules/.pnpm/**/prettier/**',
+          // Exclude next-intl client-side code (API routes don't need it)
+          '**/node_modules/next-intl/dist/client/**',
+          '**/node_modules/.pnpm/**/next-intl/**/dist/client/**',
         ],
         // Also exclude from other API routes that don't need these
         '**/api/atlantico/**': [
@@ -53,6 +76,9 @@ const nextConfig = {
           '**/node_modules/.pnpm/**/@supabase/**',
           '**/node_modules/.pnpm/**/@playwright/**',
           '**/node_modules/.pnpm/**/playwright/**',
+          '**/node_modules/.pnpm/**/tsx/**',
+          '**/node_modules/typescript/**',
+          '**/node_modules/.pnpm/**/typescript/**',
         ],
       },
     },

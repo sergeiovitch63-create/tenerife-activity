@@ -13,7 +13,7 @@
 
 import { atlanticoGet } from './client'
 import { getAtlanticoConfig } from './config'
-import { getImageForClassificationName } from '@/lib/images/classification-images'
+// Dynamic import to reduce bundle size - only load when needed (not at module load time)
 
 /**
  * Types from PDF (strict, no any)
@@ -159,7 +159,7 @@ export async function syncCatalog(
     const syncPromise = (async () => {
       // STEP 1: clasificationList/{language}/{Collaborator}
       // Note: PDF spelling is "clasificationList" (not "classificationList")
-        const step1Start = Date.now()
+      const step1Start = Date.now()
       const classifications = await atlanticoGet<Classification[]>(
         `/clasificationList/${language}/${collaborator}`
       )
@@ -230,7 +230,7 @@ export async function syncCatalog(
             
             if (!Array.isArray(eventIds) || eventIds.length === 0) {
               // No events in this group - create item from group only
-              const item = normalizeItem(
+              const item = await normalizeItem(
                 groupDetails,
                 group.Code,
                 language,
@@ -264,7 +264,7 @@ export async function syncCatalog(
                 stats.events++
 
                 // Normalize to catalog item (group + event)
-                const item = normalizeItem(
+                const item = await normalizeItem(
                   groupDetails,
                   group.Code,
                   language,
@@ -366,7 +366,7 @@ export async function syncCatalog(
  * Uses local images based on classification instead of Atlantico images
  * GUARANTEES: item.image is always a valid path (never null/undefined)
  */
-function normalizeItem(
+async function normalizeItem(
   groupDetails: GroupDetails,
   groupCode: string,
   language: string,
@@ -433,6 +433,8 @@ function normalizeItem(
 
   // Use local image based on classification/category (NOT Atlantico image)
   // Priority: classificationId > classificationCode > categoryId > categoryName > classificationName > keyword matching > default
+  // Dynamic import to reduce bundle size
+  const { getImageForClassificationName } = await import('@/lib/images/classification-images')
   const mappedImage = getImageForClassificationName(
     classificationCode,
     classificationName,
