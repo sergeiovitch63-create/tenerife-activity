@@ -8,9 +8,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { atlanticoGet } from '@/lib/atlantico/client'
 
-// DEV-only guard
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('This endpoint is DEV-only')
+// DEV-only guard - check at runtime, not at import time
+function checkDevOnly() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('This endpoint is DEV-only')
+  }
 }
 
 interface GroupDetailsAnalysis {
@@ -28,6 +30,7 @@ interface GroupDetailsAnalysis {
 }
 
 export async function GET(request: NextRequest) {
+  checkDevOnly()
   try {
     // Fetch backoffice data with fresh=1 to bypass cache and get ALL groups
     const backofficeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/atlantico/backoffice?lang=ENG&fresh=1`)

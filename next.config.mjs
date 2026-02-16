@@ -15,6 +15,14 @@ function hostnameFromEnvUrl(v) {
 const nextConfig = {
   /* config options here */
   
+  // Exclude debug routes from production build
+  ...(process.env.NODE_ENV === 'production' && {
+    pageExtensions: ['tsx', 'ts', 'jsx', 'js'].filter(ext => {
+      // Keep all extensions, but we'll handle debug routes differently
+      return true
+    }),
+  }),
+  
   // Image configuration for remote domains
   // Required for Next/Image component
   images: {

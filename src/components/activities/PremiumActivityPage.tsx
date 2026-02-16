@@ -270,7 +270,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug }: PremiumAc
                 </div>
               )}
 
-              {/* What's Included */}
+              {/* What&apos;s Included */}
               {activeTab === 'included' && (
                 <div className="space-y-8">
                   {activityFAQ ? (
@@ -282,7 +282,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug }: PremiumAc
                     </div>
                   ) : (
                     <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
-                      <p className="text-lg">Information about what's included will be displayed here.</p>
+                      <p className="text-lg">Information about what&apos;s included will be displayed here.</p>
                     </div>
                   )}
                 </div>

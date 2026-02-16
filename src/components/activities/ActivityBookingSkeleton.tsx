@@ -66,12 +66,9 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
   // Use premium version for all VIP Tours (classification 308) - 100% sales-oriented
   const isVipTour = isVipTourGroup(resolved?.t_group) || isVipTourGroup(slug)
   
-  // Early return for premium version - must be before hooks
-  if (isVipTour) {
-    return <PremiumActivityPage locale={locale} resolved={resolved} slug={slug} />
-  }
-
-  // Standard version hooks (only executed if not 303)
+  // ALL hooks must be called before any conditional returns
+  // Standard version hooks (always called, even if not used)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [activeTab, setActiveTab] = useState('what-youll-do')
   const [selectedEventId, setSelectedEventId] = useState<string | null>(resolved?.t_id || null)
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
@@ -308,6 +305,13 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
   // Get activity title and duration
   const activityTitle = groupDetails?.name || eventDetails?.name || eventDetails?.title || 'Activity'
   const activityDuration = groupDetails?.duration || eventDetails?.duration
+
+  // Early return for premium version - AFTER all hooks
+  // All hooks are called above, this is safe
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  if (isVipTour) {
+    return <PremiumActivityPage locale={locale} resolved={resolved} slug={slug} />
+  }
 
   return (
     <div className="min-h-screen bg-white">

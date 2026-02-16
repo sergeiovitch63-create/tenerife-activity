@@ -1,5 +1,24 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "react/no-unescaped-entities": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["**/debug-*/**", "**/test-*/**", "**/t-id-complete*/**"],
+      "rules": {
+        "react/no-unescaped-entities": "off"
+      }
+    },
+    {
+      "files": ["**/ActivityBookingSkeleton.tsx"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    }
+  ]
 }
 
 

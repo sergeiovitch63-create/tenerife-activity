@@ -8,9 +8,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { atlanticoGet } from '@/lib/atlantico/client'
 
-// DEV-only guard
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('This endpoint is DEV-only')
+// DEV-only guard - check at runtime, not at import time
+function checkDevOnly() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('This endpoint is DEV-only')
+  }
 }
 
 interface Classification {
@@ -21,6 +23,7 @@ interface Classification {
 }
 
 export async function GET(request: NextRequest) {
+  checkDevOnly()
   // DEV-only guard
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'This endpoint is DEV-only' }, { status: 403 })
