@@ -10,7 +10,7 @@
  * - Tabs: What you do / Description / Details / Prices / Cancellation / Reviews
  * - Calendar component (loadLimits)
  * - Prices component (loadPrices)
- * - Booking form (POST confirm/)
+ * - Booking form (POST /payment/ - redirects to payment gateway)
  * - Cancel booking (POST cancel)
  */
 
@@ -26,6 +26,7 @@ type EventOption = {
   label: string
   pProd?: '0' | '1' | '2' | '3'
   icons?: string[]
+  image?: string | null // Image URL for this event
 }
 
 type PricesResponseOk =
@@ -135,6 +136,17 @@ export function ActivityDetailClient({
   const [projectedAvailableDates, setProjectedAvailableDates] = useState<string[]>([])
   const [eventDetailsTimes, setEventDetailsTimes] = useState<string[]>([]) // For wdays_only mode
 
+  // Complete Atlantico info state
+  const [eventDetails, setEventDetails] = useState<any>(null)
+  const [groupDetails, setGroupDetails] = useState<any>(null)
+  const [limitsInfo, setLimitsInfo] = useState<any>(null)
+  
+  // Image states
+  const [eventImageUrl, setEventImageUrl] = useState<string | null>(null)
+  const [groupImageUrl, setGroupImageUrl] = useState<string | null>(null)
+  // Carousel state for event 303
+  const [heroCarouselIndex, setHeroCarouselIndex] = useState<number>(0)
+
   const [pricesData, setPricesData] = useState<PricesResponseOk | PricesResponseError | null>(null)
   const [priceStatus, setPriceStatus] = useState<PriceStatus>('idle')
 
@@ -149,9 +161,10 @@ export function ActivityDetailClient({
   const [isBooking, setIsBooking] = useState(false)
   const [bookingResult, setBookingResult] = useState<{ success: boolean; message: string } | null>(null)
 
-  // Auto-select first event option if only one
+  // Auto-select first event option if available
   useEffect(() => {
-    if (eventOptions.length === 1 && !selectedEventId) {
+    if (eventOptions.length > 0 && !selectedEventId) {
+      // Auto-select first option automatically
       setSelectedEventId(eventOptions[0].eventId)
     }
   }, [eventOptions, selectedEventId])
@@ -288,6 +301,226 @@ export function ActivityDetailClient({
       .finally(() => {
         setLoadingCalendar(false)
       })
+  }, [selectedEventId, lang, currentMonth])
+
+  // Fetch groupDetails immediately (always available)
+  useEffect(() => {
+    // SPECIAL CASE: Event 303 - Use local images
+    if (item.groupCode === '303') {
+      setGroupImageUrl('/images/events/303/A.webp')
+      // Still fetch groupDetails for other data, but override images with local ones
+      fetch(`/api/atlantico/group/${item.groupCode}/${lang}`)
+        .then(res => res.ok ? res.json() : null)
+        .then((data) => {
+          if (data) {
+            // Override images array with local images
+            const localImages = [
+              '/images/events/303/A.webp',
+              '/images/events/303/B.jpg',
+              '/images/events/303/C.jpg',
+              '/images/events/303/D.jpg',
+              '/images/events/303/E.jpg',
+            ]
+            setGroupDetails({
+              ...data,
+              images: localImages,
+              image: 'A.webp', // Main image
+            })
+          }
+        })
+        .catch(() => {})
+      return
+    }
+
+    fetch(`/api/atlantico/group/${item.groupCode}/${lang}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(async (data) => {
+        if (data) {
+          setGroupDetails(data)
+          // Resolve group image with same priority as server:
+          // 1) data.images[0] when it's a full URL
+          // 2) data.image (filename) resolved via Atlantico image base
+          // 3) keep existing hero/item image as fallback
+          let resolvedGroupImage: string | null = null
+
+          // 1) Use first entry of data.images if it's an absolute URL
+          if (Array.isArray(data.images) && data.images.length > 0) {
+            const firstImg = String(data.images[0]).trim()
+            if (firstImg.startsWith('http://') || firstImg.startsWith('https://')) {
+              resolvedGroupImage = firstImg
+            }
+          }
+
+          // 2) If no full URL from images[], use data.image (filename)
+          if (!resolvedGroupImage && data.image && typeof data.image === 'string' && data.image.trim()) {
+            const imageFilename = data.image.trim()
+            // Try to download locally via API
+            fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(imageFilename)}`)
+              .then(res => res.ok ? res.json() : null)
+              .then(async (result) => {
+                if (result?.url) {
+                  setGroupImageUrl(result.url)
+                } else {
+                  // Fallback: build remote URL
+                  const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                  const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
+                  if (remoteUrl) {
+                    setGroupImageUrl(remoteUrl)
+                  }
+                }
+              })
+              .catch(async () => {
+                // Fallback: build remote URL
+                const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
+                if (remoteUrl) {
+                  setGroupImageUrl(remoteUrl)
+                }
+              })
+          } else if (resolvedGroupImage) {
+            // We already have a full URL from images[]
+            setGroupImageUrl(resolvedGroupImage)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [item.groupCode, lang])
+
+  // Fetch complete Atlantico info when eventId is selected
+  useEffect(() => {
+    if (!selectedEventId) {
+      setEventDetails(null)
+      setLimitsInfo(null)
+      setEventImageUrl(null)
+      return
+    }
+
+    // Fetch eventDetails
+    fetch(`/api/atlantico/event/${selectedEventId}/${lang}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(async (data) => {
+        if (data) {
+          setEventDetails(data)
+          
+          // Extract image using extractCoverImage (same logic as server-side)
+          // Download and use local images for better performance
+          const { extractCoverImage } = await import('@/lib/atlantico/images')
+          const extractedImage = extractCoverImage(data)
+          
+          if (extractedImage) {
+            // If it's a full URL, try to download locally via API
+            if (extractedImage.startsWith('http://') || extractedImage.startsWith('https://')) {
+              // Extract filename from URL
+              const urlParts = extractedImage.split('/')
+              const filename = urlParts[urlParts.length - 1]
+              if (filename && /\.(jpg|jpeg|png|webp)$/i.test(filename)) {
+                // Download via API
+                fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(filename)}`)
+                  .then(res => res.ok ? res.json() : null)
+                  .then(result => {
+                    if (result?.url) {
+                      setEventImageUrl(result.url)
+                    } else {
+                      setEventImageUrl(extractedImage) // Fallback to remote URL
+                    }
+                  })
+                  .catch(() => setEventImageUrl(extractedImage))
+              } else {
+                setEventImageUrl(extractedImage)
+              }
+            } else {
+              // It's a filename, download via API
+              fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(extractedImage)}`)
+                .then(res => res.ok ? res.json() : null)
+                .then(result => {
+                  if (result?.url) {
+                    setEventImageUrl(result.url)
+                  } else {
+                    // Fallback: build remote URL
+                    const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                    setEventImageUrl(buildAtlanticoImageUrlFromFilename(extractedImage))
+                  }
+                })
+                .catch(() => {
+                  // Fallback: build remote URL
+                  import('@/lib/atlantico/images').then(({ buildAtlanticoImageUrlFromFilename }) => {
+                    setEventImageUrl(buildAtlanticoImageUrlFromFilename(extractedImage))
+                  })
+                })
+            }
+          } else {
+            // Fallback: try direct fields
+            const imageFields = ['image', 'imageUrl', 'imageFilename', 'img', 'photo', 'picture', 'cover']
+            let found = false
+            for (const field of imageFields) {
+              const value = data[field]
+              if (value && typeof value === 'string' && value.trim()) {
+                const trimmed = value.trim()
+                // If already full URL, try to extract filename
+                if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+                  const urlParts = trimmed.split('/')
+                  const filename = urlParts[urlParts.length - 1]
+                  if (filename && /\.(jpg|jpeg|png|webp)$/i.test(filename)) {
+                    fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(filename)}`)
+                      .then(res => res.ok ? res.json() : null)
+                      .then(result => {
+                        if (result?.url) {
+                          setEventImageUrl(result.url)
+                        } else {
+                          setEventImageUrl(trimmed)
+                        }
+                      })
+                      .catch(() => setEventImageUrl(trimmed))
+                  } else {
+                    setEventImageUrl(trimmed)
+                  }
+                  found = true
+                  break
+                }
+                // Otherwise it's a filename, download via API
+                fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(trimmed)}`)
+                  .then(res => res.ok ? res.json() : null)
+                  .then(result => {
+                    if (result?.url) {
+                      setEventImageUrl(result.url)
+                    } else {
+                      const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                      setEventImageUrl(buildAtlanticoImageUrlFromFilename(trimmed))
+                    }
+                  })
+                  .catch(() => {
+                    import('@/lib/atlantico/images').then(({ buildAtlanticoImageUrlFromFilename }) => {
+                      setEventImageUrl(buildAtlanticoImageUrlFromFilename(trimmed))
+                    })
+                  })
+                found = true
+                break
+              }
+            }
+            if (!found) {
+              setEventImageUrl(null)
+            }
+          }
+        }
+      })
+      .catch(() => {})
+
+    // Store limits info when fetched
+    const normalizedMonth = (() => {
+      const match = currentMonth.match(/^(\d{4}-\d{2})/)
+      if (match) {
+        return `${match[1]}-01`
+      }
+      const now = new Date()
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+    })()
+
+    fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}&month=${encodeURIComponent(normalizedMonth)}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data) setLimitsInfo(data)
+      })
+      .catch(() => {})
   }, [selectedEventId, lang, currentMonth])
 
   // Check if there are valid times for selected date
@@ -506,56 +739,242 @@ export function ActivityDetailClient({
     setBookingResult(null)
 
     try {
-      const response = await fetch('/api/atlantico/booking/confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          t_id: selectedEventId,
-          t_group: item.groupCode,
-          language: lang,
-          tourDate: selectedDate,
-          sesTime,
-          adults: bookingForm.adults,
-          childs: bookingForm.children || 0,
-          infants: bookingForm.infants || 0,
-          name: bookingForm.name,
-          email: bookingForm.email,
-          phone: bookingForm.phone,
-        }),
+      // Submit payment via native HTML form to avoid CORS issues
+      // Browser will navigate to the payment gateway HTML page
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/api/atlantico/booking/payment'
+      form.style.display = 'none'
+
+      // Add all payload fields as hidden inputs
+      const paymentPayload = {
+        t_id: selectedEventId,
+        t_group: item.groupCode,
+        language: lang,
+        tourDate: selectedDate,
+        sesTime,
+        adults: bookingForm.adults,
+        childs: bookingForm.children || 0,
+        infants: bookingForm.infants || 0,
+        name: bookingForm.name,
+        email: bookingForm.email,
+        phone: bookingForm.phone,
+      }
+
+      Object.entries(paymentPayload).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = String(value)
+          form.appendChild(input)
+        }
       })
 
-      const data = await response.json()
-
-      if (data.ok && data.reference) {
-        setBookingResult({ success: true, message: `Booking confirmed! Reference: ${data.reference}` })
-      } else {
-        let errorMessage = data.reason || data.message || 'Booking failed'
-        // Improve error message for MISSING_ATLANTICO_USER_ID
-        if (errorMessage.includes('MISSING_ATLANTICO_USER_ID')) {
-          errorMessage = 'Server configuration error: ATLANTICO_USER_ID is missing. Please contact support.'
-        }
-        setBookingResult({ success: false, message: errorMessage })
-      }
+      // Append form to body and submit
+      document.body.appendChild(form)
+      form.submit()
+      
+      // Note: Form submission will navigate the browser to the payment gateway
+      // No need to handle response here - browser handles HTML rendering automatically
+      return
     } catch (error) {
-      setBookingResult({ success: false, message: error instanceof Error ? error.message : 'Booking failed' })
-    } finally {
+      let errorMessage = error instanceof Error ? error.message : 'Booking failed'
+      // Improve error message for MISSING_ATLANTICO_USER_ID
+      if (errorMessage.includes('MISSING_ATLANTICO_USER_ID')) {
+        errorMessage = 'Server configuration error: ATLANTICO_USER_ID is missing. Please contact support.'
+      }
+      setBookingResult({ success: false, message: errorMessage })
       setIsBooking(false)
     }
   }
 
+  // Images for event 303 carousel
+  const event303Images = useMemo(() => [
+    '/images/events/303/A.webp',
+    '/images/events/303/B.jpg',
+    '/images/events/303/C.jpg',
+    '/images/events/303/D.jpg',
+    '/images/events/303/E.jpg',
+  ], [])
+
+  // Determine which image to show in hero: event image if selected, otherwise groupDetails.image, then default
+  // Priority: eventImageUrl (from eventDetails - loaded dynamically) > selectedOption.image (from server - immediate) > groupImageUrl (from groupDetails.image - PDF format) > heroImageUrl > item.image
+  // SPECIAL CASE: Event 303 uses carousel (handled separately in render)
+  // CRITICAL: Use selectedOption.image immediately if available (it's already resolved on server)
+  // Then update with eventImageUrl when it loads (if different)
+  // groupDetails.image (from PDF) takes priority over classification-based fallback
+  const heroImage = useMemo(() => {
+    // SPECIAL CASE: Event 303 - Use carousel (return first image as fallback)
+    if (item.groupCode === '303') {
+      return event303Images[0]
+    }
+    
+    // If we have eventImageUrl (loaded dynamically from eventDetails), use it
+    if (eventImageUrl) return eventImageUrl
+    // Otherwise use selectedOption.image (already resolved on server)
+    if (selectedOption?.image) return selectedOption.image
+    // Then use groupImageUrl (from groupDetails.image - PDF format: "garachico-san-miguel1.jpg")
+    if (groupImageUrl) return groupImageUrl
+    // Fallback to defaults
+    return heroImageUrl || item.image || undefined
+  }, [eventImageUrl, selectedOption?.image, groupImageUrl, heroImageUrl, item.image, item.groupCode, event303Images])
+
+  // Auto-advance carousel for event 303
+  useEffect(() => {
+    if (item.groupCode !== '303') return
+    
+    const interval = setInterval(() => {
+      setHeroCarouselIndex((prev) => (prev + 1) % event303Images.length)
+    }, 5000) // Change image every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [item.groupCode, event303Images.length])
+
+  // Navigation functions for carousel
+  const goToPreviousImage = () => {
+    setHeroCarouselIndex((prev) => (prev - 1 + event303Images.length) % event303Images.length)
+  }
+
+  const goToNextImage = () => {
+    setHeroCarouselIndex((prev) => (prev + 1) % event303Images.length)
+  }
+
+  const goToImage = (index: number) => {
+    setHeroCarouselIndex(index)
+  }
+  
+  // Debug: Log image resolution
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[HERO_IMAGE_DEBUG]', {
+        eventImageUrl,
+        selectedOptionImage: selectedOption?.image,
+        groupImageUrl,
+        heroImageUrl,
+        itemImage: item.image,
+        finalHeroImage: heroImage,
+        selectedEventId,
+        selectedOptionLabel: selectedOption?.label,
+        groupDetailsImage: groupDetails?.image,
+      })
+    }
+  }, [eventImageUrl, selectedOption?.image, groupImageUrl, heroImageUrl, item.image, heroImage, selectedEventId, selectedOption, groupDetails])
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="relative w-full h-96 bg-ocean-600">
-        <SafeImage
-          src={heroImageUrl || item.image || undefined}
-          alt={item.title}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+      <div className="relative w-full h-96 bg-ocean-600 overflow-hidden">
+        {/* SPECIAL CASE: Event 303 - Image Carousel */}
+        {item.groupCode === '303' ? (
+          <>
+            {/* Carousel Images */}
+            <div className="absolute inset-0" style={{ zIndex: 0 }}>
+              {event303Images.map((img, index) => (
+                <div
+                  key={img}
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    index === heroCarouselIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <SafeImage
+                    src={img}
+                    alt={`${item.title} - Photo ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* Navigation Arrows */}
+            {event303Images.length > 1 && (
+              <>
+                <button
+                  onClick={goToPreviousImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all"
+                  aria-label="Previous image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={goToNextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all"
+                  aria-label="Next image"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Carousel Indicators */}
+            {event303Images.length > 1 && (
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+                {event303Images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToImage(index)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === heroCarouselIndex
+                        ? 'bg-white w-8'
+                        : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Overlay gradient for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" style={{ zIndex: 1 }} />
+          </>
+        ) : (
+          /* Standard Hero Image */
+          <>
+            {heroImage ? (
+              <>
+                <div className="absolute inset-0" style={{ zIndex: 0 }}>
+                  <SafeImage
+                    key={heroImage} // Force re-render when image changes
+                    src={heroImage}
+                    alt={selectedOption?.label || item.title}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover"
+                    onError={(e) => {
+                      if (process.env.NODE_ENV === 'development') {
+                        console.error('[HERO_IMAGE_ERROR] Failed to load image:', heroImage, e)
+                      }
+                    }}
+                    onLoad={() => {
+                      if (process.env.NODE_ENV === 'development') {
+                        console.log('[HERO_IMAGE_SUCCESS] Image loaded:', heroImage)
+                      }
+                    }}
+                  />
+                </div>
+                {/* Overlay gradient for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" style={{ zIndex: 1 }} />
+              </>
+            ) : (
+              <div className="w-full h-full bg-ocean-600" />
+            )}
+          </>
+        )}
+        
+        {/* Title overlay on hero */}
+        <div className="absolute bottom-0 left-0 right-0 p-8" style={{ zIndex: 2 }}>
+          <h1 className="text-4xl font-bold text-white mb-2">{item.title}</h1>
+          {eventDetails?.times && eventDetails.times.length > 0 && (
+            <p className="text-white/90">Duration: {eventDetails.times.length}</p>
+          )}
+        </div>
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl py-8">
@@ -578,19 +997,40 @@ export function ActivityDetailClient({
             {eventOptions.length > 0 && (
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-glass-900 mb-2">Available Options</h2>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {eventOptions.map((opt) => (
                     <button
                       key={opt.eventId}
                       type="button"
                       onClick={() => setSelectedEventId(opt.eventId)}
-                      className={`px-3 py-1 rounded-full border text-sm ${
+                      className={`text-left rounded-lg border overflow-hidden transition-all ${
                         selectedEventId === opt.eventId
-                          ? 'bg-ocean-600 text-white border-ocean-600'
-                          : 'bg-white text-glass-800 border-glass-300 hover:border-ocean-300'
+                          ? 'border-ocean-600 ring-2 ring-ocean-200 shadow-md'
+                          : 'border-glass-300 hover:border-ocean-300 hover:shadow-sm'
                       }`}
                     >
-                      {opt.label}
+                      {/* Event Image */}
+                      {opt.image && (
+                        <div className="w-full h-48 bg-glass-100 relative overflow-hidden">
+                          <SafeImage
+                            src={opt.image}
+                            alt={opt.label}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
+                        </div>
+                      )}
+                      {/* Event Label */}
+                      <div className={`p-3 ${opt.image ? '' : 'p-4'}`}>
+                        <span className={`text-sm font-medium ${
+                          selectedEventId === opt.eventId
+                            ? 'text-ocean-600'
+                            : 'text-glass-800'
+                        }`}>
+                          {opt.label}
+                        </span>
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -638,6 +1078,30 @@ export function ActivityDetailClient({
                   ) : (
                     <p className="text-glass-500">No overview available.</p>
                   )}
+
+                  {/* Atlantico Images Gallery from groupDetails.images */}
+                  {Array.isArray(groupDetails?.images) && groupDetails.images.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-3">Photos</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {groupDetails.images.map((img: any, idx: number) => {
+                          const src = typeof img === 'string' ? img.trim() : ''
+                          if (!src) return null
+                          return (
+                            <div key={idx} className="relative w-full aspect-video rounded-lg overflow-hidden border border-glass-200 bg-glass-100">
+                              <SafeImage
+                                src={src}
+                                alt={`${item.title} photo ${idx + 1}`}
+                                fill
+                                sizes="33vw"
+                                className="object-cover"
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -658,16 +1122,328 @@ export function ActivityDetailClient({
               {selectedTab === 'details' && (
                 <div>
                   <h2>Details</h2>
-                  <dl className="grid grid-cols-2 gap-4">
-                    <dt className="font-medium">Group Code:</dt>
-                    <dd>{item.groupCode}</dd>
-                    {selectedEventId && (
-                      <>
-                        <dt className="font-medium">Selected Event ID:</dt>
-                        <dd>{selectedEventId}</dd>
-                      </>
-                    )}
-                  </dl>
+                  
+                  {/* Basic Info - Always show */}
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-lg mb-3">Basic Information</h3>
+                    <dl className="grid grid-cols-2 gap-4">
+                      <dt className="font-medium">Group Code:</dt>
+                      <dd>{item.groupCode}</dd>
+                      {groupDetails?.code && (
+                        <>
+                          <dt className="font-medium">Group Code (from API):</dt>
+                          <dd>{groupDetails.code}</dd>
+                        </>
+                      )}
+                      {selectedEventId ? (
+                        <>
+                          <dt className="font-medium">Event ID (t_id):</dt>
+                          <dd>{selectedEventId}</dd>
+                        </>
+                      ) : (
+                        <>
+                          <dt className="font-medium">Event ID:</dt>
+                          <dd className="text-glass-500">Select an option above to see event details</dd>
+                        </>
+                      )}
+                      {eventDetails?.code && (
+                        <>
+                          <dt className="font-medium">Event Code:</dt>
+                          <dd>{eventDetails.code}</dd>
+                        </>
+                      )}
+                    </dl>
+                  </div>
+
+                  {/* Event Details */}
+                  {selectedEventId && !eventDetails && (
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-blue-800 text-sm">Loading event details...</p>
+                    </div>
+                  )}
+                  {eventDetails && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-lg mb-3">Event Details</h3>
+                      
+                      {/* Event Image */}
+                      {eventImageUrl && (
+                        <div className="mb-4">
+                          <dt className="font-medium mb-2">Event Image:</dt>
+                          <dd>
+                            <SafeImage
+                              src={eventImageUrl}
+                              alt={eventDetails.name || eventDetails.title || 'Event image'}
+                              width={800}
+                              height={400}
+                              className="rounded-lg border border-glass-200 w-full max-w-2xl object-cover"
+                            />
+                          </dd>
+                        </div>
+                      )}
+                      
+                      <dl className="grid grid-cols-2 gap-4">
+                        {eventDetails.name && (
+                          <>
+                            <dt className="font-medium">Name:</dt>
+                            <dd>{eventDetails.name}</dd>
+                          </>
+                        )}
+                        {eventDetails.title && (
+                          <>
+                            <dt className="font-medium">Title:</dt>
+                            <dd>{eventDetails.title}</dd>
+                          </>
+                        )}
+                        {eventDetails.route && (
+                          <>
+                            <dt className="font-medium">Route:</dt>
+                            <dd>{eventDetails.route}</dd>
+                          </>
+                        )}
+                        {eventDetails.times && Array.isArray(eventDetails.times) && eventDetails.times.length > 0 && (
+                          <>
+                            <dt className="font-medium">Available Times:</dt>
+                            <dd>{eventDetails.times.join(', ')}</dd>
+                          </>
+                        )}
+                        {eventDetails.days && Array.isArray(eventDetails.days) && eventDetails.days.length > 0 && (
+                          <>
+                            <dt className="font-medium">Available Days:</dt>
+                            <dd>{eventDetails.days.join(', ')}</dd>
+                          </>
+                        )}
+                        {eventDetails.pProd !== undefined && (
+                          <>
+                            <dt className="font-medium">Price Product (pProd):</dt>
+                            <dd>{eventDetails.pProd}</dd>
+                          </>
+                        )}
+                        {eventDetails.image && (
+                          <>
+                            <dt className="font-medium">Image Filename:</dt>
+                            <dd className="text-xs font-mono break-all">{eventDetails.image}</dd>
+                          </>
+                        )}
+                        {eventDetails.id && (
+                          <>
+                            <dt className="font-medium">Internal ID:</dt>
+                            <dd>{eventDetails.id}</dd>
+                          </>
+                        )}
+                      </dl>
+                      {eventDetails.desc && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">Description:</dt>
+                          <dd className="prose prose-sm max-w-none" dangerouslySetInnerHTML={sanitizeAtlanticoHtml(eventDetails.desc)} />
+                        </div>
+                      )}
+                      {eventDetails.meetingPoints && Array.isArray(eventDetails.meetingPoints) && eventDetails.meetingPoints.length > 0 && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">Meeting Points:</dt>
+                          <dd>
+                            <ul className="list-disc list-inside space-y-1">
+                              {eventDetails.meetingPoints.map((point: any, idx: number) => (
+                                <li key={idx}>{typeof point === 'string' ? point : JSON.stringify(point)}</li>
+                              ))}
+                            </ul>
+                          </dd>
+                        </div>
+                      )}
+                      {eventDetails.icons && Array.isArray(eventDetails.icons) && eventDetails.icons.length > 0 && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">Icons:</dt>
+                          <dd className="flex flex-wrap gap-2">
+                            {eventDetails.icons.map((icon: string, idx: number) => (
+                              <EventIcon key={idx} filename={icon} />
+                            ))}
+                          </dd>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Group Details */}
+                  {groupDetails && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-lg mb-3">Group Details</h3>
+                      
+                      {/* Group Image */}
+                      {groupImageUrl && (
+                        <div className="mb-4">
+                          <dt className="font-medium mb-2">Group Image:</dt>
+                          <dd>
+                            <SafeImage
+                              src={groupImageUrl}
+                              alt={groupDetails.name || 'Group image'}
+                              width={800}
+                              height={400}
+                              className="rounded-lg border border-glass-200 w-full max-w-2xl object-cover"
+                            />
+                          </dd>
+                        </div>
+                      )}
+                      
+                      <dl className="grid grid-cols-2 gap-4">
+                        {groupDetails.name && (
+                          <>
+                            <dt className="font-medium">Name:</dt>
+                            <dd>{groupDetails.name}</dd>
+                          </>
+                        )}
+                        {groupDetails.duration && (
+                          <>
+                            <dt className="font-medium">Duration:</dt>
+                            <dd>{groupDetails.duration}</dd>
+                          </>
+                        )}
+                        {groupDetails.ids && (
+                          <>
+                            <dt className="font-medium">Event IDs:</dt>
+                            <dd>{String(groupDetails.ids)}</dd>
+                          </>
+                        )}
+                        {groupDetails.events && Array.isArray(groupDetails.events) && groupDetails.events.length > 0 && (
+                          <>
+                            <dt className="font-medium">Events:</dt>
+                            <dd>{groupDetails.events.join(', ')}</dd>
+                          </>
+                        )}
+                        {groupDetails.image && (
+                          <>
+                            <dt className="font-medium">Image Filename:</dt>
+                            <dd className="text-xs font-mono break-all">{groupDetails.image}</dd>
+                          </>
+                        )}
+                        {groupDetails.price !== undefined && groupDetails.price !== null && (
+                          <>
+                            <dt className="font-medium">Base Price:</dt>
+                            <dd>{typeof groupDetails.price === 'number' ? formatEUR(groupDetails.price) : groupDetails.price}</dd>
+                          </>
+                        )}
+                      </dl>
+                      {groupDetails.desc && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">Description:</dt>
+                          <dd className="prose prose-sm max-w-none" dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Limits Info */}
+                  {selectedEventId && !limitsInfo && (
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-blue-800 text-sm">Loading availability information...</p>
+                    </div>
+                  )}
+                  {limitsInfo && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-lg mb-3">Availability Information</h3>
+                      <dl className="grid grid-cols-2 gap-4">
+                        {limitsInfo.calendarMode && (
+                          <>
+                            <dt className="font-medium">Calendar Mode:</dt>
+                            <dd>{limitsInfo.calendarMode}</dd>
+                          </>
+                        )}
+                        {limitsInfo.requiresSessionTime !== undefined && (
+                          <>
+                            <dt className="font-medium">Requires Session Time:</dt>
+                            <dd>{limitsInfo.requiresSessionTime ? 'Yes' : 'No'}</dd>
+                          </>
+                        )}
+                        {limitsInfo.quote !== null && limitsInfo.quote !== undefined && (
+                          <>
+                            <dt className="font-medium">Quote:</dt>
+                            <dd>{limitsInfo.quote}</dd>
+                          </>
+                        )}
+                        {limitsInfo.availableDates && Array.isArray(limitsInfo.availableDates) && (
+                          <>
+                            <dt className="font-medium">Available Dates Count:</dt>
+                            <dd>{limitsInfo.availableDates.length}</dd>
+                          </>
+                        )}
+                        {limitsInfo.projectedAvailableDates && Array.isArray(limitsInfo.projectedAvailableDates) && (
+                          <>
+                            <dt className="font-medium">Projected Available Dates Count:</dt>
+                            <dd>{limitsInfo.projectedAvailableDates.length}</dd>
+                          </>
+                        )}
+                        {limitsInfo.sessionsByDay && Object.keys(limitsInfo.sessionsByDay).length > 0 && (
+                          <>
+                            <dt className="font-medium">Days with Sessions:</dt>
+                            <dd>{Object.keys(limitsInfo.sessionsByDay).length}</dd>
+                          </>
+                        )}
+                        {limitsInfo.wdays && Array.isArray(limitsInfo.wdays) && limitsInfo.wdays.length > 0 && (
+                          <>
+                            <dt className="font-medium">Weekdays Available:</dt>
+                            <dd>
+                              {limitsInfo.wdays.map((wday: number) => {
+                                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+                                return days[wday] || `Day ${wday}`
+                              }).join(', ')}
+                            </dd>
+                          </>
+                        )}
+                      </dl>
+                      {limitsInfo.availableDates && Array.isArray(limitsInfo.availableDates) && limitsInfo.availableDates.length > 0 && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">First 10 Available Dates:</dt>
+                          <dd className="text-sm">
+                            {limitsInfo.availableDates.slice(0, 10).join(', ')}
+                            {limitsInfo.availableDates.length > 10 && ` ... and ${limitsInfo.availableDates.length - 10} more`}
+                          </dd>
+                        </div>
+                      )}
+                      {limitsInfo.sessionsByDay && Object.keys(limitsInfo.sessionsByDay).length > 0 && (
+                        <div className="mt-4">
+                          <dt className="font-medium mb-2">Sample Sessions (first 3 dates):</dt>
+                          <dd>
+                            <div className="space-y-2">
+                              {Object.entries(limitsInfo.sessionsByDay).slice(0, 3).map(([date, sessions]: [string, any]) => (
+                                <div key={date} className="text-sm border-l-2 border-ocean-300 pl-2">
+                                  <strong>{date}:</strong> {Array.isArray(sessions) ? sessions.map((s: any) => `${s.time || 'N/A'} (${s.available || 0} available)`).join(', ') : 'No sessions'}
+                                </div>
+                              ))}
+                            </div>
+                          </dd>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Raw Data (Collapsible) */}
+                  <details className="mt-6">
+                    <summary className="cursor-pointer font-semibold text-lg mb-3">Raw API Data (Debug)</summary>
+                    <div className="mt-4 space-y-4">
+                      {eventDetails && (
+                        <div>
+                          <h4 className="font-medium mb-2">Event Details (Raw):</h4>
+                          <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-96">
+                            {JSON.stringify(eventDetails, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                      {groupDetails && (
+                        <div>
+                          <h4 className="font-medium mb-2">Group Details (Raw):</h4>
+                          <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-96">
+                            {JSON.stringify(groupDetails, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                      {limitsInfo && (
+                        <div>
+                          <h4 className="font-medium mb-2">Limits Info (Raw):</h4>
+                          <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-96">
+                            {JSON.stringify(limitsInfo, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  </details>
                 </div>
               )}
 
@@ -804,38 +1580,105 @@ export function ActivityDetailClient({
                       <strong>{new Date(autoSwitchedMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</strong>
                     </div>
                   )}
-                <div className="grid grid-cols-7 gap-2">
-                  {Array.from({ length: 31 }).map((_, idx) => {
+
+                  {/* Month Navigation */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="px-3 py-1 text-sm font-medium text-glass-700 bg-white border border-glass-300 rounded hover:bg-glass-50"
+                      aria-label="Previous month"
+                    >
+                      ← Prev
+                    </button>
+                    <h3 className="text-lg font-semibold text-glass-900">
+                      {(() => {
+                        const [year, month] = currentMonth.split('-').map(Number)
+                        const date = new Date(year, month - 1, 1)
+                        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                      })()}
+                    </h3>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      className="px-3 py-1 text-sm font-medium text-glass-700 bg-white border border-glass-300 rounded hover:bg-glass-50"
+                      aria-label="Next month"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                {/* Calendar Header */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1">
+                  {(() => {
                     const [yearStr, monthStr] = currentMonth.split('-')
                     const year = Number(yearStr)
                     const month = Number(monthStr)
-                    const day = idx + 1
-                    const date = new Date(year, month - 1, day)
-                    if (date.getMonth() !== month - 1) return null
-                    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-                    const isAvailable = availableDatesSet.has(dateStr)
-                    const isSelected = selectedDate === dateStr
-                    return (
-                      <button
-                        key={dateStr}
-                        onClick={() => {
-                          if (isAvailable) {
-                            setSelectedDate(dateStr)
-                          }
-                        }}
-                        disabled={!isAvailable}
-                        className={`p-2 rounded border text-sm ${
-                          isSelected
-                            ? 'bg-ocean-600 text-white border-ocean-600'
-                            : isAvailable
-                              ? 'bg-white border-glass-200 hover:border-ocean-300'
-                              : 'bg-glass-100 text-glass-400 border-glass-200 cursor-not-allowed'
-                        }`}
-                      >
-                        {day}
-                      </button>
-                    )
-                  })}
+                    const firstDay = new Date(year, month - 1, 1)
+                    const lastDay = new Date(year, month, 0)
+                    const daysInMonth = lastDay.getDate()
+                    const startingDayOfWeek = firstDay.getDay() // 0 = Sunday
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
+
+                    const days: Array<{ day: number; dateStr: string; isAvailable: boolean; isToday: boolean; isPast: boolean }> = []
+
+                    // Empty cells for days before month starts
+                    for (let i = 0; i < startingDayOfWeek; i++) {
+                      days.push({ day: 0, dateStr: '', isAvailable: false, isToday: false, isPast: false })
+                    }
+
+                    // Days of month
+                    for (let day = 1; day <= daysInMonth; day++) {
+                      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                      const date = new Date(year, month - 1, day)
+                      const isToday = date.getTime() === today.getTime()
+                      const isPast = date < today
+                      // Use projectedAvailableDates for wdays_only, otherwise availableDates
+                      const datesToCheck = calendarMode === 'wdays_only' ? projectedAvailableDates : availableDates
+                      const isAvailable = !isPast && datesToCheck.includes(dateStr)
+
+                      days.push({ day, dateStr, isAvailable, isToday, isPast })
+                    }
+
+                    return days.map((dayData, idx) => {
+                      if (dayData.day === 0) {
+                        return <div key={`empty-${idx}`} className="aspect-square" />
+                      }
+
+                      const isSelected = selectedDate === dayData.dateStr
+                      const isClickable = dayData.isAvailable && !dayData.isPast
+
+                      return (
+                        <button
+                          key={dayData.dateStr}
+                          onClick={() => {
+                            if (isClickable) {
+                              setSelectedDate(dayData.dateStr)
+                            }
+                          }}
+                          disabled={!isClickable}
+                          className={`aspect-square p-1 rounded border text-sm transition-colors ${
+                            isSelected
+                              ? 'bg-ocean-600 text-white border-ocean-600 font-semibold'
+                              : dayData.isToday && !isSelected
+                              ? 'bg-ocean-50 text-ocean-700 border-ocean-300 ring-2 ring-ocean-200'
+                              : isClickable
+                              ? 'bg-white text-glass-900 border-glass-200 hover:bg-ocean-50 hover:border-ocean-300 cursor-pointer'
+                              : 'bg-glass-100 text-glass-400 border-glass-200 cursor-not-allowed opacity-60'
+                          }`}
+                        >
+                          {dayData.day}
+                        </button>
+                      )
+                    })
+                  })()}
                 </div>
 
                 {/* Time picker - show for wdays_only mode with eventDetailsTimes */}

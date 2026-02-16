@@ -22,23 +22,37 @@ export function getBaseUrl(): string {
   // Priority 1: Use ATLANTICO_BASE_URL if defined and valid (not IP:port)
   const baseUrl = process.env.ATLANTICO_BASE_URL?.trim()
   if (baseUrl) {
-    // Reject IP:port patterns (e.g., http://46.224.147.162:8080)
-    const ipPortPattern = /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+/
-    if (!ipPortPattern.test(baseUrl)) {
+    // CRITICAL: Reject IP:port patterns (e.g., http://46.224.147.162:8080)
+    // Also reject IP without port but with http (not https)
+    const ipPortPattern = /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?/
+    const isIPAddress = ipPortPattern.test(baseUrl)
+    
+    if (isIPAddress) {
+      // Log warning and fall through to official domains
+      console.warn('[ATLANTICO_BASE_URL] Rejected IP address:', baseUrl, '- Using official domain instead')
+    } else {
+      // Valid domain, use it
       return baseUrl
     }
-    // If it's an IP:port, fall through to official domains
   }
   
   // Priority 2: Use ATLANTICO_ENV-based selection (official domains only)
   const env = process.env.ATLANTICO_ENV?.toLowerCase().trim()
   
   if (env === 'test') {
-    return 'https://testapi.atlanticoexcursiones.com'
+    const officialUrl = 'https://testapi.atlanticoexcursiones.com'
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ATLANTICO_BASE_URL] Using test environment:', officialUrl)
+    }
+    return officialUrl
   }
   
   // Default to production
-  return 'https://api.atlanticoexcursiones.com'
+  const officialUrl = 'https://api.atlanticoexcursiones.com'
+  if (process.env.NODE_ENV === 'development' && baseUrl) {
+    console.log('[ATLANTICO_BASE_URL] IP address rejected, using production:', officialUrl)
+  }
+  return officialUrl
 }
 
 /**

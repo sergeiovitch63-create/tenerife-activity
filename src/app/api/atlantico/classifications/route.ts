@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
   lang = lang.toUpperCase()
 
   // Get collaborator from env (required for classificationList endpoint)
-  const collaborator = process.env.ATLANTICO_COLLABORATOR || process.env.ATLANTICO_OFFICE || '12056'
+  const collaborator = process.env.ATLANTICO_COLLABORATOR || process.env.ATLANTICO_OFFICE || '3645'
 
   try {
     // Call Atlantico API: clasificationList/{language}/{Collaborator}
@@ -109,6 +109,12 @@ export async function GET(request: NextRequest) {
     )
   }
 }
+
+
+
+
+
+
 
 
 

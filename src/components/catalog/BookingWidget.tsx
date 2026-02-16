@@ -1197,10 +1197,24 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
 
                   if (paymentResponse.ok && contentType.includes('text/html')) {
                     const html = await paymentResponse.text()
+                    // CRITICAL: Replace entire page with payment form HTML
+                    // This ensures the auto-submit script works correctly
                     document.open()
                     document.write(html)
                     document.close()
                     return
+                  }
+                  
+                  // Also handle if response is HTML but content-type is not set correctly
+                  if (paymentResponse.ok) {
+                    const text = await paymentResponse.text()
+                    // Check if it's HTML by looking for HTML tags
+                    if (text.trim().startsWith('<html') || text.trim().startsWith('<!DOCTYPE') || text.includes('<form')) {
+                      document.open()
+                      document.write(text)
+                      document.close()
+                      return
+                    }
                   }
 
                   // Payment failed - try to extract JSON error, otherwise fall back to cart

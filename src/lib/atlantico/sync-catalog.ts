@@ -445,6 +445,15 @@ function normalizeItem(
   // GUARANTEE: Always have a valid image path (never null/undefined)
   const localImage = mappedImage || '/images/hero-poster.jpg'
 
+  // SPECIAL CASE: Override image for specific events/groups when requested by client
+  // User requirement: activity/event 509 must have a nice fixed local image
+  let finalImage = localImage
+  if (eventCode === '509' || stableSlug === '509' || groupCode === '55') {
+    // Use a curated local hero image for this activity
+    // File exists in public/images/home/must-see/row-2/teide-by-night.jpg
+    finalImage = '/images/home/must-see/row-2/teide-by-night.jpg'
+  }
+
   return {
     id: stableId,
     slug: stableSlug,
@@ -456,8 +465,8 @@ function normalizeItem(
     price,
     currency: 'EUR', // Default currency (from PDF context)
     // Use local image, NOT Atlantico image - GUARANTEED to be non-empty
-    image: localImage,
-    images: [localImage],
+    image: finalImage,
+    images: [finalImage],
     _raw: {
       group: groupDetails,
       event: eventDetails,

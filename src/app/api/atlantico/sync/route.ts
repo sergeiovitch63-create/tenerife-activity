@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl
     const lang = searchParams.get('lang') || process.env.ATLANTICO_LANGUAGE_DEFAULT || 'ENG'
-    const collaborator = process.env.ATLANTICO_COLLABORATOR || '12056'
+    const collaborator = process.env.ATLANTICO_COLLABORATOR || '3645'
     const forceFull = searchParams.get('full') === '1'
 
     // Validate lang

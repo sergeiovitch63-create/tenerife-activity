@@ -54,3 +54,9 @@ Images are served from `/placeholders/<name>.jpg` and work with Next.js Image co
 
 
 
+
+
+
+
+
+

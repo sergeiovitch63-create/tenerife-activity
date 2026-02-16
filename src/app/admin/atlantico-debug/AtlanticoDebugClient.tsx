@@ -365,22 +365,23 @@ export function AtlanticoDebugClient() {
         </p>
         <div className="text-sm text-gray-700 space-y-2">
           <p>
-            <strong>POST /api/atlantico/booking/confirm</strong>
-          </p>
-          <p>
-            Body: {'{'} userId, t_id, t_group, language, tourDate, sesTime, adults, childs, infants, name, email, phone, ... {'}'}
-          </p>
-          <p className="mt-4">
             <strong>POST /api/atlantico/booking/payment</strong>
           </p>
           <p>
-            Body: Same as confirm. Returns redirectUrl if payment gateway is provided.
+            Body: {'{'} userId, t_id, t_group, language, tourDate, sesTime, adults, childs, infants, name, email, phone, hotel?, room?, mpoint?, mtime?, notes? {'}'}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Returns: HTML payment gateway form or redirect to payment gateway
           </p>
         </div>
       </div>
     </div>
   )
 }
+
+
+
+
 
 
 

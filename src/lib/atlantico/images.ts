@@ -4,7 +4,47 @@
  * Handles various image field formats and normalizes to absolute URLs
  */
 
-const ATLANTICO_IMAGE_BASE_URL = 'https://static.atlantico-excursiones.com/images'
+/**
+ * Check if a URL is an IP address (to reject it)
+ */
+function isIPAddress(url: string): boolean {
+  const ipPortPattern = /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?/
+  return ipPortPattern.test(url)
+}
+
+/**
+ * Get the base URL for Atlantico images
+ * Uses the API base URL + /images path (e.g., https://api.atlanticoexcursiones.com/images)
+ * NEVER uses IP addresses - always uses official domains
+ */
+export function getAtlanticoImageBaseUrl(): string {
+  // Try to get from environment variable first
+  const envBase = 
+    process.env.ATLANTICO_IMAGES_BASE_URL ||
+    process.env.ATLANTICO_ASSETS_BASE_URL ||
+    process.env.NEXT_PUBLIC_ATLANTICO_IMAGES_BASE_URL ||
+    process.env.NEXT_PUBLIC_ATLANTICO_ASSETS_BASE_URL
+
+  if (envBase && envBase.trim()) {
+    const base = envBase.trim().replace(/\/+$/, '')
+    // Reject IP addresses
+    if (isIPAddress(base)) {
+      console.warn('[ATLANTICO_IMAGE_BASE] Rejected IP address in env var, using official domain')
+    } else {
+      return base
+    }
+  }
+
+  // Fallback: use official API domain + /images (NEVER use IP addresses)
+  // Use ATLANTICO_ENV to determine base
+  const env = process.env.ATLANTICO_ENV?.toLowerCase().trim()
+  if (env === 'test') {
+    return 'https://testapi.atlanticoexcursiones.com/images'
+  }
+  
+  // Default to production API (always use official domain, never IP)
+  return 'https://api.atlanticoexcursiones.com/images'
+}
 
 /**
  * Normalize a single image URL string to a valid absolute URL
@@ -49,20 +89,23 @@ function normalizeImageUrl(url: string | null | undefined, baseUrl?: string): st
   if (normalized.startsWith('/')) {
     // Remove leading slash if present (we'll add it back)
     const path = normalized.startsWith('/') ? normalized : `/${normalized}`
-    return `${ATLANTICO_IMAGE_BASE_URL}${path}`
+    const imageBase = getAtlanticoImageBaseUrl()
+    return `${imageBase}${path}`
   }
 
   // Looks like a filename (contains "." and no "http" or "/")
   // Examples: "Teleferico.jpg", "image.png", "photo.jpg"
   if (normalized.includes('.') && !normalized.includes('://') && !normalized.startsWith('/')) {
     // Build full URL with filename
-    return `${ATLANTICO_IMAGE_BASE_URL}/${encodeURIComponent(normalized)}`
+    const imageBase = getAtlanticoImageBaseUrl()
+    return `${imageBase}/${encodeURIComponent(normalized)}`
   }
 
   // If we get here and it's not a URL, assume it's a filename anyway
   // (some APIs might return filenames without extensions)
   if (!normalized.includes('://') && !normalized.startsWith('/')) {
-    return `${ATLANTICO_IMAGE_BASE_URL}/${encodeURIComponent(normalized)}`
+    const imageBase = getAtlanticoImageBaseUrl()
+    return `${imageBase}/${encodeURIComponent(normalized)}`
   }
 
   // If still not a valid URL, return null
@@ -287,5 +330,64 @@ export function extractImageUrls(raw: any, baseUrl?: string): string[] {
 export function extractCoverImage(raw: any, baseUrl?: string): string | null {
   const urls = extractImageUrls(raw, baseUrl)
   return urls.length > 0 ? urls[0] : null
+}
+
+/**
+ * Build Atlantico image URL from a filename
+ * Uses the API base URL + /images path (e.g., https://api.atlanticoexcursiones.com/images/Teleferico.jpg)
+ * 
+ * NOTE: For server-side use, prefer getLocalAtlanticoImageUrl() which downloads images locally
+ */
+export function buildAtlanticoImageUrlFromFilename(filename: string): string {
+  if (!filename || typeof filename !== 'string') {
+    return ''
+  }
+  
+  const trimmed = filename.trim()
+  if (!trimmed) {
+    return ''
+  }
+  
+  // If already a full URL, return as-is
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed
+  }
+  
+  // Build URL using base + filename
+  const imageBase = getAtlanticoImageBaseUrl()
+  return `${imageBase}/${encodeURIComponent(trimmed)}`
+}
+
+/**
+ * Get local image URL for an Atlantico image filename
+ * Downloads the image if it doesn't exist locally
+ * 
+ * @param filename - Image filename (e.g., "Teleferico.jpg")
+ * @returns Local public URL (e.g., "/images/atlantico/Teleferico.jpg") or null if download failed
+ */
+export async function getLocalAtlanticoImageUrl(filename: string): Promise<string | null> {
+  if (!filename || typeof filename !== 'string') {
+    return null
+  }
+
+  const trimmed = filename.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  // If already a full URL, return as-is (don't download external images)
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed
+  }
+
+  // Try to get or download local image
+  try {
+    const { getOrDownloadImage } = await import('./download-image')
+    return await getOrDownloadImage(trimmed)
+  } catch (error) {
+    console.error('[GET_LOCAL_IMAGE] Error:', error)
+    // Fallback to remote URL if download fails
+    return buildAtlanticoImageUrlFromFilename(trimmed)
+  }
 }
 

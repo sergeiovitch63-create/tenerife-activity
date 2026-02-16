@@ -21,6 +21,8 @@ interface ActivityBookingPanelProps {
   events: Array<{ t_id: string; title: string }>
   locale: string
   language: string // Atlántico language param (e.g., 'ENG', 'ESP')
+  duration?: string | number // Activity duration
+  startingPrice?: number | string // Starting price
 }
 
 interface BookingReadinessState {
@@ -107,6 +109,8 @@ export function ActivityBookingPanel({
   events,
   locale,
   language,
+  duration,
+  startingPrice,
 }: ActivityBookingPanelProps) {
   const router = useRouter()
   const { addItem } = useCartStore()
@@ -124,6 +128,15 @@ export function ActivityBookingPanel({
   const [currency, setCurrency] = useState('EUR')
   const [showToast, setShowToast] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // Calendar state for available dates
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+  })
+  const [availableDates, setAvailableDates] = useState<string[]>([])
+  const [loadingCalendar, setLoadingCalendar] = useState(false)
+  const [sessionsByDay, setSessionsByDay] = useState<Record<string, Array<{ time: string; available: number }>>>({})
   
   const currentTId = selectedEventId || initialEventId
 
@@ -146,6 +159,17 @@ export function ActivityBookingPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, currentTId])
 
+  // Load calendar (available dates) when event or month changes
+  useEffect(() => {
+    if (currentTId) {
+      loadCalendar()
+    } else {
+      setAvailableDates([])
+      setSessionsByDay({})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTId, currentMonth])
+
   // Load prices when date/event/participants change
   useEffect(() => {
     if (selectedDate && currentTId) {
@@ -155,6 +179,49 @@ export function ActivityBookingPanel({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, currentTId, adults, childs, infants])
+
+  const loadCalendar = async () => {
+    if (!currentTId) return
+
+    setLoadingCalendar(true)
+    try {
+      const langCode = language.length === 3 
+        ? language.toLowerCase().substring(0, 2)
+        : language.toLowerCase().substring(0, 2)
+      const langForLimits = mapLocaleToAtlanticoLang(langCode)
+      const dateMonth = currentMonth.substring(0, 7) + '-01'
+      
+      const response = await fetch(
+        `/api/atlantico/limits?eventId=${currentTId}&lang=${langForLimits}&month=${dateMonth}`
+      )
+      
+      if (!response.ok) {
+        throw new Error('Failed to load calendar')
+      }
+      
+      const data = await response.json()
+      
+      // Extract available dates
+      if (data.availableDates && Array.isArray(data.availableDates)) {
+        setAvailableDates(data.availableDates)
+      } else {
+        setAvailableDates([])
+      }
+      
+      // Extract sessions by day
+      if (data.sessionsByDay && typeof data.sessionsByDay === 'object') {
+        setSessionsByDay(data.sessionsByDay)
+      } else {
+        setSessionsByDay({})
+      }
+    } catch (error) {
+      console.error('Failed to load calendar:', error)
+      setAvailableDates([])
+      setSessionsByDay({})
+    } finally {
+      setLoadingCalendar(false)
+    }
+  }
 
   const loadSessions = async () => {
     if (!selectedDate || !currentTId) return
@@ -430,13 +497,56 @@ export function ActivityBookingPanel({
     return () => el.removeEventListener('click', onDocClick, true)
   }, [])
 
+  // Format price
+  const formatPrice = (price: number | string | undefined): string => {
+    if (!price) return ''
+    if (typeof price === 'number') {
+      return `€${price.toFixed(2)}`
+    }
+    return String(price)
+  }
+
   return (
     <div 
       data-booking-panel-root
-      className="bg-white border border-glass-200 rounded-lg p-6 space-y-6"
+      className="bg-white border border-glass-200 rounded-xl p-6 space-y-6 shadow-lg"
       style={{ position: 'relative', zIndex: 50, pointerEvents: 'auto' }}
     >
-      <h3 className="text-lg font-semibold text-glass-900">Manage your booking</h3>
+      <h3 className="text-xl font-bold text-glass-900 mb-4">Manage your booking</h3>
+
+      {/* Premium Info Cards - Duration & Starting Price */}
+      <div className="grid grid-cols-1 gap-3 pb-4 border-b border-glass-200">
+        {duration && (
+          <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">⏰</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-ocean-600 uppercase tracking-wide mb-1">Duration</div>
+                <div className="text-lg font-bold text-glass-900">
+                  {typeof duration === 'number' ? `${duration} hours` : `${duration} hours`}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {startingPrice && (
+          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">💎</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1">Starting from</div>
+                <div className="text-lg font-bold text-glass-900">
+                  {formatPrice(startingPrice)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Event Selection (if multiple events) */}
       {events.length > 1 && (
@@ -463,23 +573,119 @@ export function ActivityBookingPanel({
         </div>
       )}
 
-      {/* Date Selection */}
+      {/* Date Selection - Calendar */}
       <div>
         <label className="block text-sm font-medium text-glass-700 mb-2">
           Select a date *
         </label>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => {
-            setSelectedDate(e.target.value)
-            setSelectedTime('')
-            setPriceSnapshot(null)
-          }}
-          min={new Date().toISOString().split('T')[0]}
-          className="w-full px-3 py-2 border border-glass-300 rounded-md"
-          required
-        />
+        
+        {/* Calendar Navigation */}
+        <div className="mb-3 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              const [year, month] = currentMonth.split('-').map(Number)
+              const newDate = new Date(year, month - 2, 1)
+              setCurrentMonth(`${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}-01`)
+            }}
+            className="px-2 py-1 text-sm text-glass-600 hover:text-glass-900"
+            disabled={loadingCalendar}
+          >
+            ← Prev
+          </button>
+          <span className="text-sm font-medium text-glass-900">
+            {new Date(currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const [year, month] = currentMonth.split('-').map(Number)
+              const newDate = new Date(year, month, 1)
+              setCurrentMonth(`${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}-01`)
+            }}
+            className="px-2 py-1 text-sm text-glass-600 hover:text-glass-900"
+            disabled={loadingCalendar}
+          >
+            Next →
+          </button>
+        </div>
+
+        {/* Calendar Grid */}
+        {loadingCalendar ? (
+          <div className="text-sm text-glass-600 text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-ocean-600 mr-2"></div>
+            Loading calendar...
+          </div>
+        ) : (
+          <div className="border border-glass-200 rounded-lg p-2 bg-white">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 gap-1 mb-1">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Calendar days */}
+            <div className="grid grid-cols-7 gap-1">
+              {(() => {
+                const [year, month] = currentMonth.split('-').map(Number)
+                const firstDay = new Date(year, month - 1, 1)
+                const lastDay = new Date(year, month, 0)
+                const daysInMonth = lastDay.getDate()
+                const startingDayOfWeek = firstDay.getDay()
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+
+                const days: JSX.Element[] = []
+
+                // Empty cells for days before month start
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                  days.push(<div key={`empty-${i}`} className="aspect-square" />)
+                }
+
+                // Days of month
+                for (let day = 1; day <= daysInMonth; day++) {
+                  const date = new Date(year, month - 1, day)
+                  const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                  const isToday = date.getTime() === today.getTime()
+                  const isPast = date < today
+                  const available = !isPast && availableDates.includes(dateStr)
+                  const isSelected = dateStr === selectedDate
+
+                  days.push(
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => {
+                        if (available) {
+                          setSelectedDate(dateStr)
+                          setSelectedTime('')
+                          setPriceSnapshot(null)
+                        }
+                      }}
+                      disabled={!available || isPast}
+                      className={`aspect-square p-1 rounded text-sm transition-colors ${
+                        isPast
+                          ? 'bg-glass-100 text-glass-400 border-glass-200 opacity-60 cursor-not-allowed'
+                          : available
+                          ? isSelected
+                            ? 'bg-ocean-600 text-white border-ocean-600'
+                            : 'bg-white text-glass-900 border-glass-200 hover:bg-ocean-50 hover:border-ocean-300 cursor-pointer'
+                          : 'bg-glass-100 text-glass-400 border-glass-200 cursor-not-allowed opacity-60'
+                      } ${isToday ? 'ring-2 ring-ocean-300' : ''} border`}
+                    >
+                      {day}
+                    </button>
+                  )
+                }
+
+                return days
+              })()}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Time Selection (if has sessions) */}

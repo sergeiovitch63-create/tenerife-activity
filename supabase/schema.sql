@@ -37,3 +37,9 @@ CREATE INDEX IF NOT EXISTS idx_curated_experiences_featured_priority ON curated_
 
 
 
+
+
+
+
+
+

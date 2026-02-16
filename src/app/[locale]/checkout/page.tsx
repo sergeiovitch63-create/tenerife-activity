@@ -142,30 +142,40 @@ export default function CheckoutPage() {
       // Auto-fix: if slot unavailable and user hasn't interacted, select first available time
       if (data.hasAvailabilityIssues && !userHasInteracted) {
         for (const item of data.items) {
+          // Auto-fix if:
+          // 1. Item is unavailable
+          // 2. Has available times
+          // 3. Current sesTime is "00:00" or invalid
           if (!item.available && item.availableTimes && item.availableTimes.length > 0) {
             const firstAvailableTime = item.availableTimes[0]
-            console.log('[CHECKOUT] Auto-fixing time:', {
-              itemKey: item.itemKey,
-              oldTime: item.sesTime,
-              newTime: firstAvailableTime,
-            })
+            const currentTime = item.sesTime || '00:00'
             
-            // Update cart item with new time
-            updateItem(item.itemKey, {
-              sesTime: firstAvailableTime,
-            })
-            
-            // Set recovery time selection
-            setSelectedRecoveryTimes(prev => ({
-              ...prev,
-              [item.itemKey]: firstAvailableTime,
-            }))
-            
-            // Re-run revalidation after auto-fix
-            setTimeout(() => {
-              revalidateCart()
-            }, 100)
-            return // Exit early, revalidation will run again
+            // Only auto-fix if current time is invalid
+            if (currentTime === '00:00' || currentTime === '' || !currentTime) {
+              console.log('[CHECKOUT] Auto-fixing time:', {
+                itemKey: item.itemKey,
+                oldTime: currentTime,
+                newTime: firstAvailableTime,
+                availableTimesCount: item.availableTimes.length,
+              })
+              
+              // Update cart item with new time
+              updateItem(item.itemKey, {
+                sesTime: firstAvailableTime,
+              })
+              
+              // Set recovery time selection
+              setSelectedRecoveryTimes(prev => ({
+                ...prev,
+                [item.itemKey]: firstAvailableTime,
+              }))
+              
+              // Re-run revalidation after auto-fix
+              setTimeout(() => {
+                revalidateCart()
+              }, 100)
+              return // Exit early, revalidation will run again
+            }
           }
         }
       }
@@ -379,7 +389,7 @@ export default function CheckoutPage() {
         return
       }
 
-      // Build payment payload (same shape as /booking/confirm, but sent directly to /payment/)
+      // Build payment payload for /payment/ endpoint
       const paymentPayload = {
         t_id: item.t_id,
         t_group: item.t_group,
@@ -743,15 +753,24 @@ export default function CheckoutPage() {
                 })}
               
               {/* Show errors for items without available times */}
-              {revalidationErrors
-                .filter(err => {
-                  const item = revalidatedItems.find(i => i.itemKey === err.itemKey)
-                  return !item?.availableTimes || item.availableTimes.length === 0
-                })
-                .map((err) => (
-                  <p key={err.itemKey} className="text-sm text-red-600 mt-1">
-                    {err.error}
-                  </p>
+              {revalidatedItems
+                .filter(item => !item.available && (!item.availableTimes || item.availableTimes.length === 0))
+                .map((item) => (
+                  <div key={item.itemKey} className="bg-white border border-red-300 rounded-lg p-4">
+                    <p className="text-sm font-medium text-red-900 mb-1">
+                      {item.availabilityError || 'Session not available'}
+                    </p>
+                    {item.availabilityReason === 'time_not_found' && (
+                      <p className="text-xs text-red-700 mt-1">
+                        Time is required for this booking. Please select a different date or contact support.
+                      </p>
+                    )}
+                    {item.availabilityReason === 'no_sessions' && (
+                      <p className="text-xs text-red-700 mt-1">
+                        No sessions available on this date. Please select a different date.
+                      </p>
+                    )}
+                  </div>
                 ))}
             </div>
           )}

@@ -80,7 +80,7 @@ async function fetchWithRetryPost(
 /**
  * Make a POST request to Atlantico API with form-urlencoded data
  * 
- * @param endpoint - API endpoint path (e.g., '/confirm/')
+ * @param endpoint - API endpoint path (e.g., '/payment/')
  * @param data - Form data as key-value pairs
  * @param options - Optional request options
  * @returns Promise with Response object

@@ -27,7 +27,7 @@ export default async function ActivityDetailPage({
     notFound()
   }
 
-  return <ActivityBookingSkeleton locale={locale} resolved={resolved} />
+  return <ActivityBookingSkeleton locale={locale} resolved={resolved} slug={slug} />
 }
 
 

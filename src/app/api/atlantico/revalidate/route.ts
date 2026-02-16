@@ -83,6 +83,7 @@ function normalizeSessionTime(sesTime: string | null | undefined): string {
  * Extract available times from limits response
  * Returns array of time strings
  * IMPORTANT: Always access sessions via sessions[toYYYYMMDD(tourDate)]
+ * CRITICAL: Only return valid times (not "00:00", not empty)
  */
 function extractAvailableTimes(limits: any, tourDate: string | null): string[] {
   if (!tourDate) return []
@@ -98,9 +99,27 @@ function extractAvailableTimes(limits: any, tourDate: string | null): string[] {
     if (Array.isArray(sessions) && sessions.length > 0) {
       sessions.forEach((s: any) => {
         const sessionTime = typeof s === 'string' ? s : s.time || s.sesTime
-        if (sessionTime && typeof sessionTime === 'string') {
+        if (sessionTime && typeof sessionTime === 'string' && sessionTime.trim() !== '') {
           const normalized = normalizeSessionTime(sessionTime)
-          if (normalized !== '00:00' && !times.includes(normalized)) {
+          // Only add valid times (not "00:00", not empty)
+          if (normalized !== '00:00' && normalized !== '' && !times.includes(normalized)) {
+            times.push(normalized)
+          }
+        }
+      })
+    }
+  }
+  
+  // Also check sessionsByDay format (from normalizeLimits)
+  if (limits.sessionsByDay && typeof limits.sessionsByDay === 'object') {
+    const ymdDate = tourDate // YYYY-MM-DD format
+    const daySessions = limits.sessionsByDay[ymdDate]
+    if (Array.isArray(daySessions) && daySessions.length > 0) {
+      daySessions.forEach((s: any) => {
+        const sessionTime = typeof s === 'string' ? s : s.time || s.sesTime
+        if (sessionTime && typeof sessionTime === 'string' && sessionTime.trim() !== '') {
+          const normalized = normalizeSessionTime(sessionTime)
+          if (normalized !== '00:00' && normalized !== '' && !times.includes(normalized)) {
             times.push(normalized)
           }
         }
@@ -332,7 +351,7 @@ async function checkSessionAvailability(
       const daySessions = Array.isArray(sessionsObj[sessionsKey]) ? sessionsObj[sessionsKey] : []
       const sessionsCount = daySessions.length
       
-      // Extract available times for recovery UI
+      // Extract available times for recovery UI (ALWAYS extract, even if current sesTime is invalid)
       const availableTimes = extractAvailableTimes(limits, tourDate)
       
       // CRITICAL: If no sessions for this day => no_sessions
@@ -348,7 +367,7 @@ async function checkSessionAvailability(
           available: false,
           error: `No sessions available on ${tourDate}`,
           reason: 'no_sessions',
-          availableTimes: [],
+          availableTimes: [], // No times available
           availableDates: [], // Will be populated by caller
           selectedSesTime: '00:00',
         }
@@ -358,9 +377,27 @@ async function checkSessionAvailability(
       let selectedSesTime: string = normalizedSesTime
       let sessionToUse: any = null
       
-      // If client already has a sesTime and it matches a session, keep it
-      if (normalizedSesTime !== '00:00') {
-        sessionToUse = daySessions.find((s: any) => {
+      // Filter out invalid sessions (00:00, empty, etc.)
+      const validSessions = daySessions.filter((s: any) => {
+        const sessionTime = typeof s === 'string' ? s : s.time || s.sesTime
+        const normalizedSessionTime = normalizeSessionTime(sessionTime)
+        return normalizedSessionTime !== '00:00' && sessionTime && sessionTime.trim() !== ''
+      })
+      
+      // If no valid sessions found, return error with available times
+      if (validSessions.length === 0) {
+        return {
+          available: false,
+          error: `No valid sessions available on ${tourDate}`,
+          reason: 'no_sessions',
+          availableTimes: [], // No valid times
+          selectedSesTime: '00:00',
+        }
+      }
+      
+      // If client already has a sesTime and it matches a valid session, keep it
+      if (normalizedSesTime !== '00:00' && normalizedSesTime !== '') {
+        sessionToUse = validSessions.find((s: any) => {
           const sessionTime = typeof s === 'string' ? s : s.time || s.sesTime
           const normalizedSessionTime = normalizeSessionTime(sessionTime)
           return normalizedSessionTime === normalizedSesTime || 
@@ -369,31 +406,45 @@ async function checkSessionAvailability(
         })
         
         if (!sessionToUse) {
-          // Client's sesTime doesn't match any session, auto-select first available
-          sessionToUse = daySessions.find((s: any) => Number(s.available ?? "0") > 0) ?? daySessions[0]
+          // Client's sesTime doesn't match any valid session, auto-select first available
+          sessionToUse = validSessions.find((s: any) => Number(s.available ?? "0") > 0) ?? validSessions[0]
           selectedSesTime = typeof sessionToUse === 'string' ? sessionToUse : (sessionToUse?.time || sessionToUse?.sesTime || '00:00')
           selectedSesTime = normalizeSessionTime(selectedSesTime)
+          
+          // If still "00:00", this is an error
+          if (selectedSesTime === '00:00') {
+            return {
+              available: false,
+              error: `Time is required for this booking`,
+              reason: 'time_not_found',
+              availableTimes, // Return available times for recovery UI
+              selectedSesTime: '00:00',
+            }
+          }
+        } else {
+          // Keep the matching session time
+          selectedSesTime = normalizedSesTime
         }
       } else {
-        // No sesTime provided, auto-select first available session
-        sessionToUse = daySessions.find((s: any) => Number(s.available ?? "0") > 0) ?? daySessions[0]
+        // No sesTime provided or "00:00", auto-select first available session
+        sessionToUse = validSessions.find((s: any) => Number(s.available ?? "0") > 0) ?? validSessions[0]
         selectedSesTime = typeof sessionToUse === 'string' ? sessionToUse : (sessionToUse?.time || sessionToUse?.sesTime || '00:00')
         selectedSesTime = normalizeSessionTime(selectedSesTime)
+        
+        // If still "00:00", this is an error
+        if (selectedSesTime === '00:00') {
+          return {
+            available: false,
+            error: `Time is required for this booking`,
+            reason: 'time_not_found',
+            availableTimes, // Return available times for recovery UI
+            selectedSesTime: '00:00',
+          }
+        }
       }
       
       // Extract session details for the selected session
       const sessionDetails = selectedSesTime !== '00:00' ? extractSessionDetails(limits, tourDate, selectedSesTime) : {}
-      
-      // If we couldn't find any valid session, return error
-      if (selectedSesTime === '00:00' && sessionsCount > 0) {
-        return {
-          available: false,
-          error: `Could not select a valid session on ${tourDate}`,
-          reason: 'no_sessions',
-          availableTimes,
-          selectedSesTime: '00:00',
-        }
-      }
       
       // Session found and auto-selected - return with session details
       return { 
@@ -404,25 +455,15 @@ async function checkSessionAvailability(
       }
     }
     
-    // CAS B: wdays_only mode - allow if sesTime is valid (not "00:00")
+    // CAS B: wdays_only mode - according to PDF, sesTime can be "00:00" if no session time
     if (isWdaysOnly) {
-      // For wdays_only: validate only that sesTime is present and valid
-      if (!normalizedSesTime || normalizedSesTime === '00:00') {
-        return {
-          available: false,
-          error: `Time is required for this booking`,
-          reason: 'time_not_found',
-          availableTimes: [],
-          availableDates: [],
-          selectedSesTime: '00:00',
-        }
-      }
-      
-      // sesTime is valid -> allow (availability to be confirmed)
+      // For wdays_only: according to PDF section 2.7, sesTime can be "00:00" if there's no session time
+      // We allow the booking to proceed with "00:00" for wdays_only mode
+      // The availability will be confirmed by Atlantico
       return {
         available: true,
         availableTimes: [], // No times from loadLimits in wdays_only
-        selectedSesTime: normalizedSesTime,
+        selectedSesTime: normalizedSesTime || '00:00', // Allow "00:00" for wdays_only
         // No session details for wdays_only
       }
     }

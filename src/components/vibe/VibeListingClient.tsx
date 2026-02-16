@@ -3,12 +3,14 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Link } from '@/navigation'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
+import { isVipTourGroup, getVipTourCoverImageSync, getVipTourLocalImages } from '@/lib/atlantico/vip-tours-images'
 import { parseEventIds } from '@/lib/atlantico'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 import { Chip } from '@/ui/components/shared/Chip'
 import { cn } from '@/ui/lib/cn'
 import { TourRowCard } from './TourRowCard'
 import { InlineFilterDropdown } from './InlineFilterDropdown'
+import { SafeImage } from '@/components/SafeImage'
 
 interface Tour {
   id: string | number
@@ -484,21 +486,60 @@ interface TourCardProps {
 }
 
 function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
+  const [vipTourImage, setVipTourImage] = useState<string | null>(null)
+  const isVipTour = isVipTourGroup(tour.code)
+  
+  // Load VIP Tour images dynamically
+  useEffect(() => {
+    if (isVipTour) {
+      getVipTourLocalImages(tour.code)
+        .then(images => {
+          if (images.length > 0) {
+            setVipTourImage(images[0]) // Use first available image
+          }
+        })
+        .catch(() => {
+          // Fallback to sync version if API fails
+          const fallback = getVipTourCoverImageSync(tour.code)
+          if (fallback) {
+            setVipTourImage(fallback)
+          }
+        })
+    }
+  }, [isVipTour, tour.code])
+  
+  // Determine card image: VIP local image > API image > fallback
+  const cardImage = useMemo(() => {
+    if (isVipTour && vipTourImage) {
+      return vipTourImage
+    }
+    if (tour.image) {
+      return buildAtlanticoImageUrl(tour.image)
+    }
+    return null
+  }, [isVipTour, vipTourImage, tour.image])
+
   return (
     <Link
       href={`/activities/${tour.code}`}
       className="glass-panel p-6 hover:shadow-lg transition-all duration-200 block"
     >
       {/* Image */}
-      {tour.image && (
-        <div className="mb-4 aspect-video overflow-hidden rounded-lg">
-          <img
-            src={buildAtlanticoImageUrl(tour.image)}
+      <div className="mb-4 aspect-video overflow-hidden rounded-lg relative bg-glass-100">
+        {cardImage ? (
+          <SafeImage
+            src={cardImage}
             alt={tour.name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
           />
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
+            No image
+          </div>
+        )}
+      </div>
 
       {/* Title */}
       <h3 className="text-xl font-semibold text-glass-900 mb-2 line-clamp-2">

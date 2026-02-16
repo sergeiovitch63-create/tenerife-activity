@@ -21,7 +21,8 @@ const assetPathPatterns = [
   '/favicon.ico',
   '/robots.txt',
   '/sitemap.xml',
-  // Note: /_debug is handled by rewrite patterns below, not excluded here
+  '/_debug', // Debug routes (DEV-only)
+  '/payment', // Payment page (no locale needed)
 ]
 
 /**
@@ -48,121 +49,18 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always',
 })
 
-/**
- * Check if maintenance mode is enabled
- * Checks for NEXT_PUBLIC_MAINTENANCE_MODE environment variable (set to 'true' or '1')
- * 
- * To enable maintenance mode:
- * - Set NEXT_PUBLIC_MAINTENANCE_MODE=true in your .env file or hosting environment
- * - Or create a maintenance.enabled file in the project root (for file-based approach)
- * 
- * Note: Edge Runtime doesn't support file system access, so file-based approach
- * would require a different implementation (e.g., API route or build-time check)
- */
-function isMaintenanceModeEnabled(): boolean {
-  // Check environment variable
-  const envMaintenance = process.env.NEXT_PUBLIC_MAINTENANCE_MODE
-  return envMaintenance === 'true' || envMaintenance === '1'
-}
-
-/**
- * Check if the request is from localhost
- * Supports both IPv4 (127.0.0.1) and IPv6 (::1) localhost addresses
- */
-function isLocalhost(request: NextRequest): boolean {
-  const ip = request.ip || 
-             request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-             request.headers.get('x-real-ip') ||
-             'unknown'
-  
-  // Check for localhost IPs
-  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') {
-    return true
-  }
-  
-  // Check hostname for localhost
-  const hostname = request.headers.get('host') || ''
-  if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
-    return true
-  }
-  
-  return false
-}
-
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
-
-  // MAINTENANCE MODE CHECK - Must be first, before any other processing
-  // Skip maintenance check for asset paths, API routes, and the maintenance page itself
-  if (!isAssetPath(pathname) && !pathname.startsWith('/api') && pathname !== '/maintenance') {
-    const maintenanceEnabled = isMaintenanceModeEnabled()
-    const isLocal = isLocalhost(request)
-    
-    if (maintenanceEnabled && !isLocal) {
-      // Maintenance mode is enabled and request is NOT from localhost
-      // Return maintenance page with 503 status
-      const maintenanceUrl = new URL('/maintenance', request.url)
-      const response = NextResponse.rewrite(maintenanceUrl)
-      response.status = 503
-      response.headers.set('Retry-After', '3600')
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
-      return response
-    }
-    // If maintenance is disabled OR request is from localhost, continue normally
-  }
 
   // Early exit for asset paths - don't process locale normalization
   if (isAssetPath(pathname)) {
     return NextResponse.next()
   }
 
-  // Rewrite legacy debug routes to canonical /:locale/debug/:path* structure
-  // Must happen BEFORE next-intl middleware to ensure proper locale handling
-  // Official route: /:locale/debug/:path* (e.g., /en/debug/atlantico)
-  // Legacy routes supported via rewrite:
-  
-  // Pattern 1: /_debug/:locale/:path* -> /:locale/debug/:path*
-  // Example: /_debug/en/atlantico -> /en/debug/atlantico
-  const legacyDebugPattern1 = new RegExp(`^/_debug/${localePattern}(/.*)?$`)
-  const legacyDebugMatch1 = pathname.match(legacyDebugPattern1)
-  
-  if (legacyDebugMatch1) {
-    const locale = legacyDebugMatch1[1]
-    const rest = legacyDebugMatch1[2] || ''
-    const rewrittenPath = `/${locale}/debug${rest}`
-    
-    // Create new URL for rewrite
-    const rewrittenUrl = new URL(rewrittenPath, request.url)
-    
-    // Log rewrite for debugging (server console only)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[MW_REWRITE]', { from: pathname, to: rewrittenPath, pattern: 'legacy /_debug/:locale/:path*' })
-    }
-    
-    // Return rewritten response (rewrite, not redirect, to preserve URL in browser)
-    return NextResponse.rewrite(rewrittenUrl)
-  }
-
-  // Pattern 2: /debug/:locale/:path* -> /:locale/debug/:path*
-  // Example: /debug/en/atlantico -> /en/debug/atlantico
-  const legacyDebugPattern2 = new RegExp(`^/debug/${localePattern}(/.*)?$`)
-  const legacyDebugMatch2 = pathname.match(legacyDebugPattern2)
-  
-  if (legacyDebugMatch2) {
-    const locale = legacyDebugMatch2[1]
-    const rest = legacyDebugMatch2[2] || ''
-    const rewrittenPath = `/${locale}/debug${rest}`
-    
-    // Create new URL for rewrite
-    const rewrittenUrl = new URL(rewrittenPath, request.url)
-    
-    // Log rewrite for debugging (server console only)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[MW_REWRITE]', { from: pathname, to: rewrittenPath, pattern: 'legacy /debug/:locale/:path*' })
-    }
-    
-    // Return rewritten response (rewrite, not redirect, to preserve URL in browser)
-    return NextResponse.rewrite(rewrittenUrl)
+  // Early exit for debug routes (DEV-only, under [locale] but should bypass i18n processing)
+  // Matches: /en/_debug/..., /es/_debug/..., etc.
+  if (pathname.includes('/_debug')) {
+    return NextResponse.next()
   }
 
   // Safety net: Detect and fix nested locale paths
@@ -224,13 +122,12 @@ export const config = {
      * Match all request paths except:
      * - /api/* (API routes)
      * - /_next/* (Next.js internal)
+     * - /favicon.ico, /robots.txt, /sitemap.xml (root files)
+     * - /images/*, /videos/* (static directories)
+     * - /_debug/* or /[locale]/_debug/* (debug routes - DEV-only)
      * - files with extensions (e.g., .png, .jpg, .svg, etc.)
-     * 
-     * Debug routes /[locale]/debug/* are handled normally by next-intl
-     * Legacy routes /_debug/:locale/:path* and /debug/:locale/:path* are rewritten to /[locale]/debug/:path*
-     * Static files (favicon.ico, robots.txt, etc.) are excluded by extension pattern
      */
-    '/((?!api|_next|.*\\..*).*)',
+    '/((?!api|_next|favicon\\.ico|robots\\.txt|sitemap\\.xml|images|videos|.*\\..*).*)',
     // Also match root path explicitly
     '/',
   ],

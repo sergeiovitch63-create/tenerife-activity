@@ -134,3 +134,9 @@ function isLocalhost(request: NextRequest): boolean {
 - API routes are excluded from maintenance mode
 - Static assets continue to load normally
 
+
+
+
+
+
+

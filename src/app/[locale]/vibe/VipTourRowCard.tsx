@@ -15,6 +15,8 @@ import { ClientImage } from '../catalog/ClientImage'
 import type { FullTour } from '@/lib/atlantico/catalog-types'
 import { astronomicTourVipMedia } from '@/content/activities/astronomic-tour-vip.media'
 import { gomeraVipTourMedia } from '@/content/activities/gomera-vip-tour.media'
+import { isVipTourGroup } from '@/lib/atlantico/vip-tours-images'
+import { VipTourImageLoader } from '@/components/vibe/VipTourImageLoader'
 
 /**
  * Clean description text: decode HTML entities, strip HTML tags, trim
@@ -333,9 +335,9 @@ export function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; interna
     })
   }
   
-  // Image: Priority 1 = card config (Astronomic), Priority 2 = API images
-  // Note: Local scanned images will be handled client-side via ClientImage component fallback
-  const imageUrl = cardConfig?.coverImage ?? (tour.displayImage ?? tour.imageOverrideUrl ?? tour.image)
+  // Image: Priority 1 = card config (Astronomic), Priority 2 = VIP Tours local images (loaded dynamically), Priority 3 = API images
+  const groupCode = String(tour.groupCode || tour.code || '')
+  const apiImageUrl = tour.displayImage ?? tour.imageOverrideUrl ?? tour.image
   
   // Price: use card config override if available, otherwise get display price (main price, not extra person)
   // For Gomera/Astronomic, use card config price if > 0, otherwise fallback to display price
@@ -377,12 +379,35 @@ export function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; interna
         {/* Left: Image - Full height for all VIP cards (same structure as Astronomic Tour VIP) */}
         <div className="md:w-64 md:flex-shrink-0 md:self-stretch">
           <div className="w-full h-full md:h-full">
-            <ClientImage 
-              src={imageUrl} 
-              alt={title} 
-              className="rounded-t-lg md:rounded-l-lg md:rounded-t-none h-full"
-              fullHeight={true}
-            />
+            {cardConfig?.coverImage ? (
+              // Use card config image (Astronomic Tour VIP, etc.)
+              <ClientImage 
+                src={cardConfig.coverImage} 
+                alt={title} 
+                className="rounded-t-lg md:rounded-l-lg md:rounded-t-none h-full"
+                fullHeight={true}
+              />
+            ) : isVipTourGroup(groupCode) ? (
+              // Load VIP Tour images dynamically
+              <VipTourImageLoader groupCode={groupCode} fallbackImage={apiImageUrl}>
+                {(imageUrl) => (
+                  <ClientImage 
+                    src={imageUrl} 
+                    alt={title} 
+                    className="rounded-t-lg md:rounded-l-lg md:rounded-t-none h-full"
+                    fullHeight={true}
+                  />
+                )}
+              </VipTourImageLoader>
+            ) : (
+              // Use API image for non-VIP tours
+              <ClientImage 
+                src={apiImageUrl} 
+                alt={title} 
+                className="rounded-t-lg md:rounded-l-lg md:rounded-t-none h-full"
+                fullHeight={true}
+              />
+            )}
           </div>
         </div>
 

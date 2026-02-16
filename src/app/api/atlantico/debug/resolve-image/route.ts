@@ -97,7 +97,9 @@ export async function GET(request: NextRequest) {
   ]
 
   // Also try ATLANTICO_BASE_URL if set
-  const atlanticoBase = process.env.ATLANTICO_BASE_URL
+  // Use getBaseUrl() to ensure we never use IP:port addresses
+  const { getBaseUrl } = await import('@/lib/atlantico/client')
+  const atlanticoBase = getBaseUrl()
   if (atlanticoBase && atlanticoBase.trim()) {
     const base = atlanticoBase.trim().replace(/\/+$/, '')
     if (!hosts.includes(base)) {

@@ -56,3 +56,9 @@ export function CheckoutCancelClient({ locale }: CheckoutCancelClientProps) {
 
 
 
+
+
+
+
+
+

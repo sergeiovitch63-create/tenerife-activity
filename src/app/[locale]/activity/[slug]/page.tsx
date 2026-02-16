@@ -10,6 +10,8 @@
 import { notFound } from 'next/navigation'
 import { ActivityDetailClient } from './ActivityDetailClient'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
+import { extractCoverImage, extractImageUrls } from '@/lib/atlantico/images'
+import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import {
   addDays,
   getEventDetails,
@@ -84,6 +86,7 @@ type EventOption = {
   label: string
   pProd?: '0' | '1' | '2' | '3'
   icons?: string[]
+  image?: string | null // Image URL for this event
 }
 
 export default async function ActivityDetailPage({
@@ -122,13 +125,45 @@ export default async function ActivityDetailPage({
         tourId: item.groupCode,
         rawIds,
         parsedEventIds: eventIds,
+        groupDetailsImage: groupDetails?.image,
       })
     }
 
-    // Use local image from item (based on classification mapping)
-    // item.image is now a local path, guaranteed to be non-null
-    // normalizeItem() ensures item.image is always set to a valid path
-    heroImageUrl = item.image || '/images/hero-poster.jpg'
+    // SPECIAL CASE: Event 303 - Use local images from /images/events/303/
+    if (item.groupCode === '303' || slug === '303') {
+      // Use A.webp as hero (main image)
+      heroImageUrl = '/images/events/303/A.webp'
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[ACTIVITY_303] Using local hero image:', heroImageUrl)
+      }
+    } else {
+      // Extract image from groupDetails according to PDF Atlantico API
+      // Priority:
+      // 1) groupDetails.images[0] when it's a full URL (e.g. https://www.atlanticoexcursiones.com/zeus/pictures/GRP303/B.jpg)
+      // 2) groupDetails.image (filename) resolved via Atlantico image base
+      // 3) item.image (local classification-based fallback)
+      let resolvedHero: string | null = null
+
+      // 1) Use first entry of groupDetails.images if it's an absolute URL
+      const rawImages = (groupDetails as any)?.images
+      if (Array.isArray(rawImages) && rawImages.length > 0) {
+        const firstImg = String(rawImages[0]).trim()
+        if (firstImg.startsWith('http://') || firstImg.startsWith('https://')) {
+          resolvedHero = firstImg
+        }
+      }
+
+      // 2) If no full URL from images[], use groupDetails.image (filename)
+      if (!resolvedHero && groupDetails?.image && typeof groupDetails.image === 'string' && groupDetails.image.trim()) {
+        const imageFilename = groupDetails.image.trim()
+        const { getLocalAtlanticoImageUrl, buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+        const localImageUrl = await getLocalAtlanticoImageUrl(imageFilename)
+        resolvedHero = localImageUrl || buildAtlanticoImageUrlFromFilename(imageFilename)
+      }
+
+      // 3) Fallback to item.image or generic hero image
+      heroImageUrl = resolvedHero || item.image || '/images/hero-poster.jpg'
+    }
 
     // Build event options from eventDetails
     // IMPORTANT: Use CODE from eventDetails, not the internal id
@@ -161,11 +196,63 @@ export default async function ActivityDetailPage({
             ? (details as any).icons.filter((x: any) => typeof x === 'string' && x.trim().length > 0).map((x: string) => x.trim())
             : undefined
 
+        // Extract image from eventDetails according to PDF Atlantico API
+        // Download and use local images for better performance
+        let eventImage: string | null = null
+        
+        // Extract image using extractCoverImage - this returns full URL or filename
+        const extractedImage = extractCoverImage(details as any)
+        
+        if (extractedImage) {
+          // If it's already a full URL, try to extract filename and download locally
+          if (extractedImage.startsWith('http://') || extractedImage.startsWith('https://')) {
+            // Extract filename from URL
+            const urlParts = extractedImage.split('/')
+            const filename = urlParts[urlParts.length - 1]
+            if (filename && /\.(jpg|jpeg|png|webp)$/i.test(filename)) {
+              // Try to download locally
+              const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+              eventImage = await getLocalAtlanticoImageUrl(filename) || extractedImage
+            } else {
+              eventImage = extractedImage
+            }
+          } else {
+            // It's a filename, download locally
+            const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+            eventImage = await getLocalAtlanticoImageUrl(extractedImage) || extractedImage
+          }
+        } else {
+          // Fallback: try direct fields and download locally
+          const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+          const imageFields = ['image', 'imageUrl', 'imageFilename', 'img', 'photo', 'picture', 'cover']
+          for (const field of imageFields) {
+            const value = (details as any)[field]
+            if (value && typeof value === 'string' && value.trim()) {
+              const trimmed = value.trim()
+              // If already full URL, try to extract filename
+              if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+                const urlParts = trimmed.split('/')
+                const filename = urlParts[urlParts.length - 1]
+                if (filename && /\.(jpg|jpeg|png|webp)$/i.test(filename)) {
+                  eventImage = await getLocalAtlanticoImageUrl(filename) || trimmed
+                } else {
+                  eventImage = trimmed
+                }
+                break
+              }
+              // Otherwise it's a filename, download locally
+              eventImage = await getLocalAtlanticoImageUrl(trimmed)
+              if (eventImage) break
+            }
+          }
+        }
+
         options.push({
           eventId: String(eventCode), // Use CODE, not internal id
           label: name,
           pProd,
           icons,
+          image: eventImage, // Add resolved image URL
         })
 
         if (process.env.NODE_ENV === 'development') {
@@ -175,6 +262,18 @@ export default async function ActivityDetailPage({
             internalId: (details as any).id,
             name,
             pProd,
+            image: eventImage,
+            extractedImage,
+            imageFields: {
+              image: (details as any).image,
+              imageUrl: (details as any).imageUrl,
+              imageFilename: (details as any).imageFilename,
+              img: (details as any).img,
+              photo: (details as any).photo,
+              picture: (details as any).picture,
+              cover: (details as any).cover,
+            },
+            allKeys: Object.keys(details || {}),
           })
         }
       } catch (error) {

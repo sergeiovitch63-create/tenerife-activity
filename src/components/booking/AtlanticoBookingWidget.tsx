@@ -1834,7 +1834,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
                   
                   // DEV log
                   if (process.env.NODE_ENV === 'development') {
-                    console.log('[BOOKING] Confirming booking:', {
+                    console.log('[BOOKING] Submitting payment:', {
                       slug,
                       t_id,
                       t_group,
@@ -1850,41 +1850,45 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
                     })
                   }
 
-                  // Call confirm endpoint
-                  const formData = new URLSearchParams()
-                  formData.append('t_id', t_id)
-                  formData.append('t_group', t_group)
-                  formData.append('language', language)
-                  formData.append('tourDate', selectedDate)
-                  formData.append('sesTime', sesTime)
-                  formData.append('adults', String(pax.adults))
-                  formData.append('childs', String(pax.children || 0))
-                  formData.append('infants', String(pax.infants || 0))
-                  formData.append('name', customerName)
-                  formData.append('email', customerEmail)
-                  formData.append('phone', customerPhone)
+                  // Submit payment via native HTML form to avoid CORS issues
+                  // Browser will navigate to the payment gateway HTML page
+                  const form = document.createElement('form')
+                  form.method = 'POST'
+                  form.action = '/api/atlantico/booking/payment'
+                  form.style.display = 'none'
 
-                  const response = await fetch('/api/atlantico/confirm', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: formData.toString(),
+                  // Add all payload fields as hidden inputs
+                  const paymentPayload = {
+                    t_id,
+                    t_group,
+                    language,
+                    tourDate: selectedDate,
+                    sesTime,
+                    adults: pax.adults,
+                    childs: pax.children || 0,
+                    infants: pax.infants || 0,
+                    name: customerName,
+                    email: customerEmail,
+                    phone: customerPhone,
+                  }
+
+                  Object.entries(paymentPayload).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined && value !== '') {
+                      const input = document.createElement('input')
+                      input.type = 'hidden'
+                      input.name = key
+                      input.value = String(value)
+                      form.appendChild(input)
+                    }
                   })
 
-                  const data = await response.json()
-
-                  if (!response.ok || !data.success) {
-                    throw new Error(data.message || data.error || 'Failed to confirm booking')
-                  }
-
-                  setBookingReference(data.bookingReference)
+                  // Append form to body and submit
+                  document.body.appendChild(form)
+                  form.submit()
                   
-                  if (process.env.NODE_ENV === 'development') {
-                    console.log('[BOOKING] Confirmed:', {
-                      bookingReference: data.bookingReference,
-                    })
-                  }
+                  // Note: Form submission will navigate the browser to the payment gateway
+                  // No need to handle response here - browser handles HTML rendering automatically
+                  return
                 } catch (err) {
                   const errorMsg = err instanceof Error ? err.message : 'Failed to confirm booking'
                   setBookingError(errorMsg)
@@ -1901,7 +1905,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
               disabled={!selectedEventCode || !selectedDate || !pricePerPerson || pax.adults < 1 || isBooking || !customerName || !customerEmail || !customerPhone}
               className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isBooking ? 'Confirming...' : 'Réserver'}
+              {isBooking ? 'Redirecting to payment...' : 'Réserver'}
             </button>
             
             {/* Booking Result */}

@@ -254,16 +254,33 @@ export async function POST(request: NextRequest) {
     const validatedBody = body as PaymentRequest
 
     // Validate userId
-    const serverUserId = process.env.ATLANTICO_USER_ID
+    let serverUserId = process.env.ATLANTICO_USER_ID?.trim()
     if (!serverUserId || serverUserId === '0') {
+      console.error('[PAYMENT] ❌ ATLANTICO_USER_ID is missing or invalid:', {
+        value: serverUserId,
+        envSet: !!process.env.ATLANTICO_USER_ID,
+      })
       return NextResponse.json(
         {
           error: 'Configuration error',
-          message: 'Missing ATLANTICO_USER_ID environment variable',
+          message: 'Missing ATLANTICO_USER_ID environment variable. Please set ATLANTICO_USER_ID=3645 in your .env.local file.',
         },
         { status: 500 }
       )
     }
+    
+    // CRITICAL: Force userId to 3645 if it's not already
+    // This ensures we always use the correct userId
+    if (serverUserId !== '3645') {
+      console.error('[PAYMENT] ❌ CRITICAL: ATLANTICO_USER_ID is not 3645!')
+      console.error('[PAYMENT] Current value:', serverUserId)
+      console.error('[PAYMENT] Please update .env.local with: ATLANTICO_USER_ID=3645')
+      console.error('[PAYMENT] Forcing userId to 3645 for this request...')
+      serverUserId = '3645'
+    }
+    
+    // Log userId for debugging
+    console.log('[PAYMENT] ✅ Using userId:', serverUserId, '(Expected: 3645)')
 
     // DEV logging (sanitized)
     if (process.env.NODE_ENV === 'development') {
@@ -358,13 +375,27 @@ export async function POST(request: NextRequest) {
     // Build form data for POST (UTF-8 encoding)
     // Required params per Atlantico API PDF: userId, t_id, t_group, language, tourDate, sesTime, adults, childs, infants, name, email, phone
     const formData = new URLSearchParams()
+    // CRITICAL: Ensure userId is sent as string and is 3645
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[PAYMENT] Sending userId to Atlantico API:', serverUserId)
+      if (serverUserId !== '3645') {
+        console.error('[PAYMENT] ❌ ERROR: userId is not 3645! Current:', serverUserId)
+      }
+    }
     formData.append('userId', String(serverUserId))
     formData.append('t_id', String(validatedBody.t_id))
     formData.append('t_group', String(validatedBody.t_group))
     formData.append('language', normalizedLang)
     // For calendarMode === 'none': tourDate and sesTime are null (on-request booking)
-    // Only append if not null
-    if (validatedBody.tourDate) formData.append('tourDate', validatedBody.tourDate)
+    // CRITICAL: Convert tourDate to YYYYMMDD format (required by Atlantico API)
+    if (validatedBody.tourDate) {
+      let tourDateFormatted = validatedBody.tourDate
+      // Convert YYYY-MM-DD to YYYYMMDD if needed
+      if (/^\d{4}-\d{2}-\d{2}$/.test(tourDateFormatted)) {
+        tourDateFormatted = tourDateFormatted.replace(/-/g, '')
+      }
+      formData.append('tourDate', tourDateFormatted)
+    }
     if (sesTime) formData.append('sesTime', sesTime)
     formData.append('adults', String(validatedBody.adults))
     formData.append('childs', String(validatedBody.childs || 0))

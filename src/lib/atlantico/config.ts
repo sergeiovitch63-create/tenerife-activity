@@ -24,11 +24,33 @@ export interface AtlanticoConfig {
  * In production, throws only when route is actually called.
  */
 export function getAtlanticoConfig(): AtlanticoConfig {
-  // Default to production API base URL, but allow override via env.
-  const baseUrl = process.env.ATLANTICO_BASE_URL || 'https://api.atlanticoexcursiones.com'
   const timeoutMs = getAtlanticoTimeoutMs()
   const revalidateSeconds = getAtlanticoRevalidateSeconds()
   const token = process.env.ATLANTICO_TOKEN
+
+  // Get base URL from env or use default
+  let baseUrl = process.env.ATLANTICO_BASE_URL?.trim()
+  
+  // CRITICAL: Reject IP:port addresses - they cause ECONNREFUSED errors
+  // Use official domains instead
+  if (baseUrl) {
+    const ipPortPattern = /^https?:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?/
+    if (ipPortPattern.test(baseUrl)) {
+      console.warn('[ATLANTICO_CONFIG] Rejected IP address in ATLANTICO_BASE_URL:', baseUrl)
+      console.warn('[ATLANTICO_CONFIG] Using official domain instead')
+      baseUrl = undefined // Force fallback to official domain
+    }
+  }
+  
+  // If no valid baseUrl, use ATLANTICO_ENV or default to production
+  if (!baseUrl) {
+    const env = process.env.ATLANTICO_ENV?.toLowerCase().trim()
+    if (env === 'test') {
+      baseUrl = 'https://testapi.atlanticoexcursiones.com'
+    } else {
+      baseUrl = 'https://api.atlanticoexcursiones.com'
+    }
+  }
 
   // Validate base URL
   if (!baseUrl || baseUrl.trim() === '') {

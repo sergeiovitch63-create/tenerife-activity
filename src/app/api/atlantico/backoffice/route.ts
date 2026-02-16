@@ -132,8 +132,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl
     const lang = searchParams.get('lang') || process.env.ATLANTICO_LANGUAGE_DEFAULT || 'ENG'
-    const collaborator = process.env.ATLANTICO_COLLABORATOR || '12056'
-    const office = process.env.ATLANTICO_OFFICE || '12056'
+    const collaborator = process.env.ATLANTICO_COLLABORATOR || '3645'
+    const office = process.env.ATLANTICO_OFFICE || '3645'
     const fresh = searchParams.get('fresh') === '1'
 
     // Validate lang
@@ -251,6 +251,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const failedGroups: Array<{ group: any; reason: string; groupCodeUsed?: string }> = []
+    const successGroups: Array<{ groupCode: string; groupId: string }> = []
+
     await mapLimit(allGroups, 6, async (group) => {
       // Resolve groupCode: Priority: Code > code > id (only if string/number matches code shape)
       let groupCodeUsed: string | null = null
@@ -268,6 +271,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (!groupCodeUsed) {
+        failedGroups.push({
+          group,
+          reason: 'Missing valid Code/code/id',
+        })
         if (process.env.NODE_ENV !== 'production') {
           console.warn('[BACKOFFICE] Group missing valid Code/code/id:', group)
         }
@@ -280,6 +287,7 @@ export async function GET(request: NextRequest) {
         )
 
         if (groupDetails && typeof groupDetails === 'object') {
+          successGroups.push({ groupCode: groupCodeUsed, groupId: String(group.id || groupCodeUsed) })
           // Store with multiple keys for flexible lookup
           const keysToStore: string[] = []
           
@@ -322,12 +330,43 @@ export async function GET(request: NextRequest) {
         }
       } catch (error) {
         totals.failures++
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        failedGroups.push({
+          group,
+          reason: `API error: ${errorMessage}`,
+          groupCodeUsed,
+        })
         if (process.env.NODE_ENV !== 'production') {
           console.error(`[BACKOFFICE] groupDetails failed for groupCode=${groupCodeUsed}:`, error)
         }
       }
     })
     timings.groupDetails = Date.now() - step3Start
+
+    // Log detailed failure information
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[BACKOFFICE] GroupDetails Summary:', {
+        totalGroups: allGroups.length,
+        success: successGroups.length,
+        failed: failedGroups.length,
+        failureReasons: (() => {
+          const reasons = new Map<string, number>()
+          failedGroups.forEach(f => {
+            const reason = f.reason
+            reasons.set(reason, (reasons.get(reason) || 0) + 1)
+          })
+          return Object.fromEntries(reasons)
+        })(),
+        sampleFailed: failedGroups.slice(0, 5).map(f => ({
+          id: f.group.id,
+          Code: f.group.Code,
+          code: f.group.code,
+          name: f.group.name,
+          groupCodeUsed: f.groupCodeUsed,
+          reason: f.reason,
+        })),
+      })
+    }
 
     // STEP 4: eventDetails/{Code}/{language}
     const step4Start = Date.now()
@@ -485,6 +524,31 @@ export async function GET(request: NextRequest) {
       eventDetailsByEventId,
       timings,
       totals,
+      // Add debug info in development
+      ...(process.env.NODE_ENV !== 'production' ? {
+        debug: {
+          totalGroupsInClassifications: allGroups.length,
+          groupDetailsRetrieved: Object.keys(groupDetailsByGroupId).length,
+          failedGroupsCount: failedGroups.length,
+          successGroupsCount: successGroups.length,
+          failureReasons: (() => {
+            const reasons = new Map<string, number>()
+            failedGroups.forEach(f => {
+              const reason = f.reason
+              reasons.set(reason, (reasons.get(reason) || 0) + 1)
+            })
+            return Object.fromEntries(reasons)
+          })(),
+          sampleFailedGroups: failedGroups.slice(0, 20).map(f => ({
+            id: f.group.id,
+            Code: f.group.Code,
+            code: f.group.code,
+            name: f.group.name,
+            groupCodeUsed: f.groupCodeUsed,
+            reason: f.reason,
+          })),
+        },
+      } : {}),
     }
 
     // Cache the result
