@@ -322,7 +322,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
       validSessions.map(s => s.time).filter(t => t && t !== '' && t !== '00:00' && t !== '-')
     ))
     return validTimes.length > 0
-  }, [selectedDate, sessionsByDay, calendarMode, eventDetailsTimes])
+  }, [selectedDate, sessionsByDay, calendarMode, eventDetailsTimes]) // eventDetailsTimes is used in wdays_only mode
 
   // Auto-select first time when date changes (earliest valid time)
   useEffect(() => {

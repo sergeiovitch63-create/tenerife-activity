@@ -544,7 +544,7 @@ export function ActivityDetailClient({
       validSessions.map(s => s.time).filter(t => t && t !== '' && t !== '00:00' && t !== '-')
     ))
     return validTimes.length > 0
-  }, [selectedDate, sessionsByDay, calendarMode, eventDetailsTimes])
+  }, [selectedDate, sessionsByDay, calendarMode]) // eventDetailsTimes not used in this calculation
 
   // Auto-select first time when date changes (earliest valid time)
   useEffect(() => {
