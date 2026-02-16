@@ -2,8 +2,11 @@
  * Atlantico Image Downloader
  * 
  * Downloads images from Atlantico API and saves them locally in public/images/atlantico/
+ * 
+ * SERVER-ONLY: This module uses Node.js fs module and must never be imported on the client
  */
 
+import 'server-only'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { getAtlanticoImageBaseUrl } from './images'
