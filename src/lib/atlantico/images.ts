@@ -390,7 +390,7 @@ export async function getLocalAtlanticoImageUrl(filename: string): Promise<strin
 
   // SERVER-SIDE: Try to get or download local image
   try {
-    const { getOrDownloadImage } = await import('./download-image')
+    const { getOrDownloadImage } = await import('./download-image.server')
     return await getOrDownloadImage(trimmed)
   } catch (error) {
     console.error('[GET_LOCAL_IMAGE] Error:', error)

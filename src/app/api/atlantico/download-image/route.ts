@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { downloadAtlanticoImage, getLocalImageUrl, imageExistsLocally } from '@/lib/atlantico/download-image'
+import { downloadAtlanticoImage, getLocalImageUrl, imageExistsLocally } from '@/lib/atlantico/download-image.server'
 
 export async function POST(request: NextRequest) {
   try {
