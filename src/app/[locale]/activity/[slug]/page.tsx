@@ -10,7 +10,7 @@
 import { notFound } from 'next/navigation'
 import { ActivityDetailClient } from './ActivityDetailClient'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
-import { extractCoverImage, extractImageUrls } from '@/lib/atlantico/images'
+import { extractCoverImage, extractImageUrls } from '@/lib/atlantico/images.server'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import {
   addDays,
@@ -156,7 +156,7 @@ export default async function ActivityDetailPage({
       // 2) If no full URL from images[], use groupDetails.image (filename)
       if (!resolvedHero && groupDetails?.image && typeof groupDetails.image === 'string' && groupDetails.image.trim()) {
         const imageFilename = groupDetails.image.trim()
-        const { getLocalAtlanticoImageUrl, buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+        const { getLocalAtlanticoImageUrl, buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.server')
         const localImageUrl = await getLocalAtlanticoImageUrl(imageFilename)
         resolvedHero = localImageUrl || buildAtlanticoImageUrlFromFilename(imageFilename)
       }
@@ -211,7 +211,7 @@ export default async function ActivityDetailPage({
             const filename = urlParts[urlParts.length - 1]
             if (filename && /\.(jpg|jpeg|png|webp)$/i.test(filename)) {
               // Try to download locally
-              const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+              const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images.server')
               eventImage = await getLocalAtlanticoImageUrl(filename) || extractedImage
             } else {
               eventImage = extractedImage

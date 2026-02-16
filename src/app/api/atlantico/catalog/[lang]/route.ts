@@ -18,7 +18,7 @@ import { NextRequest } from 'next/server'
 import { getAtlanticoConfig } from '@/lib/atlantico/config'
 import { extractEventCodes } from '@/lib/atlantico/mappers'
 import type { AtlanticoGroupDetails, AtlanticoEventDetails } from '@/lib/atlantico/mappers'
-import { extractCoverImage, extractImageUrls } from '@/lib/atlantico/images'
+import { extractCoverImage, extractImageUrls } from '@/lib/atlantico/images.server'
 import { getFallbackImageForTour } from '@/lib/images/fallback'
 import { assignVibeId } from '@/lib/vibes/assignVibe'
 

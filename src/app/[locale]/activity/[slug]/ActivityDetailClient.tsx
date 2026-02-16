@@ -362,7 +362,7 @@ export function ActivityDetailClient({
                   setGroupImageUrl(result.url)
                 } else {
                   // Fallback: build remote URL
-                  const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                  const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
                   const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
                   if (remoteUrl) {
                     setGroupImageUrl(remoteUrl)
@@ -404,7 +404,7 @@ export function ActivityDetailClient({
           
           // Extract image using extractCoverImage (same logic as server-side)
           // Download and use local images for better performance
-          const { extractCoverImage } = await import('@/lib/atlantico/images')
+          const { extractCoverImage } = await import('@/lib/atlantico/images.client')
           const extractedImage = extractCoverImage(data)
           
           if (extractedImage) {
@@ -437,7 +437,7 @@ export function ActivityDetailClient({
                     setEventImageUrl(result.url)
                   } else {
                     // Fallback: build remote URL
-                    const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                    const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
                     setEventImageUrl(buildAtlanticoImageUrlFromFilename(extractedImage))
                   }
                 })
@@ -484,12 +484,12 @@ export function ActivityDetailClient({
                     if (result?.url) {
                       setEventImageUrl(result.url)
                     } else {
-                      const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                      const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
                       setEventImageUrl(buildAtlanticoImageUrlFromFilename(trimmed))
                     }
                   })
                   .catch(() => {
-                    import('@/lib/atlantico/images').then(({ buildAtlanticoImageUrlFromFilename }) => {
+                    import('@/lib/atlantico/images.client').then(({ buildAtlanticoImageUrlFromFilename }) => {
                       setEventImageUrl(buildAtlanticoImageUrlFromFilename(trimmed))
                     })
                   })

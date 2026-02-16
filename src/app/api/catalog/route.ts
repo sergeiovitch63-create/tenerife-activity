@@ -8,7 +8,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { experienceRepository } from '@/config/repositories'
-import { extractImageUrls } from '@/lib/atlantico/images'
+import { extractImageUrls } from '@/lib/atlantico/images.server'
 import type { Experience } from '@/core/entities/experience'
 
 /**
