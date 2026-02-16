@@ -8,68 +8,25 @@
  * 1. Start dev server
  * 2. Open: /api/atlantico/debug/resolve-image?file=garachico-san-miguel1.jpg
  * 3. Extract base from firstOkUrl and set ATLANTICO_IMAGES_BASE_URL
+ * 
+ * NOTE: This endpoint is disabled in production builds to prevent build errors.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 
-// DEV-only guard
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('This endpoint is DEV-only')
-}
+// Mark route as dynamic to prevent static analysis during build
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
-/**
- * Test if a URL returns a valid image (200, 206, or redirects to valid image)
- */
-async function testImageUrl(url: string): Promise<{ ok: boolean; status: number; finalUrl?: string }> {
-  try {
-    // Use Range header to request only first byte (avoid downloading full image)
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
-
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Range: 'bytes=0-0',
-        },
-        redirect: 'follow', // Follow redirects
-        cache: 'no-store',
-        signal: controller.signal,
-      })
-
-      clearTimeout(timeoutId)
-
-      // 200 (full response) or 206 (partial content) are both valid
-      // fetch follows redirects automatically, so we'll see the final status
-      const status = response.status
-      const isOk = status === 200 || status === 206
-
-      return {
-        ok: isOk,
-        status,
-        finalUrl: response.url, // Final URL after redirects
-      }
-    } catch (fetchError) {
-      clearTimeout(timeoutId)
-      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        return { ok: false, status: 0 } // Timeout
-      }
-      throw fetchError
-    }
-  } catch (error) {
-    return {
-      ok: false,
-      status: 0,
-    }
-  }
-}
-
+// Production guard - return early without executing any code
 export async function GET(request: NextRequest) {
-  // DEV-only guard
+  // DEV-only guard - return early in production to avoid any code execution
+  // This check happens at runtime, not build time
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'This endpoint is DEV-only' }, { status: 403 })
   }
 
+  // Development code below - only executed in development
   const { searchParams } = request.nextUrl
   const file = searchParams.get('file')
 
@@ -98,13 +55,19 @@ export async function GET(request: NextRequest) {
 
   // Also try ATLANTICO_BASE_URL if set
   // Use getBaseUrl() to ensure we never use IP:port addresses
-  const { getBaseUrl } = await import('@/lib/atlantico/client')
-  const atlanticoBase = getBaseUrl()
-  if (atlanticoBase && atlanticoBase.trim()) {
-    const base = atlanticoBase.trim().replace(/\/+$/, '')
-    if (!hosts.includes(base)) {
-      hosts.unshift(base) // Prefer env base
+  // Wrap in try-catch to prevent build-time errors if module can't be resolved
+  try {
+    const { getBaseUrl } = await import('@/lib/atlantico/client')
+    const atlanticoBase = getBaseUrl()
+    if (atlanticoBase && atlanticoBase.trim()) {
+      const base = atlanticoBase.trim().replace(/\/+$/, '')
+      if (!hosts.includes(base)) {
+        hosts.unshift(base) // Prefer env base
+      }
     }
+  } catch (error) {
+    // Silently ignore import errors during build/runtime
+    // This allows the route to work even if the module can't be resolved
   }
 
   // Candidate paths
@@ -204,3 +167,49 @@ export async function GET(request: NextRequest) {
   })
 }
 
+/**
+ * Test if a URL returns a valid image (200, 206, or redirects to valid image)
+ */
+async function testImageUrl(url: string): Promise<{ ok: boolean; status: number; finalUrl?: string }> {
+  try {
+    // Use Range header to request only first byte (avoid downloading full image)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Range: 'bytes=0-0',
+        },
+        redirect: 'follow', // Follow redirects
+        cache: 'no-store',
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      // 200 (full response) or 206 (partial content) are both valid
+      // fetch follows redirects automatically, so we'll see the final status
+      const status = response.status
+      const isOk = status === 200 || status === 206
+
+      return {
+        ok: isOk,
+        status,
+        finalUrl: response.url, // Final URL after redirects
+      }
+    } catch (fetchError) {
+      clearTimeout(timeoutId)
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        return { ok: false, status: 0 } // Timeout
+      }
+      throw fetchError
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+    }
+  }
+}

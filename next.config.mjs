@@ -16,11 +16,16 @@ const nextConfig = {
   /* config options here */
   
   // Exclude debug routes from production build
+  // This prevents Next.js from trying to collect page data for debug routes during build
   ...(process.env.NODE_ENV === 'production' && {
-    pageExtensions: ['tsx', 'ts', 'jsx', 'js'].filter(ext => {
-      // Keep all extensions, but we'll handle debug routes differently
-      return true
-    }),
+    experimental: {
+      outputFileTracingExcludes: {
+        '*': [
+          '**/api/debug/**',
+          '**/api/atlantico/debug/**',
+        ],
+      },
+    },
   }),
   
   // Image configuration for remote domains

@@ -7,11 +7,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { atlanticoGet } from '@/lib/atlantico/client'
 
-// DEV-only guard - check at runtime, not at import time
-function checkDevOnly() {
+// DEV-only guard - returns HTTP response instead of throwing
+function checkDevOnly(): NextResponse | null {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('This endpoint is DEV-only')
+    return NextResponse.json({ error: 'This endpoint is DEV-only' }, { status: 403 })
   }
+  return null
 }
 
 interface GroupDetailsAnalysis {
@@ -29,7 +30,9 @@ interface GroupDetailsAnalysis {
 }
 
 export async function GET(request: NextRequest) {
-  checkDevOnly()
+  const devCheck = checkDevOnly()
+  if (devCheck) return devCheck
+  
   try {
     const { searchParams } = request.nextUrl
     const classificationId = searchParams.get('classificationId')

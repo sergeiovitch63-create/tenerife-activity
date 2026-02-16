@@ -8,11 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { atlanticoGet } from '@/lib/atlantico/client'
 
-// DEV-only guard - check at runtime, not at import time
-function checkDevOnly() {
+// DEV-only guard - returns HTTP response instead of throwing
+function checkDevOnly(): NextResponse | null {
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('This endpoint is DEV-only')
+    return NextResponse.json({ error: 'This endpoint is DEV-only' }, { status: 403 })
   }
+  return null
 }
 
 interface ImageTest {
@@ -95,7 +96,9 @@ function buildImageUrls(filenameOrUrl: string): string[] {
 }
 
 export async function GET(request: NextRequest) {
-  checkDevOnly()
+  const devCheck = checkDevOnly()
+  if (devCheck) return devCheck
+  
   try {
     // Fetch backoffice data via our API route
     const backofficeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/atlantico/backoffice?lang=ENG`)

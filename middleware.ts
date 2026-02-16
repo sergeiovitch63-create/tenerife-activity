@@ -52,6 +52,16 @@ const intlMiddleware = createMiddleware({
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
+  // Block debug routes in production
+  if (process.env.NODE_ENV === 'production') {
+    if (pathname.startsWith('/api/debug/') || pathname.startsWith('/api/atlantico/debug/')) {
+      return NextResponse.json(
+        { error: 'Debug endpoints are disabled in production' },
+        { status: 404 }
+      )
+    }
+  }
+
   // Early exit for asset paths - don't process locale normalization
   if (isAssetPath(pathname)) {
     return NextResponse.next()
