@@ -15,15 +15,8 @@ function hostnameFromEnvUrl(v) {
 const nextConfig = {
   /* config options here */
   
-  // Exclude heavy packages from server components and API routes
-  // This reduces bundle size for Vercel Functions (300mb limit)
-  // These packages will be loaded at runtime instead of bundled
-  serverExternalPackages: [
-    '@supabase/supabase-js',
-    'playwright',
-    'tsx',
-    '@playwright/test',
-  ],
+  // Note: serverExternalPackages is not available in Next.js 14.2.35
+  // Using outputFileTracingExcludes instead
   
   // Exclude debug routes and heavy dependencies from production build
   // This prevents Next.js from trying to collect page data for debug routes during build

@@ -241,7 +241,7 @@ export async function syncCatalog(
                 (groupDetails as any).categoryName,
                 classification.id
               )
-              if (item && !seenSlugs.has(item.slug)) {
+              if (!seenSlugs.has(item.slug)) {
                 seenSlugs.add(item.slug)
                 allItems.push(item)
               }
@@ -275,7 +275,7 @@ export async function syncCatalog(
                   (groupDetails as any).categoryName,
                   classification.id
                 )
-                if (item && !seenSlugs.has(item.slug)) {
+                if (!seenSlugs.has(item.slug)) {
                   seenSlugs.add(item.slug)
                   allItems.push(item)
                 }
@@ -376,7 +376,7 @@ async function normalizeItem(
   categoryId?: string | number | null | undefined,
   categoryName?: string | null | undefined,
   classificationId?: string | number | null | undefined
-): NormalizedCatalogItem | null {
+): Promise<NormalizedCatalogItem> {
   // Use event code if available, otherwise group code
   const eventCodeRaw = eventDetails?.Code || eventDetails?.code
   const eventCode = eventCodeRaw ? String(eventCodeRaw) : undefined
