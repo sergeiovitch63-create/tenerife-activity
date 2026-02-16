@@ -362,6 +362,9 @@ export function buildAtlanticoImageUrlFromFilename(filename: string): string {
  * Get local image URL for an Atlantico image filename
  * Downloads the image if it doesn't exist locally
  * 
+ * NOTE: This function is SERVER-ONLY (uses fs module)
+ * On the client, it will return the remote URL instead
+ * 
  * @param filename - Image filename (e.g., "Teleferico.jpg")
  * @returns Local public URL (e.g., "/images/atlantico/Teleferico.jpg") or null if download failed
  */
@@ -380,7 +383,12 @@ export async function getLocalAtlanticoImageUrl(filename: string): Promise<strin
     return trimmed
   }
 
-  // Try to get or download local image
+  // CLIENT-SIDE: Return remote URL (can't use fs on client)
+  if (typeof window !== 'undefined') {
+    return buildAtlanticoImageUrlFromFilename(trimmed)
+  }
+
+  // SERVER-SIDE: Try to get or download local image
   try {
     const { getOrDownloadImage } = await import('./download-image')
     return await getOrDownloadImage(trimmed)
