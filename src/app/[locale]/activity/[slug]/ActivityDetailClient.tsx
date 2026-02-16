@@ -20,6 +20,8 @@ import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
 import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
 import { buildWhatsAppUrl, buildCallUrl } from '@/lib/booking/contactHelpers'
+import { MeetingPointsDisplay } from '@/components/booking/MeetingPointsDisplay'
+import { extractImageUrls } from '@/lib/atlantico/images.client'
 
 type EventOption = {
   eventId: string
@@ -70,6 +72,25 @@ function iconAltFromFilename(filename: string): string {
   return base.replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').trim() || 'icon'
 }
 
+/**
+ * Parse FAQ/Includes text into a clean list of items
+ * Handles formats like "INCLUDES:\n\n\t\n\tItem 1\n\t\n\t\n\tItem 2"
+ */
+function parseIncludesList(faqText: string | null | undefined): string[] {
+  if (!faqText || typeof faqText !== 'string') return []
+  
+  // Remove "INCLUDES:" prefix if present
+  let text = faqText.replace(/^INCLUDES:\s*/i, '').trim()
+  
+  // Split by newlines and tabs, filter empty, clean up
+  const items = text
+    .split(/\n|\t/)
+    .map(item => item.trim())
+    .filter(item => item.length > 0 && !item.match(/^\s*$/))
+  
+  return items
+}
+
 function EventIcon({ filename }: { filename: string }) {
   const [src, setSrc] = useState<string | null>(null)
 
@@ -116,7 +137,21 @@ export function ActivityDetailClient({
   eventOptions,
   heroImageUrl,
 }: ActivityDetailClientProps) {
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'description' | 'details' | 'prices' | 'cancellation' | 'reviews'>('overview')
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'whats-included' | 'description' | 'what-you-do' | 'details' | 'prices' | 'cancellation' | 'reviews'>('overview')
+  
+  // Check if this is activity 508 for custom tab layout
+  const isActivity508 = item.groupCode === '508' || item.slug === '508'
+  
+  // Debug log - Always log to help debug
+  useEffect(() => {
+    console.log('[ACTIVITY_508_CHECK]', {
+      groupCode: item.groupCode,
+      slug: item.slug,
+      isActivity508,
+      itemTitle: item.title,
+      willRenderPremium: isActivity508,
+    })
+  }, [item.groupCode, item.slug, isActivity508, item.title])
 
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
@@ -146,6 +181,20 @@ export function ActivityDetailClient({
   const [groupImageUrl, setGroupImageUrl] = useState<string | null>(null)
   // Carousel state for event 303
   const [heroCarouselIndex, setHeroCarouselIndex] = useState<number>(0)
+  // All images from API (for gallery)
+  const [allImages, setAllImages] = useState<string[]>([])
+  
+  // Debug log for activity 508
+  useEffect(() => {
+    if (isActivity508 && process.env.NODE_ENV === 'development') {
+      console.log('[ACTIVITY_508] Detected activity 508', {
+        groupCode: item.groupCode,
+        hasGroupDetails: !!groupDetails,
+        hasAllImages: allImages.length > 0,
+        selectedTab,
+      })
+    }
+  }, [isActivity508, item.groupCode, groupDetails, allImages.length, selectedTab])
 
   const [pricesData, setPricesData] = useState<PricesResponseOk | PricesResponseError | null>(null)
   const [priceStatus, setPriceStatus] = useState<PriceStatus>('idle')
@@ -337,49 +386,97 @@ export function ActivityDetailClient({
       .then(async (data) => {
         if (data) {
           setGroupDetails(data)
-          // Resolve group image with same priority as server:
-          // 1) data.images[0] when it's a full URL
-          // 2) data.image (filename) resolved via Atlantico image base
-          // 3) keep existing hero/item image as fallback
-          let resolvedGroupImage: string | null = null
-
-          // 1) Use first entry of data.images if it's an absolute URL
+          
+          // Collect ALL images from groupDetails - resolve filenames to URLs
+          const images: string[] = []
+          const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
+          
+          // 1. Extract from data.images array (can be URLs or filenames)
           if (Array.isArray(data.images) && data.images.length > 0) {
-            const firstImg = String(data.images[0]).trim()
-            if (firstImg.startsWith('http://') || firstImg.startsWith('https://')) {
-              resolvedGroupImage = firstImg
+            for (const img of data.images) {
+              if (typeof img === 'string' && img.trim()) {
+                const trimmed = img.trim()
+                // If it's already a full URL, use it directly
+                if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+                  if (!images.includes(trimmed)) {
+                    images.push(trimmed)
+                  }
+                } else {
+                  // It's a filename, resolve it to a URL
+                  const url = buildAtlanticoImageUrlFromFilename(trimmed)
+                  if (url && !images.includes(url)) {
+                    images.push(url)
+                  }
+                }
+              }
             }
           }
-
-          // 2) If no full URL from images[], use data.image (filename)
-          if (!resolvedGroupImage && data.image && typeof data.image === 'string' && data.image.trim()) {
+          
+          // 2. Extract from data.image (single image field) - resolve immediately
+          if (data.image && typeof data.image === 'string' && data.image.trim()) {
             const imageFilename = data.image.trim()
-            // Try to download locally via API
+            // Resolve filename to URL immediately (synchronously)
+            const imageUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
+            if (imageUrl && !images.includes(imageUrl)) {
+              images.push(imageUrl)
+            }
+            
+            // Also try to download locally via API (async, for better performance)
             fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(imageFilename)}`)
               .then(res => res.ok ? res.json() : null)
               .then(async (result) => {
                 if (result?.url) {
                   setGroupImageUrl(result.url)
+                  // Update allImages if we got a local URL (replace remote with local)
+                  setAllImages(prev => {
+                    const updated = prev.map(img => img === imageUrl ? result.url : img)
+                    if (!updated.includes(result.url)) {
+                      updated.push(result.url)
+                    }
+                    return updated.filter((img, idx, arr) => arr.indexOf(img) === idx) // Remove duplicates
+                  })
                 } else {
-                  // Fallback: build remote URL
-                  const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
-                  const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
-                  if (remoteUrl) {
-                    setGroupImageUrl(remoteUrl)
-                  }
+                  // Fallback: use remote URL
+                  setGroupImageUrl(imageUrl)
                 }
               })
               .catch(async () => {
-                // Fallback: build remote URL
-                const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
-                const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
-                if (remoteUrl) {
-                  setGroupImageUrl(remoteUrl)
-                }
+                // Fallback: use remote URL
+                setGroupImageUrl(imageUrl)
               })
-          } else if (resolvedGroupImage) {
-            // We already have a full URL from images[]
-            setGroupImageUrl(resolvedGroupImage)
+          } else if (Array.isArray(data.images) && data.images.length > 0) {
+            // Use first image from images array as group image
+            const firstImg = String(data.images[0]).trim()
+            if (firstImg.startsWith('http://') || firstImg.startsWith('https://')) {
+              setGroupImageUrl(firstImg)
+            } else {
+              const url = buildAtlanticoImageUrlFromFilename(firstImg)
+              if (url) {
+                setGroupImageUrl(url)
+              }
+            }
+          }
+          
+          // 3. Also try extractImageUrls as fallback (handles other fields like photos, gallery, etc.)
+          const extractedImages = extractImageUrls(data)
+          for (const img of extractedImages) {
+            if (img && !images.includes(img)) {
+              images.push(img)
+            }
+          }
+          
+          // Store all collected images
+          if (images.length > 0) {
+            setAllImages(prev => {
+              const combined = [...images]
+              // Add any existing images that aren't in the new list (preserve event images)
+              for (const img of prev) {
+                if (!combined.includes(img)) {
+                  combined.push(img)
+                }
+              }
+              return combined
+            })
           }
         }
       })
@@ -392,6 +489,13 @@ export function ActivityDetailClient({
       setEventDetails(null)
       setLimitsInfo(null)
       setEventImageUrl(null)
+      // Reset allImages to only group images when no event is selected
+      if (groupDetails) {
+        const groupImages = extractImageUrls(groupDetails)
+        setAllImages(groupImages)
+      } else {
+        setAllImages([])
+      }
       return
     }
 
@@ -401,6 +505,81 @@ export function ActivityDetailClient({
       .then(async (data) => {
         if (data) {
           setEventDetails(data)
+          
+          // Collect ALL images from eventDetails - resolve filenames to URLs
+          const eventImages: string[] = []
+          const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
+          
+          // 1. Extract from data.images array (can be URLs or filenames)
+          if (Array.isArray(data.images) && data.images.length > 0) {
+            for (const img of data.images) {
+              if (typeof img === 'string' && img.trim()) {
+                const trimmed = img.trim()
+                // If it's already a full URL, use it directly
+                if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+                  if (!eventImages.includes(trimmed)) {
+                    eventImages.push(trimmed)
+                  }
+                } else {
+                  // It's a filename, resolve it to a URL
+                  const url = buildAtlanticoImageUrlFromFilename(trimmed)
+                  if (url && !eventImages.includes(url)) {
+                    eventImages.push(url)
+                  }
+                }
+              }
+            }
+          }
+          
+          // 2. Extract from data.image (single image field) - resolve immediately
+          if (data.image && typeof data.image === 'string' && data.image.trim()) {
+            const imageFilename = data.image.trim()
+            // Resolve filename to URL immediately
+            const url = buildAtlanticoImageUrlFromFilename(imageFilename)
+            if (url && !eventImages.includes(url)) {
+              eventImages.push(url)
+            }
+            
+            // Also try to download locally via API (async, for better performance)
+            fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(imageFilename)}`)
+              .then(res => res.ok ? res.json() : null)
+              .then(async (result) => {
+                if (result?.url && result.url !== url) {
+                  // Update allImages if we got a local URL (replace remote with local)
+                  setAllImages(prev => {
+                    const updated = prev.map(img => img === url ? result.url : img)
+                    if (!updated.includes(result.url)) {
+                      updated.push(result.url)
+                    }
+                    return updated.filter((img, idx, arr) => arr.indexOf(img) === idx) // Remove duplicates
+                  })
+                }
+              })
+              .catch(() => {
+                // Ignore errors, use remote URL
+              })
+          }
+          
+          // 3. Also try extractImageUrls as fallback (handles other fields like photos, gallery, etc.)
+          const extractedImages = extractImageUrls(data)
+          for (const img of extractedImages) {
+            if (img && !eventImages.includes(img)) {
+              eventImages.push(img)
+            }
+          }
+          
+          // Merge event images with existing group images (avoid duplicates)
+          if (eventImages.length > 0) {
+            setAllImages(prev => {
+              const combined = [...prev]
+              for (const img of eventImages) {
+                if (!combined.includes(img)) {
+                  combined.push(img)
+                }
+              }
+              return combined
+            })
+          }
           
           // Extract image using extractCoverImage (same logic as server-side)
           // Download and use local images for better performance
@@ -861,6 +1040,607 @@ export function ActivityDetailClient({
     }
   }, [eventImageUrl, selectedOption?.image, groupImageUrl, heroImageUrl, item.image, heroImage, selectedEventId, selectedOption, groupDetails])
 
+  // Premium layout for activity 508
+  if (isActivity508) {
+    console.log('[ACTIVITY_508] Rendering premium layout for activity 508', { groupCode: item.groupCode, slug: item.slug })
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-glass-50 to-white">
+        {/* Debug banner - remove in production */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="bg-yellow-400 text-black p-2 text-center font-bold">
+            🎨 PREMIUM LAYOUT ACTIVE FOR ACTIVITY 508
+          </div>
+        )}
+        {/* Premium Hero Section */}
+        <div className="relative w-full h-[70vh] min-h-[500px] bg-gradient-to-br from-ocean-900 via-ocean-800 to-ocean-700 overflow-hidden">
+          {heroImage && (
+            <>
+              <div className="absolute inset-0">
+                <SafeImage
+                  src={heroImage}
+                  alt={item.title}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              </div>
+              {/* Premium gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-ocean-900/60 to-transparent" />
+            </>
+          )}
+          
+          {/* Hero Content */}
+          <div className="relative z-10 h-full flex flex-col justify-end">
+            <div className="container mx-auto px-4 pb-12 max-w-7xl">
+              <div className="max-w-3xl">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 mb-6">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-white font-semibold text-sm">VIP Experience</span>
+                </div>
+                
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+                  {item.title}
+                </h1>
+                
+                {/* Key Info Cards */}
+                <div className="flex flex-wrap gap-4 mt-6">
+                  {groupDetails?.duration && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-white font-medium">{groupDetails.duration} hours</span>
+                    </div>
+                  )}
+                  {groupBasePrice && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-white font-medium">From {formatEUR(groupBasePrice)}</span>
+                    </div>
+                  )}
+                  {groupDetails?.childAge && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <span className="text-white font-medium">Child: {groupDetails.childAge}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="container mx-auto px-4 py-12 max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Left Column: Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Premium Tabs */}
+              <div className="border-b-2 border-glass-200">
+                <div className="flex space-x-1">
+                  {(['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`px-6 py-4 font-semibold text-sm uppercase tracking-wide border-b-3 transition-all relative ${
+                        selectedTab === tab
+                          ? 'text-ocean-600 border-ocean-600'
+                          : 'text-glass-500 border-transparent hover:text-glass-700 hover:border-glass-300'
+                      }`}
+                    >
+                      {tab === 'whats-included' ? "What's Included" : 
+                       tab === 'what-you-do' ? "What You Do" :
+                       tab === 'cancellation' ? 'Cancellation' :
+                       tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {selectedTab === tab && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-ocean-600" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab Content - Premium Styling */}
+              <div className="pt-8">
+                {selectedTab === 'overview' && (
+                  <div className="space-y-8">
+                    {/* Icons */}
+                    {groupDetails?.icons && Array.isArray(groupDetails.icons) && groupDetails.icons.length > 0 && (
+                      <div className="flex flex-wrap gap-3">
+                        {groupDetails.icons.map((icon: string) => (
+                          <EventIcon key={icon} filename={icon} />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Gallery */}
+                    {allImages.length > 0 && (
+                      <div>
+                        <h3 className="text-3xl font-bold text-glass-900 mb-6">Photo Gallery</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                          {allImages.map((imgUrl: string, idx: number) => {
+                            if (!imgUrl || !imgUrl.trim()) return null
+                            return (
+                              <div key={idx} className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300">
+                                <SafeImage
+                                  src={imgUrl}
+                                  alt={`${item.title} photo ${idx + 1}`}
+                                  fill
+                                  sizes="(max-width: 640px) 100vw, 50vw"
+                                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedTab === 'whats-included' && (
+                  <div>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">What's Included</h2>
+                    {groupDetails?.faq ? (
+                      <div className="space-y-4">
+                        {(() => {
+                          const includesList = parseIncludesList(groupDetails.faq)
+                          if (includesList.length > 0) {
+                            return (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {includesList.map((item, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-start gap-4 p-6 bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl border border-ocean-100 hover:border-ocean-200 hover:shadow-lg transition-all group"
+                                  >
+                                    <div className="flex-shrink-0 mt-1">
+                                      <div className="w-8 h-8 rounded-full bg-ocean-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                    <p className="text-glass-800 font-medium leading-relaxed text-lg flex-1">{item}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )
+                          } else {
+                            return (
+                              <div
+                                className="prose prose-lg max-w-none"
+                                dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.faq)}
+                              />
+                            )
+                          }
+                        })()}
+                      </div>
+                    ) : (
+                      <p className="text-glass-500">Information not available.</p>
+                    )}
+                  </div>
+                )}
+
+                {selectedTab === 'cancellation' && (
+                  <div>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">Cancellation Policy</h2>
+                    {groupDetails?.canDesc || groupDetails?.canTitle ? (
+                      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-8 border-2 border-green-200 shadow-lg">
+                        {groupDetails.canTitle && (
+                          <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center shadow-lg">
+                              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-green-800">{groupDetails.canTitle}</h3>
+                          </div>
+                        )}
+                        {groupDetails.canDesc && (
+                          <div 
+                            className="prose prose-lg max-w-none text-glass-800 leading-relaxed"
+                            dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.canDesc)} 
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-glass-500">Cancellation policy information not available.</p>
+                    )}
+                  </div>
+                )}
+
+                {selectedTab === 'description' && (
+                  <div>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">Description</h2>
+                    {groupDetails?.desc ? (
+                      <div className="space-y-6">
+                        <div className="prose prose-lg max-w-none text-glass-800 leading-relaxed">
+                          <div dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)} />
+                        </div>
+                        
+                        {/* Info Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                          {groupDetails.duration && (
+                            <div className="bg-gradient-to-br from-glass-50 to-glass-100 rounded-xl p-6 border border-glass-200 shadow-sm">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-ocean-600 flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-glass-600 font-medium">Duration</p>
+                                  <p className="text-2xl font-bold text-glass-900">{groupDetails.duration} hours</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {groupDetails.childAge && (
+                            <div className="bg-gradient-to-br from-glass-50 to-glass-100 rounded-xl p-6 border border-glass-200 shadow-sm">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-ocean-600 flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-glass-600 font-medium">Child Age</p>
+                                  <p className="text-2xl font-bold text-glass-900">{groupDetails.childAge}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-glass-500">No description available.</p>
+                    )}
+                  </div>
+                )}
+
+                {selectedTab === 'what-you-do' && (
+                  <div>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">What You Do</h2>
+                    {groupDetails?.willDo ? (
+                      <div className="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
+                        <div
+                          className="prose prose-lg max-w-none text-glass-800 leading-relaxed"
+                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.willDo)}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-glass-500">Information not available.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column: Booking Sidebar - Premium */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <div className="bg-white rounded-2xl shadow-2xl border border-glass-200 overflow-hidden">
+                  {/* Booking Header */}
+                  <div className="bg-gradient-to-r from-ocean-600 to-ocean-700 p-6 text-white">
+                    <h3 className="text-2xl font-bold mb-2">Book Your Experience</h3>
+                    {groupBasePrice && (
+                      <p className="text-ocean-100 text-lg">From {formatEUR(groupBasePrice)}</p>
+                    )}
+                  </div>
+
+                  {/* Booking Form */}
+                  <div className="p-6 space-y-6">
+                    {/* Option selector */}
+                    {eventOptions.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Select Option</label>
+                        <select
+                          value={selectedEventId}
+                          onChange={(e) => {
+                            setSelectedEventId(e.target.value)
+                            setSelectedDate('')
+                          }}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all bg-white"
+                        >
+                          <option value="">Choose an option...</option>
+                          {eventOptions.map((opt) => (
+                            <option key={opt.eventId} value={opt.eventId}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Calendar - Premium Styling */}
+                    {selectedEventId && calendarMode !== 'none' && (
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-3">Select Date</label>
+                        {loadingCalendar ? (
+                          <div className="text-center py-8 text-glass-500">Loading calendar...</div>
+                        ) : (
+                          <>
+                            {/* Month Navigation */}
+                            <div className="flex items-center justify-between mb-4">
+                              <button
+                                onClick={() => changeMonth(-1)}
+                                className="px-3 py-2 text-sm font-medium text-glass-700 bg-white border-2 border-glass-300 rounded-lg hover:bg-glass-50 transition-all"
+                                aria-label="Previous month"
+                              >
+                                ←
+                              </button>
+                              <h4 className="text-base font-semibold text-glass-900">
+                                {(() => {
+                                  const [year, month] = currentMonth.split('-').map(Number)
+                                  const date = new Date(year, month - 1, 1)
+                                  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                                })()}
+                              </h4>
+                              <button
+                                onClick={() => changeMonth(1)}
+                                className="px-3 py-2 text-sm font-medium text-glass-700 bg-white border-2 border-glass-300 rounded-lg hover:bg-glass-50 transition-all"
+                                aria-label="Next month"
+                              >
+                                →
+                              </button>
+                            </div>
+                            
+                            {/* Calendar Grid */}
+                            <div className="grid grid-cols-7 gap-1 mb-2">
+                              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+                                <div key={day} className="text-center text-xs font-semibold text-glass-600 py-1">
+                                  {day}
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <div className="grid grid-cols-7 gap-1">
+                              {(() => {
+                                const [yearStr, monthStr] = currentMonth.split('-')
+                                const year = Number(yearStr)
+                                const month = Number(monthStr)
+                                const firstDay = new Date(year, month - 1, 1)
+                                const lastDay = new Date(year, month, 0)
+                                const daysInMonth = lastDay.getDate()
+                                const startingDayOfWeek = firstDay.getDay()
+                                const today = new Date()
+                                today.setHours(0, 0, 0, 0)
+                                
+                                const datesToCheck = calendarMode === 'wdays_only' ? projectedAvailableDates : availableDates
+                                const days: Array<{ day: number; dateStr: string; isAvailable: boolean; isToday: boolean; isPast: boolean }> = []
+                                
+                                for (let i = 0; i < startingDayOfWeek; i++) {
+                                  days.push({ day: 0, dateStr: '', isAvailable: false, isToday: false, isPast: false })
+                                }
+                                
+                                for (let day = 1; day <= daysInMonth; day++) {
+                                  const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                                  const date = new Date(year, month - 1, day)
+                                  const isToday = date.getTime() === today.getTime()
+                                  const isPast = date < today
+                                  const isAvailable = !isPast && datesToCheck.includes(dateStr)
+                                  days.push({ day, dateStr, isAvailable, isToday, isPast })
+                                }
+                                
+                                return days.map((dayData, idx) => {
+                                  if (dayData.day === 0) {
+                                    return <div key={`empty-${idx}`} className="aspect-square" />
+                                  }
+                                  
+                                  const isSelected = selectedDate === dayData.dateStr
+                                  const isClickable = dayData.isAvailable && !dayData.isPast
+                                  
+                                  return (
+                                    <button
+                                      key={dayData.dateStr}
+                                      onClick={() => {
+                                        if (isClickable) {
+                                          setSelectedDate(dayData.dateStr)
+                                        }
+                                      }}
+                                      disabled={!isClickable}
+                                      className={`aspect-square text-sm font-medium rounded-lg transition-all ${
+                                        isSelected
+                                          ? 'bg-ocean-600 text-white shadow-lg scale-105'
+                                          : dayData.isToday && !isSelected
+                                          ? 'bg-ocean-100 text-ocean-700 border-2 border-ocean-400'
+                                          : isClickable
+                                          ? 'bg-white text-glass-900 border border-glass-200 hover:bg-ocean-50 hover:border-ocean-300 hover:scale-105'
+                                          : 'bg-glass-100 text-glass-400 border border-glass-200 opacity-50 cursor-not-allowed'
+                                      }`}
+                                    >
+                                      {dayData.day}
+                                    </button>
+                                  )
+                                })
+                              })()}
+                            </div>
+                            
+                            {/* Time picker */}
+                            {selectedDate && calendarMode !== 'wdays_only' && sessionsByDay[selectedDate] && sessionsByDay[selectedDate].length > 0 && (
+                              <div className="mt-4">
+                                <label className="block text-sm font-semibold text-glass-900 mb-2">Select Time</label>
+                                <select
+                                  value={selectedTime}
+                                  onChange={(e) => setSelectedTime(e.target.value)}
+                                  className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all bg-white"
+                                >
+                                  <option value="">Choose time...</option>
+                                  {sessionsByDay[selectedDate]
+                                    .filter(s => s.time && s.time !== '00:00' && s.time !== '-')
+                                    .map((session) => (
+                                      <option key={session.time} value={session.time}>
+                                        {session.time} {session.available > 0 ? `(${session.available} available)` : '(Sold out)'}
+                                      </option>
+                                    ))}
+                                </select>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Participants */}
+                    <div className="space-y-4 pt-4 border-t border-glass-200">
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Adults *</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={bookingForm.adults}
+                          onChange={(e) => setBookingForm({ ...bookingForm, adults: parseInt(e.target.value) || 1 })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Children</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={bookingForm.children}
+                          onChange={(e) => setBookingForm({ ...bookingForm, children: parseInt(e.target.value) || 0 })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Infants</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={bookingForm.infants}
+                          onChange={(e) => setBookingForm({ ...bookingForm, infants: parseInt(e.target.value) || 0 })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="space-y-4 pt-4 border-t border-glass-200">
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Name *</label>
+                        <input
+                          type="text"
+                          value={bookingForm.name}
+                          onChange={(e) => setBookingForm({ ...bookingForm, name: e.target.value })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Email *</label>
+                        <input
+                          type="email"
+                          value={bookingForm.email}
+                          onChange={(e) => setBookingForm({ ...bookingForm, email: e.target.value })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">Phone *</label>
+                        <input
+                          type="tel"
+                          value={bookingForm.phone}
+                          onChange={(e) => setBookingForm({ ...bookingForm, phone: e.target.value })}
+                          className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Total Price */}
+                    <div className="pt-4 border-t-2 border-ocean-200 bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-lg font-semibold text-glass-900">Total</span>
+                        <span className={`text-2xl font-bold ${
+                          priceStatus === 'ok' ? 'text-ocean-600' : 'text-glass-600'
+                        }`}>
+                          {totalDisplay}
+                        </span>
+                      </div>
+                      {priceStatus === 'loading' && (
+                        <p className="text-sm text-glass-500">Calculating price...</p>
+                      )}
+                    </div>
+
+                    {/* Booking Button */}
+                    {(calendarMode === 'none' || (calendarMode === 'wdays_only' && eventDetailsTimes.length === 0)) ? (
+                      <div className="space-y-3">
+                        <a
+                          href={buildWhatsAppUrl({
+                            activityName: item.title || 'Activity',
+                            eventId: selectedEventId,
+                            lang: lang,
+                            date: selectedDate || undefined,
+                            adults: bookingForm.adults > 0 ? bookingForm.adults : undefined,
+                            childs: bookingForm.children > 0 ? bookingForm.children : undefined,
+                            infants: bookingForm.infants > 0 ? bookingForm.infants : undefined,
+                          })}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all text-center shadow-lg hover:shadow-xl"
+                        >
+                          Contact via WhatsApp
+                        </a>
+                        <a
+                          href={buildCallUrl()}
+                          className="w-full px-6 py-4 bg-white border-2 border-ocean-600 text-ocean-600 font-bold rounded-xl hover:bg-ocean-50 transition-all text-center"
+                        >
+                          Call Us
+                        </a>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleBooking}
+                        disabled={
+                          isBooking || 
+                          !selectedEventId || 
+                          !selectedDate || 
+                          bookingForm.adults < 1 ||
+                          (requiresSessionTime && !hasValidTimes)
+                        }
+                        className="w-full px-6 py-4 bg-gradient-to-r from-ocean-600 to-ocean-700 text-white font-bold rounded-xl hover:from-ocean-700 hover:to-ocean-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
+                      >
+                        {isBooking ? 'Processing...' : 'Book Now'}
+                      </button>
+                    )}
+
+                    {bookingResult && (
+                      <div className={`p-4 rounded-xl ${
+                        bookingResult.success 
+                          ? 'bg-green-50 text-green-800 border-2 border-green-200' 
+                          : 'bg-red-50 text-red-800 border-2 border-red-200'
+                      }`}>
+                        {bookingResult.message}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Default layout for other activities
   return (
     <div className="min-h-screen bg-white">
       <div className="relative w-full h-96 bg-ocean-600 overflow-hidden">
@@ -1049,19 +1829,40 @@ export function ActivityDetailClient({
             {/* Tabs */}
             <div className="border-b border-glass-200 mb-6">
               <div className="flex space-x-4">
-                {(['overview', 'description', 'details', 'prices', 'cancellation', 'reviews'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setSelectedTab(tab)}
-                    className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-                      selectedTab === tab
-                        ? 'border-ocean-600 text-ocean-600'
-                        : 'border-transparent text-glass-600 hover:text-glass-900'
-                    }`}
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
+                {isActivity508 ? (
+                  // Custom tab order for activity 508
+                  (['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                        selectedTab === tab
+                          ? 'border-ocean-600 text-ocean-600'
+                          : 'border-transparent text-glass-600 hover:text-glass-900'
+                      }`}
+                    >
+                      {tab === 'whats-included' ? "What's Included" : 
+                       tab === 'what-you-do' ? "What you do" :
+                       tab === 'cancellation' ? 'Cancellation Policy' :
+                       tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    </button>
+                  ))
+                ) : (
+                  // Default tab order for other activities
+                  (['overview', 'description', 'details', 'prices', 'cancellation', 'reviews'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                        selectedTab === tab
+                          ? 'border-ocean-600 text-ocean-600'
+                          : 'border-transparent text-glass-600 hover:text-glass-900'
+                      }`}
+                    >
+                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
 
@@ -1069,38 +1870,99 @@ export function ActivityDetailClient({
             <div className="prose max-w-none">
               {selectedTab === 'overview' && (
                 <div>
-                  <h2>What you do</h2>
-                  {item.description ? (
-                    <div
-                      className="prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={sanitizeAtlanticoHtml(item.description)}
-                    />
-                  ) : (
-                    <p className="text-glass-500">No overview available.</p>
-                  )}
-
-                  {/* Atlantico Images Gallery from groupDetails.images */}
-                  {Array.isArray(groupDetails?.images) && groupDetails.images.length > 0 && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-semibold mb-3">Photos</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {groupDetails.images.map((img: any, idx: number) => {
-                          const src = typeof img === 'string' ? img.trim() : ''
-                          if (!src) return null
-                          return (
-                            <div key={idx} className="relative w-full aspect-video rounded-lg overflow-hidden border border-glass-200 bg-glass-100">
-                              <SafeImage
-                                src={src}
-                                alt={`${item.title} photo ${idx + 1}`}
-                                fill
-                                sizes="33vw"
-                                className="object-cover"
-                              />
+                  {isActivity508 ? (
+                    // Premium layout for activity 508
+                    <>
+                      {/* Hero section with key info */}
+                      <div className="mb-8">
+                        <div className="flex flex-wrap items-center gap-4 mb-4">
+                          {groupDetails?.duration && (
+                            <div className="flex items-center gap-2 text-glass-700">
+                              <svg className="w-5 h-5 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span className="font-medium">{groupDetails.duration} hours</span>
                             </div>
-                          )
-                        })}
+                          )}
+                          {groupDetails?.childAge && (
+                            <div className="flex items-center gap-2 text-glass-700">
+                              <svg className="w-5 h-5 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                              </svg>
+                              <span className="font-medium">Child: {groupDetails.childAge}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Icons display */}
+                        {groupDetails?.icons && Array.isArray(groupDetails.icons) && groupDetails.icons.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-6">
+                            {groupDetails.icons.map((icon: string) => (
+                              <EventIcon key={icon} filename={icon} />
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
+
+                      {/* Photos Gallery */}
+                      {allImages.length > 0 && (
+                        <div className="mb-8">
+                          <h3 className="text-2xl font-bold text-glass-900 mb-4">Gallery</h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {allImages.map((imgUrl: string, idx: number) => {
+                              if (!imgUrl || !imgUrl.trim()) return null
+                              return (
+                                <div key={idx} className="relative w-full aspect-video rounded-xl overflow-hidden border border-glass-200 bg-glass-100 shadow-sm hover:shadow-md transition-shadow">
+                                  <SafeImage
+                                    src={imgUrl}
+                                    alt={`${item.title} photo ${idx + 1}`}
+                                    fill
+                                    sizes="33vw"
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    // Default layout for other activities
+                    <>
+                      <h2>What you do</h2>
+                      {item.description ? (
+                        <div
+                          className="prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(item.description)}
+                        />
+                      ) : (
+                        <p className="text-glass-500">No overview available.</p>
+                      )}
+
+                      {/* Atlantico Images Gallery - All photos from API */}
+                      {allImages.length > 0 && (
+                        <div className="mt-6">
+                          <h3 className="text-lg font-semibold mb-3">Photos</h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {allImages.map((imgUrl: string, idx: number) => {
+                              if (!imgUrl || !imgUrl.trim()) return null
+                              return (
+                                <div key={idx} className="relative w-full aspect-video rounded-lg overflow-hidden border border-glass-200 bg-glass-100">
+                                  <SafeImage
+                                    src={imgUrl}
+                                    alt={`${item.title} photo ${idx + 1}`}
+                                    fill
+                                    sizes="33vw"
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )}
@@ -1241,11 +2103,10 @@ export function ActivityDetailClient({
                         <div className="mt-4">
                           <dt className="font-medium mb-2">Meeting Points:</dt>
                           <dd>
-                            <ul className="list-disc list-inside space-y-1">
-                              {eventDetails.meetingPoints.map((point: any, idx: number) => (
-                                <li key={idx}>{typeof point === 'string' ? point : JSON.stringify(point)}</li>
-                              ))}
-                            </ul>
+                            <MeetingPointsDisplay
+                              meetingPoints={eventDetails.meetingPoints}
+                              showTitle={false}
+                            />
                           </dd>
                         </div>
                       )}
@@ -1488,10 +2349,148 @@ export function ActivityDetailClient({
                 </div>
               )}
 
+              {selectedTab === 'whats-included' && (
+                <div>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">What's Included</h2>
+                  {groupDetails?.faq ? (
+                    <div className="space-y-4">
+                      {(() => {
+                        const includesList = parseIncludesList(groupDetails.faq)
+                        if (includesList.length > 0) {
+                          return (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {includesList.map((item, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-start gap-3 p-4 bg-gradient-to-br from-ocean-50 to-blue-50 rounded-lg border border-ocean-100 hover:border-ocean-200 transition-colors"
+                                >
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <svg className="w-5 h-5 text-ocean-600" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <p className="text-glass-800 font-medium leading-relaxed">{item}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )
+                        } else {
+                          // Fallback to HTML rendering if parsing didn't work
+                          return (
+                            <div
+                              className="prose prose-lg max-w-none"
+                              dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.faq)}
+                            />
+                          )
+                        }
+                      })()}
+                    </div>
+                  ) : (
+                    <p className="text-glass-500">Information not available.</p>
+                  )}
+                </div>
+              )}
+
               {selectedTab === 'cancellation' && (
                 <div>
-                  <h2>Cancellation Policy</h2>
-                  <p className="text-glass-500">Cancellation policy information not available.</p>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">Cancellation Policy</h2>
+                  {groupDetails?.canDesc || groupDetails?.canTitle ? (
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                      {groupDetails.canTitle && (
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex-shrink-0">
+                            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-2xl font-bold text-green-800">{groupDetails.canTitle}</h3>
+                        </div>
+                      )}
+                      {groupDetails.canDesc && (
+                        <div 
+                          className="prose prose-lg max-w-none text-glass-800"
+                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.canDesc)} 
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-glass-500">Cancellation policy information not available.</p>
+                  )}
+                </div>
+              )}
+
+              {selectedTab === 'what-you-do' && isActivity508 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">What you do</h2>
+                  {groupDetails?.willDo ? (
+                    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-8 border border-purple-200">
+                      <div
+                        className="prose prose-lg max-w-none text-glass-800 leading-relaxed"
+                        dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.willDo)}
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-glass-500">Information not available.</p>
+                  )}
+                </div>
+              )}
+
+              {selectedTab === 'description' && (
+                <div>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">Description</h2>
+                  {isActivity508 ? (
+                    // Premium layout for activity 508
+                    groupDetails?.desc ? (
+                      <div className="space-y-6">
+                        <div className="prose prose-lg max-w-none text-glass-800 leading-relaxed">
+                          <div dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)} />
+                        </div>
+                        
+                        {/* Additional info cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                          {groupDetails.duration && (
+                            <div className="bg-glass-50 rounded-lg p-4 border border-glass-200">
+                              <div className="flex items-center gap-3">
+                                <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                  <p className="text-sm text-glass-600">Duration</p>
+                                  <p className="text-lg font-semibold text-glass-900">{groupDetails.duration} hours</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {groupDetails.childAge && (
+                            <div className="bg-glass-50 rounded-lg p-4 border border-glass-200">
+                              <div className="flex items-center gap-3">
+                                <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <div>
+                                  <p className="text-sm text-glass-600">Child Age</p>
+                                  <p className="text-lg font-semibold text-glass-900">{groupDetails.childAge}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-glass-500">No description available.</p>
+                    )
+                  ) : (
+                    // For other activities, use item.description
+                    item.description ? (
+                      <div
+                        className="prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={sanitizeAtlanticoHtml(item.description)}
+                      />
+                    ) : (
+                      <p className="text-glass-500">No description available.</p>
+                    )
+                  )}
                 </div>
               )}
 

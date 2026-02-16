@@ -54,7 +54,14 @@ export interface FullEvent {
   times?: string[] // ['09:00', '14:00', ...]
   icons?: string[] // Icon identifiers
   route?: string // Route description
-  meetingPoints?: string[] // Meeting point descriptions
+  meetingPoints?: Array<string | {
+    name?: string
+    address?: string
+    description?: string
+    time?: string
+    coordinates?: { lat?: number; lng?: number }
+    [key: string]: unknown
+  }> // Meeting point descriptions (can be strings or objects with details)
   price?: EventPrice
   availability?: EventAvailability
   raw?: any // Raw Atlantico data (if includeRaw=true)
@@ -144,7 +151,14 @@ export interface CoreEvent {
   times?: string[] // ['09:00', '14:00', ...]
   icons?: string[] // Icon identifiers
   route?: string // Route description
-  meetingPoints?: string[] // Meeting point descriptions
+  meetingPoints?: Array<string | {
+    name?: string
+    address?: string
+    description?: string
+    time?: string
+    coordinates?: { lat?: number; lng?: number }
+    [key: string]: unknown
+  }> // Meeting point descriptions (can be strings or objects with details)
   raw?: any // Raw Atlantico data (if includeRaw=true)
   rawError?: string // Error message if fetch failed (DEV only)
 }

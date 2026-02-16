@@ -8,6 +8,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchJson } from '@/lib/atlantico/client'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 
+/**
+ * Meeting point can be a string or an object with more details
+ */
+export type MeetingPoint = string | {
+  name?: string
+  address?: string
+  description?: string
+  time?: string
+  coordinates?: {
+    lat?: number
+    lng?: number
+  }
+  [key: string]: unknown
+}
+
 interface EventDetailsResponse {
   id: string
   code: string
@@ -18,6 +33,7 @@ interface EventDetailsResponse {
   route: string | null
   icons: string[]
   desc: string | null
+  meetingPoints?: MeetingPoint[]
 }
 
 /**
@@ -37,6 +53,31 @@ function normalizeEventDetails(raw: any, eventId: string): EventDetailsResponse 
     }
   }
   
+  // Normalize meetingPoints - can be array of strings or objects
+  let meetingPoints: MeetingPoint[] | undefined = undefined
+  if (raw.meetingPoints !== undefined && raw.meetingPoints !== null) {
+    if (Array.isArray(raw.meetingPoints)) {
+      meetingPoints = raw.meetingPoints.map((point: any) => {
+        if (typeof point === 'string') {
+          return point
+        }
+        if (typeof point === 'object' && point !== null) {
+          return {
+            name: point.name || point.nombre || point.title || undefined,
+            address: point.address || point.direccion || point.adresse || undefined,
+            description: point.description || point.desc || point.descripcion || undefined,
+            time: point.time || point.hora || point.tiempo || undefined,
+            coordinates: point.coordinates || point.coords || (point.lat && point.lng ? { lat: point.lat, lng: point.lng } : undefined),
+            ...point, // Keep other fields
+          }
+        }
+        return String(point)
+      })
+    } else if (typeof raw.meetingPoints === 'string') {
+      meetingPoints = [raw.meetingPoints]
+    }
+  }
+
   return {
     id: String(raw.id || raw.code || eventId),
     code: String(raw.code || raw.id || eventId),
@@ -47,6 +88,7 @@ function normalizeEventDetails(raw: any, eventId: string): EventDetailsResponse 
     route: raw.route ? String(raw.route) : null,
     icons: Array.isArray(raw.icons) ? raw.icons.map(String) : typeof raw.icons === 'string' ? [raw.icons] : [],
     desc: raw.desc || raw.description || raw.descripcion || null,
+    meetingPoints,
   }
 }
 

@@ -273,8 +273,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Validate filename format
+    // Validate filename format - allow short filenames like "2.webp"
     if (!isValidImageFilename(filename)) {
+      // Log in dev to help debug
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[ATL_IMAGE_PROXY] Invalid filename format:', filename)
+      }
       return NextResponse.json(
         {
           error: 'Invalid filename',
@@ -301,57 +305,70 @@ export async function GET(request: NextRequest) {
       }
       triedUrls = discovery.tried
     } else {
-      // Production: require env var
-      return NextResponse.json(
-        {
-          error: 'Configuration missing',
-          message: 'ATLANTICO_IMAGES_BASE_URL is not set. Set it in your environment variables.',
-        },
-        { status: 500 }
-      )
+      // Production: require env var, but return 404 instead of 500
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[ATL_IMAGE_PROXY] No ATLANTICO_IMAGES_BASE_URL set, attempting discovery')
+        // Will fall through to discovery logic above
+      } else {
+        // In production, return 404 (not 500) for missing configuration
+        return NextResponse.json(
+          {
+            error: 'Image not found',
+            message: 'Image service is not configured',
+          },
+          { status: 404 }
+        )
+      }
     }
 
     // Guard: NEVER allow our own domain
     if (upstream && isOurDomain(upstream)) {
       if (process.env.NODE_ENV === 'development') {
+        console.error('[ATL_IMAGE_PROXY] Misconfigured base URL points to our domain:', upstream)
         return NextResponse.json(
           {
             error: 'Misconfigured ATLANTICO_IMAGES_BASE_URL (points to our domain)',
             upstream,
             message: 'ATLANTICO_IMAGES_BASE_URL must point to an Atlantico host, not tenerife-activity.com',
           },
-          { status: 500 }
+          { status: 404 } // Return 404 instead of 500
         )
       }
-      // In production, return generic error
+      // In production, return 404 (not 500) for misconfiguration
       return NextResponse.json(
         {
-          error: 'Configuration error',
-          message: 'Image base URL is misconfigured',
+          error: 'Image not found',
+          message: 'Image service configuration error',
         },
-        { status: 500 }
+        { status: 404 }
       )
     }
 
     if (!upstream) {
       // In DEV, provide helpful error with tried URLs
       if (process.env.NODE_ENV === 'development') {
+        console.error('[ATL_IMAGE_PROXY] No upstream URL found:', {
+          filename,
+          triedUrls: triedUrls.slice(0, 5),
+        })
         return NextResponse.json(
           {
             error: 'No working Atlantico image base found',
             tried: triedUrls.slice(0, 10),
             message: 'Use /api/atlantico/debug/resolve-image?file=<filename> to discover the correct base URL',
+            filename,
           },
-          { status: 500 }
+          { status: 404 } // Return 404 instead of 500 for missing images
         )
       }
 
+      // In production, return 404 (not 500) for missing images
       return NextResponse.json(
         {
-          error: 'Cannot resolve image URL',
+          error: 'Image not found',
           message: 'Unable to determine Atlantico images base URL',
         },
-        { status: 500 }
+        { status: 404 }
       )
     }
 

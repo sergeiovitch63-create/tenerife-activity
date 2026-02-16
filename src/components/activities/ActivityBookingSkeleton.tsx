@@ -16,6 +16,7 @@ import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
 import { LuxuryHeroGallery } from './LuxuryHeroGallery'
 import { PremiumActivityPage } from './PremiumActivityPage'
 import { isVipTourGroup } from '@/lib/atlantico/vip-tours-images'
+import { MeetingPointsDisplay } from '@/components/booking/MeetingPointsDisplay'
 
 interface ActivityBookingSkeletonProps {
   locale?: string
@@ -65,6 +66,9 @@ function EventIcon({ filename }: { filename: string }) {
 export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: ActivityBookingSkeletonProps) {
   // Use premium version for all VIP Tours (classification 308) - 100% sales-oriented
   const isVipTour = isVipTourGroup(resolved?.t_group) || isVipTourGroup(slug)
+  
+  // Check if this is activity 508 for custom premium layout
+  const isActivity508 = resolved?.t_group === '508' || slug === '508'
   
   // ALL hooks must be called before any conditional returns
   // Standard version hooks (always called, even if not used)
@@ -309,8 +313,8 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
   // Early return for premium version - AFTER all hooks
   // All hooks are called above, this is safe
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (isVipTour) {
-    return <PremiumActivityPage locale={locale} resolved={resolved} slug={slug} />
+  if (isVipTour || isActivity508) {
+    return <PremiumActivityPage locale={locale} resolved={resolved} slug={slug} isActivity508={isActivity508} />
   }
 
   return (
@@ -498,13 +502,10 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                         <div className="mt-4">
                           <dt className="font-medium text-glass-600 mb-2">Meeting Points:</dt>
                           <dd>
-                            <ul className="list-disc list-inside space-y-1">
-                              {eventDetails.meetingPoints.map((point: any, idx: number) => (
-                                <li key={idx} className="text-glass-900">
-                                  {typeof point === 'string' ? point : JSON.stringify(point)}
-                                </li>
-                              ))}
-                            </ul>
+                            <MeetingPointsDisplay
+                              meetingPoints={eventDetails.meetingPoints}
+                              showTitle={false}
+                            />
                           </dd>
                         </div>
                       )}

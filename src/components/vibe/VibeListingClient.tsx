@@ -11,6 +11,7 @@ import { cn } from '@/ui/lib/cn'
 import { TourRowCard } from './TourRowCard'
 import { InlineFilterDropdown } from './InlineFilterDropdown'
 import { SafeImage } from '@/components/SafeImage'
+import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 
 interface Tour {
   id: string | number
@@ -486,16 +487,123 @@ interface TourCardProps {
 }
 
 function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
+  const [heroImage, setHeroImage] = useState<string | null>(null) // For activity 508: exact hero image
   const [vipTourImage, setVipTourImage] = useState<string | null>(null)
+  const [apiImage, setApiImage] = useState<string | null>(null)
+  const [loadingImage, setLoadingImage] = useState(true)
   const isVipTour = isVipTourGroup(tour.code)
+  const isActivity508 = tour.code === '508'
+  const atlLang = mapLocaleToAtlanticoLang(locale)
   
-  // Load VIP Tour images dynamically
+  // Activity 508: Use exact same image as hero (simplified - same logic as PremiumActivityPage)
   useEffect(() => {
-    if (isVipTour) {
+    if (isActivity508) {
+      setLoadingImage(true)
+      
+      // Fetch groupDetails and eventDetails (same as PremiumActivityPage)
+      Promise.all([
+        fetch(`/api/atlantico/group/${tour.code}/${atlLang}`).then(res => res.ok ? res.json() : null),
+        (async () => {
+          if (tour.ids) {
+            const eventIds = parseEventIds(tour.ids)
+            if (eventIds.length > 0) {
+              try {
+                const res = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eventIds[0])}&lang=${encodeURIComponent(atlLang)}`)
+                return res.ok ? await res.json() : null
+              } catch {
+                return null
+              }
+            }
+          }
+          return null
+        })()
+      ])
+        .then(async ([groupData, eventData]) => {
+          const images: string[] = []
+          
+          // Same logic as PremiumActivityPage - collect images in same order
+          if (groupData) {
+            if (Array.isArray(groupData.images) && groupData.images.length > 0) {
+              for (const img of groupData.images) {
+                if (typeof img === 'string' && img.trim() && (img.startsWith('http://') || img.startsWith('https://'))) {
+                  images.push(img.trim())
+                }
+              }
+            }
+            if (groupData.image && typeof groupData.image === 'string') {
+              const url = await atlanticoAssetUrl(groupData.image, 'tour', { activityId: tour.code, page: 'details' })
+              if (url && !images.includes(url)) {
+                images.push(url)
+              }
+            }
+          }
+          if (eventData) {
+            const eventImages: string[] = []
+            if (Array.isArray(eventData.images) && eventData.images.length > 0) {
+              for (const img of eventData.images) {
+                if (typeof img === 'string' && img.trim() && (img.startsWith('http://') || img.startsWith('https://'))) {
+                  eventImages.push(img.trim())
+                }
+              }
+            }
+            if (eventData.image && typeof eventData.image === 'string') {
+              const eventId = tour.ids ? parseEventIds(tour.ids)[0] : tour.code
+              const url = await atlanticoAssetUrl(eventData.image, 'tour', { activityId: eventId, page: 'details' })
+              if (url && !eventImages.includes(url)) {
+                eventImages.push(url)
+              }
+            }
+            for (const img of eventImages) {
+              if (!images.includes(img)) {
+                images.push(img)
+              }
+            }
+          }
+          
+          // Use first image (same as hero - allImages[0])
+          if (images.length > 0) {
+            setHeroImage(images[0])
+          }
+          setLoadingImage(false)
+        })
+        .catch(() => {
+          setLoadingImage(false)
+        })
+      return
+    }
+    
+    // Load VIP Tour images dynamically (for other VIP tours)
+    if (isVipTour && !isActivity508) {
+      setLoadingImage(true)
       getVipTourLocalImages(tour.code)
         .then(images => {
           if (images.length > 0) {
             setVipTourImage(images[0]) // Use first available image
+            setLoadingImage(false)
+          } else {
+            // If no local images, try to fetch from API
+            fetch(`/api/atlantico/group/${tour.code}/${atlLang}`)
+              .then(res => res.ok ? res.json() : null)
+              .then(async (data) => {
+                if (data) {
+                  let imageUrl: string | null = null
+                  if (data.image && typeof data.image === 'string') {
+                    imageUrl = await atlanticoAssetUrl(data.image, 'tour', { activityId: tour.code, page: 'details' })
+                  } else if (Array.isArray(data.images) && data.images.length > 0) {
+                    const firstImg = data.images[0]
+                    if (typeof firstImg === 'string' && (firstImg.startsWith('http://') || firstImg.startsWith('https://'))) {
+                      imageUrl = firstImg
+                    }
+                  }
+                  if (imageUrl) {
+                    setApiImage(imageUrl)
+                  }
+                }
+                setLoadingImage(false)
+              })
+              .catch(() => {
+                setLoadingImage(false)
+              })
           }
         })
         .catch(() => {
@@ -503,21 +611,105 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
           const fallback = getVipTourCoverImageSync(tour.code)
           if (fallback) {
             setVipTourImage(fallback)
+            setLoadingImage(false)
+          } else {
+            // Try API as last resort
+            fetch(`/api/atlantico/group/${tour.code}/${atlLang}`)
+              .then(res => res.ok ? res.json() : null)
+              .then(async (data) => {
+                if (data) {
+                  let imageUrl: string | null = null
+                  if (data.image && typeof data.image === 'string') {
+                    imageUrl = await atlanticoAssetUrl(data.image, 'tour', { activityId: tour.code, page: 'details' })
+                  } else if (Array.isArray(data.images) && data.images.length > 0) {
+                    const firstImg = data.images[0]
+                    if (typeof firstImg === 'string' && (firstImg.startsWith('http://') || firstImg.startsWith('https://'))) {
+                      imageUrl = firstImg
+                    }
+                  }
+                  if (imageUrl) {
+                    setApiImage(imageUrl)
+                  }
+                }
+                setLoadingImage(false)
+              })
+              .catch(() => {
+                setLoadingImage(false)
+              })
           }
         })
     }
-  }, [isVipTour, tour.code])
+  }, [isActivity508, isVipTour, tour.code, atlLang])
   
-  // Determine card image: VIP local image > API image > fallback
+  // Fetch image from API if not already available (for non-508 tours)
+  useEffect(() => {
+    if (isActivity508) return // Skip for activity 508, handled above
+    
+    // If we already have tour.image, use it directly
+    if (tour.image) {
+      const imageUrl = buildAtlanticoImageUrl(tour.image)
+      setApiImage(imageUrl)
+      setLoadingImage(false)
+      return
+    }
+    
+    // Otherwise, fetch from groupDetails API
+    setLoadingImage(true)
+    fetch(`/api/atlantico/group/${tour.code}/${atlLang}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(async (data) => {
+        if (data) {
+          // Try to get image from groupDetails
+          let imageUrl: string | null = null
+          
+          // 1. Check data.image (single image field)
+          if (data.image && typeof data.image === 'string') {
+            imageUrl = buildAtlanticoImageUrl(data.image)
+          }
+          // 2. Check data.images array (first image)
+          else if (Array.isArray(data.images) && data.images.length > 0) {
+            const firstImage = data.images[0]
+            if (typeof firstImage === 'string') {
+              if (firstImage.startsWith('http://') || firstImage.startsWith('https://')) {
+                imageUrl = firstImage
+              } else {
+                imageUrl = buildAtlanticoImageUrl(firstImage)
+              }
+            }
+          }
+          
+          if (imageUrl) {
+            setApiImage(imageUrl)
+          }
+        }
+      })
+      .catch(() => {
+        // Silently fail
+      })
+      .finally(() => {
+        setLoadingImage(false)
+      })
+  }, [isActivity508, tour.code, tour.image, atlLang])
+  
+  // Determine card image
   const cardImage = useMemo(() => {
+    // Activity 508: Use exact hero image (first image from allImages in PremiumActivityPage)
+    if (isActivity508) {
+      return heroImage || null
+    }
+    // Other VIP tours: Use local images first, then API
     if (isVipTour && vipTourImage) {
       return vipTourImage
     }
+    // Fallback to tour.image or apiImage
     if (tour.image) {
       return buildAtlanticoImageUrl(tour.image)
     }
+    if (apiImage) {
+      return apiImage
+    }
     return null
-  }, [isVipTour, vipTourImage, tour.image])
+  }, [isActivity508, heroImage, isVipTour, vipTourImage, tour.image, apiImage])
 
   return (
     <Link
@@ -526,7 +718,11 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
     >
       {/* Image */}
       <div className="mb-4 aspect-video overflow-hidden rounded-lg relative bg-glass-100">
-        {cardImage ? (
+        {loadingImage && !cardImage ? (
+          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
+            <div className="animate-pulse text-glass-300">Loading image...</div>
+          </div>
+        ) : cardImage ? (
           <SafeImage
             src={cardImage}
             alt={tour.name}
@@ -535,8 +731,11 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-            No image
+          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm bg-glass-50">
+            <div className="text-center">
+              <div className="text-2xl mb-2">📷</div>
+              <div>Image unavailable</div>
+            </div>
           </div>
         )}
       </div>

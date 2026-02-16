@@ -13,6 +13,8 @@ import { useCartStore } from '@/lib/cart/store'
 import { isCartItemExpired, type CartItem } from '@/lib/cart/types'
 import { Button } from '@/ui/components/shared/Button'
 import { cn } from '@/ui/lib/cn'
+import type { MeetingPoint } from '@/app/api/atlantico/event-details/route'
+import { getMeetingPointName } from '@/components/booking/MeetingPointsDisplay'
 
 interface CheckoutClientProps {
   locale: string
@@ -57,13 +59,59 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
     acceptTerms: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [meetingPoints, setMeetingPoints] = useState<Record<string, MeetingPoint[]>>({}) // itemKey -> meetingPoints
+  const [loadingMeetingPoints, setLoadingMeetingPoints] = useState(false)
 
   useEffect(() => {
     setMounted(true)
     removeExpired()
     // Auto-revalidate on mount
     handleRevalidate()
+    // Load meeting points for cart items
+    loadMeetingPoints()
   }, [])
+
+  /**
+   * Load meeting points for all cart items
+   */
+  const loadMeetingPoints = async () => {
+    if (validItems.length === 0) return
+
+    setLoadingMeetingPoints(true)
+    const pointsMap: Record<string, MeetingPoint[]> = {}
+
+    try {
+      // Fetch meeting points for each unique event ID
+      const eventIds = Array.from(new Set(validItems.map(item => item.t_id)))
+      
+      await Promise.all(
+        eventIds.map(async (eventId) => {
+          try {
+            const response = await fetch(`/api/atlantico/event-details?eventId=${eventId}&lang=${validItems[0]?.language || 'ENG'}`)
+            if (response.ok) {
+              const data = await response.json()
+              if (data.meetingPoints && Array.isArray(data.meetingPoints)) {
+                // Store for all items with this eventId
+                validItems.forEach(item => {
+                  if (item.t_id === eventId) {
+                    pointsMap[item.itemKey] = data.meetingPoints
+                  }
+                })
+              }
+            }
+          } catch (error) {
+            console.error(`[CHECKOUT] Failed to load meeting points for event ${eventId}:`, error)
+          }
+        })
+      )
+
+      setMeetingPoints(pointsMap)
+    } catch (error) {
+      console.error('[CHECKOUT] Error loading meeting points:', error)
+    } finally {
+      setLoadingMeetingPoints(false)
+    }
+  }
 
   const validItems = mounted ? items.filter((item) => !isCartItemExpired(item)) : []
 
@@ -370,13 +418,59 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
                 <label htmlFor="mpoint" className="block text-sm font-medium text-glass-700 mb-2">
                   {t('meetingPoint')}
                 </label>
-                <input
-                  type="text"
-                  id="mpoint"
-                  value={customerData.mpoint}
-                  onChange={(e) => setCustomerData({ ...customerData, mpoint: e.target.value })}
-                  className="w-full px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
-                />
+                {loadingMeetingPoints ? (
+                  <div className="w-full px-4 py-2 border border-glass-300 rounded-lg bg-glass-50 text-glass-500">
+                    Loading meeting points...
+                  </div>
+                ) : (() => {
+                  // Get meeting points from first cart item (or combine all unique)
+                  const firstItem = validItems[0]
+                  const availablePoints = firstItem ? (meetingPoints[firstItem.itemKey] || []) : []
+                  
+                  if (availablePoints.length > 0) {
+                    return (
+                      <select
+                        id="mpoint"
+                        value={customerData.mpoint}
+                        onChange={(e) => setCustomerData({ ...customerData, mpoint: e.target.value })}
+                        className="w-full px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
+                      >
+                        <option value="">{t('selectMeetingPoint') || 'Select a meeting point'}</option>
+                        {availablePoints.map((point, idx) => {
+                          const name = getMeetingPointName(point)
+                          const value = typeof point === 'string' ? point : JSON.stringify(point)
+                          return (
+                            <option key={idx} value={value}>
+                              {name}
+                            </option>
+                          )
+                        })}
+                        <option value="__custom__">{t('customMeetingPoint') || 'Other (specify below)'}</option>
+                      </select>
+                    )
+                  } else {
+                    return (
+                      <input
+                        type="text"
+                        id="mpoint"
+                        value={customerData.mpoint}
+                        onChange={(e) => setCustomerData({ ...customerData, mpoint: e.target.value })}
+                        placeholder={t('meetingPointPlaceholder') || 'Enter meeting point'}
+                        className="w-full px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
+                      />
+                    )
+                  }
+                })()}
+                {customerData.mpoint === '__custom__' && (
+                  <input
+                    type="text"
+                    id="mpoint-custom"
+                    value=""
+                    onChange={(e) => setCustomerData({ ...customerData, mpoint: e.target.value })}
+                    placeholder={t('meetingPointPlaceholder') || 'Enter custom meeting point'}
+                    className="w-full mt-2 px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
+                  />
+                )}
               </div>
 
               <div>

@@ -14,6 +14,10 @@ import { createCartItem, type PriceSnapshot } from '@/lib/cart/types'
 import { Button } from '@/ui/components/shared/Button'
 import { CartToast } from '@/components/cart/CartToast'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
+import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+
+import type { MeetingPoint } from '@/app/api/atlantico/event-details/route'
+import { MeetingPointsDisplay } from '@/components/booking/MeetingPointsDisplay'
 
 interface ActivityBookingPanelProps {
   t_group: string
@@ -23,6 +27,9 @@ interface ActivityBookingPanelProps {
   language: string // Atlántico language param (e.g., 'ENG', 'ESP')
   duration?: string | number // Activity duration
   startingPrice?: number | string // Starting price
+  cancellationPolicy?: string // Cancellation policy text
+  cancellationTitle?: string // Cancellation policy title
+  meetingPoints?: MeetingPoint[] // Meeting points and pickup points
 }
 
 interface BookingReadinessState {
@@ -111,6 +118,9 @@ export function ActivityBookingPanel({
   language,
   duration,
   startingPrice,
+  cancellationPolicy,
+  cancellationTitle,
+  meetingPoints,
 }: ActivityBookingPanelProps) {
   const router = useRouter()
   const { addItem } = useCartStore()
@@ -546,6 +556,26 @@ export function ActivityBookingPanel({
             </div>
           </div>
         )}
+        {cancellationPolicy && (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                {cancellationTitle && (
+                  <div className="text-sm font-bold text-green-800 mb-2">{cancellationTitle}</div>
+                )}
+                <div 
+                  className="text-xs text-green-700 leading-relaxed prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={sanitizeAtlanticoHtml(cancellationPolicy)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Event Selection (if multiple events) */}
@@ -751,6 +781,33 @@ export function ActivityBookingPanel({
           </div>
         </div>
       </div>
+
+      {/* Meeting Points / Pickup Points */}
+      {(() => {
+        // Debug log
+        if (process.env.NODE_ENV === 'development' && t_group === '508') {
+          console.log('[ACTIVITY_508_BOOKING_PANEL] Meeting points check:', {
+            hasMeetingPoints: !!meetingPoints,
+            isArray: Array.isArray(meetingPoints),
+            length: Array.isArray(meetingPoints) ? meetingPoints.length : 0,
+            meetingPoints,
+          })
+        }
+        
+        if (meetingPoints && Array.isArray(meetingPoints) && meetingPoints.length > 0) {
+          return (
+            <div className="border-t border-glass-200 pt-4 mt-4">
+              <MeetingPointsDisplay
+                meetingPoints={meetingPoints}
+                showTitle={true}
+                title="Meeting & Pickup Points"
+                className="text-sm"
+              />
+            </div>
+          )
+        }
+        return null
+      })()}
 
       {/* Price Display */}
       {priceSnapshot && (

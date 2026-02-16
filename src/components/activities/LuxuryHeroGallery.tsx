@@ -19,6 +19,7 @@ interface LuxuryHeroGalleryProps {
   duration?: string | number
   rating?: number
   reviewCount?: number
+  fullScreenMobile?: boolean // For activity 508: full screen image on mobile
 }
 
 export function LuxuryHeroGallery({ 
@@ -26,7 +27,8 @@ export function LuxuryHeroGallery({
   title, 
   duration,
   rating,
-  reviewCount 
+  reviewCount,
+  fullScreenMobile = false
 }: LuxuryHeroGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [mainImageIndex, setMainImageIndex] = useState(0)
@@ -47,51 +49,109 @@ export function LuxuryHeroGallery({
 
   return (
     <div className="relative w-full">
-      {/* Title and Info Section - Above Gallery (like Disney) */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-medium text-ocean-600 bg-ocean-50 px-2 py-1 rounded">
-            Certified by Tenerife Activity
-          </span>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-glass-900 mb-2">
-          {title}
-        </h1>
-        <div className="flex items-center gap-4 flex-wrap">
-          {rating && (
-            <div className="flex items-center gap-1">
-              <span className="text-lg font-semibold text-glass-900">{rating}</span>
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-glass-300'}`}
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                ))}
+      {/* Title and Info Section - Above Gallery (like Disney) - Hidden on mobile for fullScreenMobile */}
+      {!fullScreenMobile && (
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-medium text-ocean-600 bg-ocean-50 px-2 py-1 rounded">
+              Certified by Tenerife Activity
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-glass-900 mb-2">
+            {title}
+          </h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            {rating && (
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-semibold text-glass-900">{rating}</span>
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-glass-300'}`}
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                    </svg>
+                  ))}
+                </div>
+                {reviewCount && (
+                  <span className="text-sm text-glass-600 ml-1">
+                    {reviewCount.toLocaleString()} reviews
+                  </span>
+                )}
               </div>
-              {reviewCount && (
-                <span className="text-sm text-glass-600 ml-1">
-                  {reviewCount.toLocaleString()} reviews
-                </span>
-              )}
-            </div>
-          )}
+            )}
+            {duration && (
+              <div className="text-glass-600">
+                <span className="font-medium">Duration:</span> {typeof duration === 'number' ? `${duration} hours` : `${duration} hours`}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Title overlay on mobile for fullScreenMobile - positioned over image */}
+      {fullScreenMobile && (
+        <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/40 to-transparent p-4 md:hidden">
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {title}
+          </h1>
           {duration && (
-            <div className="text-glass-600">
+            <div className="text-white/90 text-sm">
               <span className="font-medium">Duration:</span> {typeof duration === 'number' ? `${duration} hours` : `${duration} hours`}
             </div>
           )}
         </div>
-      </div>
+      )}
+      
+      {/* Title and Info Section - Desktop only for fullScreenMobile */}
+      {fullScreenMobile && (
+        <div className="hidden md:block mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-medium text-ocean-600 bg-ocean-50 px-2 py-1 rounded">
+              Certified by Tenerife Activity
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-glass-900 mb-2">
+            {title}
+          </h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            {rating && (
+              <div className="flex items-center gap-1">
+                <span className="text-lg font-semibold text-glass-900">{rating}</span>
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className={`w-4 h-4 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-glass-300'}`}
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                    </svg>
+                  ))}
+                </div>
+                {reviewCount && (
+                  <span className="text-sm text-glass-600 ml-1">
+                    {reviewCount.toLocaleString()} reviews
+                  </span>
+                )}
+              </div>
+            )}
+            {duration && (
+              <div className="text-glass-600">
+                <span className="font-medium">Duration:</span> {typeof duration === 'number' ? `${duration} hours` : `${duration} hours`}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Gallery Section - Disney Style */}
-      <div className="relative w-full h-[500px] md:h-[600px] grid grid-cols-3 gap-2 rounded-lg overflow-hidden">
-        {/* Main Large Image (Left - 2 columns) */}
+      <div className={`relative w-full ${fullScreenMobile ? 'h-screen md:h-[600px]' : 'h-[500px] md:h-[600px]'} ${fullScreenMobile ? 'grid grid-cols-1 md:grid-cols-3' : 'grid grid-cols-3'} gap-2 ${fullScreenMobile ? 'rounded-none md:rounded-lg' : 'rounded-lg'} overflow-hidden`}>
+        {/* Main Large Image - Full screen on mobile for activity 508 */}
         <div 
-          className="col-span-2 relative cursor-pointer group"
+          className={`${fullScreenMobile ? 'col-span-1 md:col-span-2' : 'col-span-2'} relative cursor-pointer group`}
           onClick={() => setSelectedImage(mainImage)}
         >
           <SafeImage
@@ -99,15 +159,15 @@ export function LuxuryHeroGallery({
             alt={`${title} - Main photo`}
             fill
             priority
-            sizes="66vw"
+            sizes={fullScreenMobile ? "100vw" : "66vw"}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
 
-        {/* Thumbnails Stack (Right - 1 column) */}
-        <div className="col-span-1 flex flex-col gap-2">
+        {/* Thumbnails Stack (Right - 1 column) - Hidden on mobile for activity 508 */}
+        <div className={`${fullScreenMobile ? 'hidden md:flex' : 'flex'} col-span-1 flex-col gap-2`}>
           {thumbnails.map((img, idx) => (
             <div
               key={idx}
