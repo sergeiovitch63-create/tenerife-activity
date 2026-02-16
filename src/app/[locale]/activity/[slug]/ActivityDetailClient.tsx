@@ -432,7 +432,7 @@ export function ActivityDetailClient({
               // It's a filename, download via API
               fetch(`/api/atlantico/download-image?filename=${encodeURIComponent(extractedImage)}`)
                 .then(res => res.ok ? res.json() : null)
-                .then(result => {
+                .then(async (result) => {
                   if (result?.url) {
                     setEventImageUrl(result.url)
                   } else {
