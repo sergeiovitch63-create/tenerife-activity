@@ -15,14 +15,44 @@ function hostnameFromEnvUrl(v) {
 const nextConfig = {
   /* config options here */
   
-  // Exclude debug routes from production build
+  // Exclude heavy packages from server components and API routes
+  // This reduces bundle size for Vercel Functions (300mb limit)
+  serverExternalPackages: [
+    '@supabase/supabase-js',
+    'playwright',
+    'tsx',
+  ],
+  
+  // Exclude debug routes and heavy dependencies from production build
   // This prevents Next.js from trying to collect page data for debug routes during build
+  // and reduces bundle size for API routes
   ...(process.env.NODE_ENV === 'production' && {
     experimental: {
       outputFileTracingExcludes: {
         '*': [
           '**/api/debug/**',
           '**/api/atlantico/debug/**',
+        ],
+        // Exclude heavy dependencies from API routes that don't need them
+        // This significantly reduces bundle size for Vercel Functions (300mb limit)
+        '**/api/atlantico/sync/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/playwright/**',
+          '**/node_modules/tsx/**',
+          '**/node_modules/@playwright/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+          '**/node_modules/.pnpm/**/@playwright/**',
+          '**/node_modules/.pnpm/**/playwright/**',
+        ],
+        // Also exclude from other API routes that don't need these
+        '**/api/atlantico/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/playwright/**',
+          '**/node_modules/tsx/**',
+          '**/node_modules/@playwright/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+          '**/node_modules/.pnpm/**/@playwright/**',
+          '**/node_modules/.pnpm/**/playwright/**',
         ],
       },
     },
