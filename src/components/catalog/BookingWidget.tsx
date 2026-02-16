@@ -535,7 +535,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
       return adults >= 1
     }
     return true
-  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, selectedTime, priceStatus, priceMode, adults, hasValidTimes, eventDetailsTimes])
+  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, priceStatus, priceMode, adults, hasValidTimes])
 
   // Validation for Buy Now (same as Add to Cart - customer fields collected at checkout)
   const canBuyNow = useMemo(() => {
@@ -570,7 +570,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
       return adults >= 1
     }
     return true
-  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, selectedTime, priceStatus, priceMode, adults, hasValidTimes, eventDetailsTimes])
+  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, priceStatus, priceMode, adults, hasValidTimes])
 
   // Age labels from groupDetails
   const childAgeLabel = groupDetails?.childAge ? `Children (${groupDetails.childAge})` : 'Children'

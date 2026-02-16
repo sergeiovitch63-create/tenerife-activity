@@ -172,10 +172,12 @@ export function VibeCard({ vibe }: VibeCardProps) {
           >
             {/* Hidden image element to detect load errors and trigger fallback - only render once per format */}
             {thumbnailSrc && !hasErroredRef.current && (
-              <img
+              <Image
                 key={thumbnailSrc}
                 src={thumbnailSrc}
                 alt=""
+                width={1}
+                height={1}
                 style={{ display: 'none', width: 0, height: 0, position: 'absolute' }}
                 onError={handleThumbnailError}
                 onLoad={() => {

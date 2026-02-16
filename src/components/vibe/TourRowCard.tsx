@@ -3,6 +3,7 @@
 import { Link } from '@/navigation'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 import { cn } from '@/ui/lib/cn'
+import Image from 'next/image'
 
 interface Tour {
   id: string | number
@@ -100,11 +101,13 @@ export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
     >
       {/* Left: Image */}
       {tour.image && (
-        <div className="w-[360px] h-[200px] flex-shrink-0 overflow-hidden rounded-l-xl">
-          <img
+        <div className="w-[360px] h-[200px] flex-shrink-0 overflow-hidden rounded-l-xl relative">
+          <Image
             src={buildAtlanticoImageUrl(tour.image)}
             alt={tour.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="360px"
           />
         </div>
       )}

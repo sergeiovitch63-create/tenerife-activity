@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { cn } from '@/ui/lib/cn'
 import type { Activity } from '@/core/entities/activity'
 import { Link } from '@/navigation'
+import Image from 'next/image'
 
 interface ActivityCardProps {
   activity: Activity
@@ -102,10 +103,12 @@ export function ActivityCard({ activity, href }: ActivityCardProps) {
 
       {!hasVideo && activity.media.type === 'image' && (
         <div className="absolute inset-0 w-full h-full">
-          <img
+          <Image
             src={activity.media.src}
             alt={activity.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="100vw"
             style={{ zIndex: 1 }}
           />
           {/* Dark gradient overlay for text readability */}

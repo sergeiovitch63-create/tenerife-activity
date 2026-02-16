@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 
 type Group = {
   id?: string | number
@@ -72,10 +73,12 @@ export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: G
       {/* Image */}
       <div className="relative w-full aspect-[4/3] overflow-hidden bg-gradient-to-br from-ocean-100 to-ocean-200">
         {imageUrl ? (
-          <img
+          <Image
             src={String(imageUrl)}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={(e) => {
               // Fallback to gradient on error
               const target = e.currentTarget
