@@ -218,12 +218,12 @@ export default async function ActivityDetailPage({
             }
           } else {
             // It's a filename, download locally
-            const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+            const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images.server')
             eventImage = await getLocalAtlanticoImageUrl(extractedImage) || extractedImage
           }
         } else {
           // Fallback: try direct fields and download locally
-          const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images')
+          const { getLocalAtlanticoImageUrl } = await import('@/lib/atlantico/images.server')
           const imageFields = ['image', 'imageUrl', 'imageFilename', 'img', 'photo', 'picture', 'cover']
           for (const field of imageFields) {
             const value = (details as any)[field]

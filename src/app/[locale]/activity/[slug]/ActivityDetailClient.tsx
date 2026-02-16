@@ -371,7 +371,7 @@ export function ActivityDetailClient({
               })
               .catch(async () => {
                 // Fallback: build remote URL
-                const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images')
+                const { buildAtlanticoImageUrlFromFilename } = await import('@/lib/atlantico/images.client')
                 const remoteUrl = buildAtlanticoImageUrlFromFilename(imageFilename)
                 if (remoteUrl) {
                   setGroupImageUrl(remoteUrl)
@@ -443,7 +443,7 @@ export function ActivityDetailClient({
                 })
                 .catch(() => {
                   // Fallback: build remote URL
-                  import('@/lib/atlantico/images').then(({ buildAtlanticoImageUrlFromFilename }) => {
+                  import('@/lib/atlantico/images.client').then(({ buildAtlanticoImageUrlFromFilename }) => {
                     setEventImageUrl(buildAtlanticoImageUrlFromFilename(extractedImage))
                   })
                 })
