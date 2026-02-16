@@ -10,6 +10,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { normalizeLimits } from '@/lib/atlantico/normalizeLimits'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export interface LimitsResponse {
   ok: true
   quote: number | null

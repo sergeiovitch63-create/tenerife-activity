@@ -44,6 +44,10 @@ import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import type { LimitsResponse } from '../limits/route'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // Simple in-memory cache for calendar data
 const calendarCache = new Map<string, { data: any; timestamp: number }>()
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes

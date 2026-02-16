@@ -26,6 +26,10 @@ import { NextRequest } from 'next/server'
 import { getAtlanticoConfig } from '@/lib/atlantico/config'
 import { fetchAtlantico } from '@/lib/atlantico/fetch'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 /**
  * Normalize date to YYYY-MM-01 format (first day of month)
  */

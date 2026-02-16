@@ -11,6 +11,10 @@ import { join } from 'path'
 import { promises as fs } from 'fs'
 import { readJsonFile } from '@/lib/cache/jsonFile'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // Cache files
 const CORE_CACHE_FILE = join(process.cwd(), 'data', 'atlantico_catalog_core.json')
 const DYNAMIC_CACHE_FILE = join(process.cwd(), 'data', 'atlantico_catalog_dynamic.json')

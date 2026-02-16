@@ -32,6 +32,10 @@ import { NextRequest } from 'next/server'
 import { atlanticoGet } from '@/lib/atlantico/client'
 import { getAtlanticoConfig } from '@/lib/atlantico/config'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 interface Classification {
   code: string
   name?: string

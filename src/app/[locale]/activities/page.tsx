@@ -11,6 +11,9 @@ import { Link } from '@/navigation'
 import { ClientImage } from '../catalog/ClientImage'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
 
+// Mark page as dynamic (uses headers())
+export const dynamic = 'force-dynamic'
+
 
 /**
  * Format price with currency
@@ -112,47 +115,56 @@ export default async function ActivitiesPage({
 
   try {
     // Build absolute URL for Server Component fetch
-    const headersList = await import('next/headers').then((m) => m.headers)
-    const hdrs = headersList()
-    const host = hdrs.get('host') || 'localhost:3000'
-    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    // During build, avoid fetching if no base URL is configured
     const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
-    const origin = envBase ? envBase : `${protocol}://${host}`
-
-    const fetchUrl = `${origin}/api/atlantico/sync?lang=${lang}`
     
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[ActivitiesPage] Fetching from:', { fetchUrl, lang })
-    }
+    // If no base URL and we're in build phase, skip fetch
+    if (!envBase && process.env.NEXT_PHASE === 'phase-production-build') {
+      isApiUnavailable = true
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ActivitiesPage] Skipping fetch during build (no base URL configured)')
+      }
+    } else {
+      const headersList = await import('next/headers').then((m) => m.headers)
+      const hdrs = headersList()
+      const host = hdrs.get('host') || 'localhost:3000'
+      const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+      const origin = envBase ? envBase : `${protocol}://${host}`
 
-    // Fetch from sync API with 6s timeout (cache only, no blocking)
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 6000) // 6s timeout
+      const fetchUrl = `${origin}/api/atlantico/sync?lang=${lang}`
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ActivitiesPage] Fetching from:', { fetchUrl, lang })
+      }
 
-    try {
-      const response = await fetch(
-        fetchUrl,
-        {
-          signal: controller.signal,
-          next: { revalidate: 21600 }, // 6 hours cache (per PDF requirement)
-        }
-      )
+      // Fetch from sync API with 6s timeout (cache only, no blocking)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 6000) // 6s timeout
 
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        // If 202 (warming), treat as unavailable but don't error
-        if (response.status === 202) {
-          isApiUnavailable = true
-          if (process.env.NODE_ENV !== 'production') {
-            console.log('[ActivitiesPage] API warming (202):', { lang, status: response.status })
+      try {
+        const response = await fetch(
+          fetchUrl,
+          {
+            signal: controller.signal,
+            cache: 'no-store', // Use no-store for dynamic pages
           }
-        } else {
-          error = `HTTP ${response.status}: ${response.statusText}`
-          if (process.env.NODE_ENV !== 'production') {
-            console.error('[ActivitiesPage] HTTP error:', { lang, status: response.status, statusText: response.statusText })
+        )
+
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          // If 202 (warming), treat as unavailable but don't error
+          if (response.status === 202) {
+            isApiUnavailable = true
+            if (process.env.NODE_ENV !== 'production') {
+              console.log('[ActivitiesPage] API warming (202):', { lang, status: response.status })
+            }
+          } else {
+            error = `HTTP ${response.status}: ${response.statusText}`
+            if (process.env.NODE_ENV !== 'production') {
+              console.error('[ActivitiesPage] HTTP error:', { lang, status: response.status, statusText: response.statusText })
+            }
           }
-        }
       } else {
         const data = await response.json()
         
@@ -207,6 +219,7 @@ export default async function ActivitiesPage({
           console.error('[ActivitiesPage] Fetch error:', { lang, error })
         }
       }
+    }
     }
   } catch (err) {
     error = err instanceof Error ? err.message : 'Unknown error occurred'

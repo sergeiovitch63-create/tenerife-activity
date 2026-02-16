@@ -25,6 +25,10 @@ import { getFallbackImageForTour } from '@/lib/images/fallback'
 import { assignVibeId } from '@/lib/vibes/assignVibe'
 import type { AtlanticoEventDetails } from '@/lib/atlantico/mappers'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // Cache files (new split structure)
 const CORE_CACHE_FILE = join(process.cwd(), 'data', 'atlantico_catalog_core.json')
 const DYNAMIC_CACHE_FILE = join(process.cwd(), 'data', 'atlantico_catalog_dynamic.json')

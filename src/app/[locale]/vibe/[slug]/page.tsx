@@ -10,6 +10,9 @@ import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { getClassificationNameForVibe } from '@/lib/vibes/vibe-classification-mapping'
 import { VibeListingClient } from '@/components/vibe/VibeListingClient'
 
+// Mark page as dynamic (uses headers())
+export const dynamic = 'force-dynamic'
+
 interface VibePageProps {
   params: Promise<{ locale: string; slug: string }>
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
@@ -73,45 +76,54 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
 
   if (classificationName) {
     try {
-      // Build absolute URL for Server Component fetch
-      const headersList = await import('next/headers').then((m) => m.headers)
-      const hdrs = headersList()
-      const host = hdrs.get('host') || 'localhost:3000'
-      const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+      // During build, avoid fetching if no base URL is configured
       const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
-      const origin = envBase ? envBase : `${protocol}://${host}`
+      
+      // If no base URL and we're in build phase, skip fetch
+      if (!envBase && process.env.NEXT_PHASE === 'phase-production-build') {
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[VibePage] Skipping fetch during build (no base URL configured)')
+        }
+      } else {
+        // Build absolute URL for Server Component fetch
+        const headersList = await import('next/headers').then((m) => m.headers)
+        const hdrs = headersList()
+        const host = hdrs.get('host') || 'localhost:3000'
+        const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+        const origin = envBase ? envBase : `${protocol}://${host}`
 
-      // Fetch classifications
-      const classificationsResponse = await fetch(
-        `${origin}/api/atlantico/classifications?lang=${atlLang}`,
-        { next: { revalidate: 300 } } // Cache for 5 minutes
-      )
+        // Fetch classifications
+        const classificationsResponse = await fetch(
+          `${origin}/api/atlantico/classifications?lang=${atlLang}`,
+          { cache: 'no-store' } // Use no-store for dynamic pages
+        )
 
-      if (classificationsResponse.ok) {
-        const classificationsData = await classificationsResponse.json()
-        
-        if (classificationsData.ok && Array.isArray(classificationsData.classifications)) {
-          // Find classification by name (case-insensitive, trim)
-          const normalizedSearchName = classificationName.trim().toLowerCase()
-          const found = classificationsData.classifications.find((c: any) => {
-            const normalizedName = String(c.name || '').trim().toLowerCase()
-            return normalizedName === normalizedSearchName
-          })
+        if (classificationsResponse.ok) {
+          const classificationsData = await classificationsResponse.json()
+          
+          if (classificationsData.ok && Array.isArray(classificationsData.classifications)) {
+            // Find classification by name (case-insensitive, trim)
+            const normalizedSearchName = classificationName.trim().toLowerCase()
+            const found = classificationsData.classifications.find((c: any) => {
+              const normalizedName = String(c.name || '').trim().toLowerCase()
+              return normalizedName === normalizedSearchName
+            })
 
-          if (found) {
-            classificationId = found.id
+            if (found) {
+              classificationId = found.id
 
-            // Fetch groups for this classification
-            const groupsResponse = await fetch(
-              `${origin}/api/atlantico/groups?lang=${atlLang}&page=-1&classificationId=${encodeURIComponent(String(classificationId))}`,
-              { next: { revalidate: 120 } } // Cache for 2 minutes
-            )
+              // Fetch groups for this classification
+              const groupsResponse = await fetch(
+                `${origin}/api/atlantico/groups?lang=${atlLang}&page=-1&classificationId=${encodeURIComponent(String(classificationId))}`,
+                { cache: 'no-store' } // Use no-store for dynamic pages
+              )
 
-            if (groupsResponse.ok) {
-              const groupsData = await groupsResponse.json()
-              
-              if (groupsData.ok && Array.isArray(groupsData.groups)) {
-                groups = groupsData.groups
+              if (groupsResponse.ok) {
+                const groupsData = await groupsResponse.json()
+                
+                if (groupsData.ok && Array.isArray(groupsData.groups)) {
+                  groups = groupsData.groups
+                }
               }
             }
           }

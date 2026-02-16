@@ -7,10 +7,10 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function PaymentPage() {
+function PaymentPageContent() {
   const searchParams = useSearchParams()
   const [html, setHtml] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -166,5 +166,38 @@ export default function PaymentPage() {
   }
 
   return null
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100vh',
+        padding: '20px'
+      }}>
+        <div style={{ 
+          width: '50px', 
+          height: '50px', 
+          border: '4px solid #f3f3f3',
+          borderTop: '4px solid #3498db',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }}></div>
+        <p style={{ marginTop: '20px', fontSize: '18px' }}>Chargement du formulaire de paiement...</p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    }>
+      <PaymentPageContent />
+    </Suspense>
+  )
 }
 

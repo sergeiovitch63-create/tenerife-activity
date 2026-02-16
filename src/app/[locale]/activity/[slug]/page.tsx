@@ -23,6 +23,9 @@ import {
 } from '@/lib/atlantico'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 
+// Mark page as dynamic (uses headers())
+export const dynamic = 'force-dynamic'
+
 /**
  * Map locale to Atlántico language code
  * IMPORTANT: Use proper mapping (CAS/ENG/FRA/RUS/ALE/ITA) for loadLimits/loadPrices
@@ -37,18 +40,28 @@ function mapLocaleToLang(locale: string): string {
  */
 async function fetchActivityBySlug(slug: string, lang: string): Promise<NormalizedCatalogItem | null> {
   try {
+    // During build, avoid fetching if no base URL is configured
+    const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
+    
+    // If no base URL and we're in build phase, return null
+    if (!envBase && process.env.NEXT_PHASE === 'phase-production-build') {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ActivityDetailPage] Skipping fetch during build (no base URL configured)')
+      }
+      return null
+    }
+    
     const headersList = await import('next/headers').then((m) => m.headers)
     const hdrs = headersList()
     const host = hdrs.get('host') || 'localhost:3000'
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
-    const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
     const origin = envBase ? envBase : `${protocol}://${host}`
 
     // Fetch from sync API
     const response = await fetch(
       `${origin}/api/atlantico/sync?lang=${lang}`,
       {
-        next: { revalidate: 21600 }, // 6 hours cache
+        cache: 'no-store', // Use no-store for dynamic pages
       }
     )
 

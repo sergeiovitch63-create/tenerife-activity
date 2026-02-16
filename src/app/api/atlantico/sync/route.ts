@@ -24,6 +24,10 @@ import { NextRequest } from 'next/server'
 import { syncCatalog, type NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
 import { getCachedSync, setCachedSync, hasCachedSync } from '@/lib/atlantico/sync-cache'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
   

@@ -17,6 +17,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAtlanticoConfig } from '@/lib/atlantico/config'
 
+// Mark route as dynamic (uses searchParams)
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 /**
  * Validate filename - allow only safe characters and image extensions
  */
