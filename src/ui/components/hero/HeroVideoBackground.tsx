@@ -20,7 +20,7 @@ export function HeroVideoBackground({
 }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // iOS fallback safety: force playback after mount
+  // Optimize video loading: load only when visible
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -28,11 +28,31 @@ export function HeroVideoBackground({
     // Set webkit-playsinline for older iOS versions
     video.setAttribute('webkit-playsinline', 'true')
     
-    // Ensure muted and force play
-    video.muted = true
-    video.play().catch(() => {
-      // Silently handle autoplay failures
-    })
+    // Load video only when it enters viewport (IntersectionObserver)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Video is visible, load it
+            video.load()
+            // Ensure muted and force play
+            video.muted = true
+            video.play().catch(() => {
+              // Silently handle autoplay failures
+            })
+            // Disconnect observer after first load
+            observer.disconnect()
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+    
+    observer.observe(video)
+    
+    return () => {
+      observer.disconnect()
+    }
   }, [])
 
   return (
