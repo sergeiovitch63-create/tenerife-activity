@@ -72,9 +72,9 @@ export default async function LocaleLayout({
       <FloatingBackButton />
       {children}
       <Footer locale={locale} />
-      {/* Prefetch critical routes for instant navigation */}
-      <link rel="prefetch" href="/get-inspired" as="document" />
-      <link rel="prefetch" href="/must-see" as="document" />
+      <Suspense fallback={null}>
+        <PrefetchLinks />
+      </Suspense>
     </NextIntlClientProvider>
   )
 }
