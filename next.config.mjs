@@ -15,8 +15,25 @@ function hostnameFromEnvUrl(v) {
 const nextConfig = {
   /* config options here */
   
-  // Note: serverExternalPackages is not available in Next.js 14.2.35
-  // Using outputFileTracingExcludes instead
+  // Exclude heavy dependencies from Serverless Functions to stay under 250MB limit
+  // Using both serverExternalPackages (if available) and outputFileTracingExcludes
+  
+  // Try serverExternalPackages first (better approach, available in Next.js 14+)
+  serverExternalPackages: [
+    'react',
+    'react-dom',
+    'zustand',
+    '@supabase/supabase-js',
+    'playwright',
+    '@playwright/test',
+    'tsx',
+    'typescript',
+    'eslint',
+    'prettier',
+    'tailwindcss',
+    'autoprefixer',
+    'postcss',
+  ],
   
   // Exclude debug routes and heavy dependencies from production build
   // This prevents Next.js from trying to collect page data for debug routes during build
@@ -57,9 +74,9 @@ const nextConfig = {
           // Exclude Prettier (dev only)
           '**/node_modules/prettier/**',
           '**/node_modules/.pnpm/**/prettier/**',
-          // Exclude next-intl client-side code (API routes don't need it)
-          '**/node_modules/next-intl/dist/client/**',
-          '**/node_modules/.pnpm/**/next-intl/**/dist/client/**',
+          // Exclude next-intl completely from API routes (not needed) - saves ~10mb
+          '**/node_modules/next-intl/**',
+          '**/node_modules/.pnpm/**/next-intl/**',
           // Exclude Tailwind CSS (not needed in API routes)
           '**/node_modules/tailwindcss/**',
           '**/node_modules/.pnpm/**/tailwindcss/**',
@@ -67,6 +84,11 @@ const nextConfig = {
           '**/node_modules/.pnpm/**/autoprefixer/**',
           '**/node_modules/postcss/**',
           '**/node_modules/.pnpm/**/postcss/**',
+          // Exclude clsx/tailwind-merge (not needed in API routes) - saves ~2mb
+          '**/node_modules/clsx/**',
+          '**/node_modules/.pnpm/**/clsx/**',
+          '**/node_modules/tailwind-merge/**',
+          '**/node_modules/.pnpm/**/tailwind-merge/**',
         ],
         // Exclude Supabase from routes that don't use it (most routes)
         // Only keep Supabase for routes that explicitly need it
