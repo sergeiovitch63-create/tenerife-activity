@@ -15,6 +15,17 @@ function hostnameFromEnvUrl(v) {
 const nextConfig = {
   /* config options here */
   
+  // Enable SWC minification for faster builds and smaller bundles
+  swcMinify: true,
+  
+  // Compiler optimizations
+  compiler: {
+    // Remove console.log in production (smaller bundle)
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'], // Keep error and warn for debugging
+    } : false,
+  },
+  
   // Exclude heavy dependencies from Serverless Functions to stay under 250MB limit
   // Using outputFileTracingExcludes for maximum effect
   // Note: serverExternalPackages is only available in Next.js 15+, so we use outputFileTracingExcludes instead
@@ -218,7 +229,7 @@ const nextConfig = {
   
   // Disable webpack persistent filesystem cache in development to fix Windows ENOENT issues
   // This prevents file system locking problems on Windows that cause slow rebuilds and Fast Refresh issues
-  webpack: (config, { dev }) => {
+  webpack: (config, { dev, isServer }) => {
     if (dev) {
       // Use in-memory cache instead of filesystem cache
       // This avoids Windows file locking issues (ENOENT errors) and improves dev server performance
@@ -226,8 +237,34 @@ const nextConfig = {
         type: 'memory',
       }
     }
+    
+    // Optimize bundle splitting
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
+      }
+    }
+    
     return config
   },
+  
+  // Experimental features for better performance
+  ...(process.env.NODE_ENV === 'production' && {
+    experimental: {
+      ...(nextConfig.experimental || {}),
+      // Optimize package imports (tree shaking)
+      optimizePackageImports: [
+        'next-intl',
+        'react',
+        'react-dom',
+        '@supabase/supabase-js',
+      ],
+    },
+  }),
 }
 
 export default withNextIntl(nextConfig)

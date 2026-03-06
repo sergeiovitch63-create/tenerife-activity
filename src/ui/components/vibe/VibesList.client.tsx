@@ -3,13 +3,13 @@
 import { useProgressiveRender } from '@/ui/hooks/useProgressiveRender'
 import { VibeRow } from './VibeRow'
 import type { Vibe } from '@/core/entities/vibe'
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 
 interface VibesListProps {
   vibes: Vibe[]
 }
 
-export function VibesList({ vibes }: VibesListProps) {
+function VibesListComponent({ vibes }: VibesListProps) {
   const { visibleCount } = useProgressiveRender({
     initialCount: Math.max(15, vibes.length),
     batchSize: 6,
@@ -28,3 +28,10 @@ export function VibesList({ vibes }: VibesListProps) {
     </div>
   )
 }
+
+// Memoize to prevent re-renders when vibes array reference doesn't change
+export const VibesList = memo(VibesListComponent, (prevProps, nextProps) => {
+  // Only re-render if vibes array length or IDs change
+  if (prevProps.vibes.length !== nextProps.vibes.length) return false
+  return prevProps.vibes.every((vibe, index) => vibe.id === nextProps.vibes[index]?.id)
+})

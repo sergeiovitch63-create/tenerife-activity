@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
@@ -60,46 +60,53 @@ const mustSeeRow2: MustSeeItem[] = [
 
 // Removed dev logging - use React DevTools for debugging
 
-export function RecommendationsCarousel() {
+function RecommendationsCarouselComponent() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
 
-  // Duplicate items multiple times for seamless looping (4x for smooth infinite feel)
-  const row1Duplicated = [
+  // Memoize duplicated arrays to prevent recreation on every render
+  const row1Duplicated = useMemo(() => [
     ...mustSeeRow1,
     ...mustSeeRow1,
     ...mustSeeRow1,
     ...mustSeeRow1,
-  ]
-  const row2Duplicated = [
+  ], [])
+  
+  const row2Duplicated = useMemo(() => [
     ...mustSeeRow2,
     ...mustSeeRow2,
     ...mustSeeRow2,
     ...mustSeeRow2,
-  ]
+  ], [])
+
+  // Memoize handlers to prevent recreation
+  const handleMediaChange = useCallback((e: MediaQueryListEvent) => {
+    setPrefersReducedMotion(e.matches)
+  }, [])
 
   useEffect(() => {
     // Check for prefers-reduced-motion
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setPrefersReducedMotion(mediaQuery.matches)
 
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches)
-    }
+    mediaQuery.addEventListener('change', handleMediaChange)
+    return () => mediaQuery.removeEventListener('change', handleMediaChange)
+  }, [handleMediaChange])
 
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
-  }, [])
-
+  // Memoize translation functions
   const tCommon = useTranslations('common')
   const tMustSee = useTranslations('mustSee')
+  
+  // Memoize hover handlers
+  const handleMouseEnter = useCallback(() => setIsHovered(true), [])
+  const handleMouseLeave = useCallback(() => setIsHovered(false), [])
 
   return (
     <div
       className="w-full max-w-5xl mx-auto px-4"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Section Title */}
       <h2 className="mb-8 text-center text-2xl md:text-3xl font-semibold text-white tracking-tight">

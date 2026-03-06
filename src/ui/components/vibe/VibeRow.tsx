@@ -78,9 +78,10 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
     return cleanup
   }, [vibe.slug])
 
-  const handleClick = () => {
+  // Memoize click handler to prevent recreation
+  const handleClick = useCallback(() => {
     trackingProvider.track({ type: 'vibe_opened', vibeId: vibe.id })
-  }
+  }, [vibe.id])
 
   return (
     <Link
