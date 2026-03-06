@@ -14,6 +14,16 @@ import type { CartItem, PriceSnapshot } from '@/lib/cart/types'
 import { Button } from '@/ui/components/shared/Button'
 import { Section, Container } from '@/ui/components/layout'
 import { isCartItemExpired } from '@/lib/cart/types'
+import { CartItemImage } from '@/components/cart/CartItemImage.client'
+import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { Link } from '@/navigation'
+
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return '—'
+  const [y, m, d] = dateStr.split('-')
+  if (!y || !m || !d) return dateStr
+  return `${d} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m,10)-1]} ${y}`
+}
 
 /**
  * Inline language mapper - no external dependency
@@ -55,16 +65,6 @@ export default function CheckoutPage() {
   const { items, updateItem, removeExpired, getTotal, getCurrency, clearCart } = useCartStore()
   const [mounted, setMounted] = useState(false)
   
-  // Watermark timestamp - client-only to avoid hydration mismatch
-  const [wmTs, setWmTs] = useState<string>("")
-
-  // Build watermark - visible proof that updated code is running
-  useEffect(() => {
-    const timestamp = new Date().toISOString()
-    setWmTs(timestamp)
-    console.log('BUILD_CHECKOUT_V1', timestamp)
-    console.log('CHECKOUT_FILE', 'src/app/[locale]/checkout/page.tsx')
-  }, [])
   const [revalidating, setRevalidating] = useState(true)
   const [revalidatedItems, setRevalidatedItems] = useState<RevalidatedItem[]>([])
   const [revalidationErrors, setRevalidationErrors] = useState<RevalidateResponse['errors']>([])
@@ -91,6 +91,7 @@ export default function CheckoutPage() {
 
   // Form state
   const [name, setName] = useState('')
+  const [surnames, setSurnames] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [hotel, setHotel] = useState('')
@@ -264,6 +265,9 @@ export default function CheckoutPage() {
     if (!phone.trim()) {
       errors.phone = t('errors.phoneRequired')
     }
+    if (!hotel.trim()) {
+      errors.hotel = t('errors.hotelRequired')
+    }
     if (!acceptTerms) {
       errors.terms = t('errors.termsRequired')
     }
@@ -297,7 +301,7 @@ export default function CheckoutPage() {
     
     // Block only if not wdays_only and has availability issues
     if (hasAvailabilityIssues && hasUnavailableItems) {
-      alert(t('availabilityIssueDesc') + ' Please select an available time above.')
+      alert(t('availabilityIssueDesc') + ' ' + t('pleaseSelectAvailableTime'))
       return
     }
 
@@ -378,19 +382,19 @@ export default function CheckoutPage() {
         
         // If still null but requiresSessionTime is true, this is an error
         if (!sesTime) {
-          throw new Error('Session time is required but not available for this date')
+          throw new Error(t('sessionTimeRequired'))
         }
       }
 
       // Block payment if sesTime is "00:00" - must have valid time or be omitted
       if (sesTime === '00:00') {
-        alert('Please select a valid time')
+        alert(t('pleaseSelectValidTime'))
         setProcessing(false)
         return
       }
 
       // Build payment payload for /payment/ endpoint
-      const paymentPayload = {
+      const paymentPayload: Record<string, string | number | null> = {
         t_id: item.t_id,
         t_group: item.t_group,
         language: atlanticoLanguage,
@@ -399,7 +403,7 @@ export default function CheckoutPage() {
         adults: item.adults,
         childs: item.childs,
         infants: item.infants,
-        name: name.trim(),
+        name: [name.trim(), surnames.trim()].filter(Boolean).join(' ').trim() || name.trim(),
         email: email.trim(),
         phone: phone.trim(),
         ...(hotel.trim() && { hotel: hotel.trim() }),
@@ -407,6 +411,14 @@ export default function CheckoutPage() {
         ...(mpoint.trim() && { mpoint: mpoint.trim() }),
         ...(mtime.trim() && { mtime: mtime.trim() }),
         ...(notes.trim() && { notes: notes.trim() }),
+      }
+      // Combination (Twin Ticket): second date for Loro Parque
+      if (item.isCombination && item.tourDate2) {
+        paymentPayload.tourDate2 = item.tourDate2
+      }
+      // Date range (car rental): end date
+      if (item.isDateRange && item.tourDateEnd) {
+        paymentPayload.tourDateEnd = item.tourDateEnd
       }
 
       // Submit payment via native HTML form to avoid CORS issues
@@ -459,33 +471,13 @@ export default function CheckoutPage() {
 
   if (!mounted || revalidating) {
     return (
-      <>
-        {/* Build watermark - visible proof that updated code is running */}
-        <div style={{
-          position: 'fixed',
-          bottom: 8,
-          left: 8,
-          zIndex: 99999,
-          background: '#000',
-          color: '#fff',
-          padding: '6px 10px',
-          borderRadius: 8,
-          fontSize: 12,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4
-        }}>
-          <div>BUILD_CHECKOUT_V1{wmTs ? ` - ${wmTs}` : ""}</div>
-          <div style={{ fontSize: 10, opacity: 0.8 }}>FILE: src/app/[locale]/checkout/page.tsx</div>
-        </div>
-        <Section variant="default" background="default">
-          <Container size="lg">
-            <div className="py-12 text-center">
-              <p className="text-glass-600">{t('revalidating')}</p>
-            </div>
-          </Container>
-        </Section>
-      </>
+      <Section variant="default" background="default">
+        <Container size="lg">
+          <div className="py-12 text-center">
+            <p className="text-glass-600">{t('revalidating')}</p>
+          </div>
+        </Container>
+      </Section>
     )
   }
 
@@ -509,33 +501,27 @@ export default function CheckoutPage() {
   }
 
   return (
-    <>
-      {/* Build watermark - visible proof that updated code is running */}
-      <div style={{
-        position: 'fixed',
-        bottom: 8,
-        left: 8,
-        zIndex: 99999,
-        background: '#000',
-        color: '#fff',
-        padding: '6px 10px',
-        borderRadius: 8,
-        fontSize: 12,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4
-      }}>
-        <div>BUILD_CHECKOUT_V1{wmTs ? ` - ${wmTs}` : ""}</div>
-        <div style={{ fontSize: 10, opacity: 0.8 }}>FILE: src/app/[locale]/checkout/page.tsx</div>
-      </div>
-
-      <Section variant="default" background="default">
-        <Container size="lg">
-          <div className="py-8 space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-glass-900 mb-2">{t('title')}</h1>
-            <p className="text-glass-600">{t('description')}</p>
+    <Section variant="default" background="default">
+      <Container size="lg">
+        {/* Progress indicator */}
+        <div className="flex items-center gap-2 py-6 border-b border-glass-200">
+          <button type="button" onClick={() => router.push('/cart')} className="flex items-center gap-2 text-glass-600 hover:text-ocean-600">
+            <span className="w-8 h-8 rounded-full bg-glass-200 flex items-center justify-center text-sm font-bold">1</span>
+            <span>{t('orderSummary')}</span>
+          </button>
+          <span className="text-glass-400">→</span>
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-ocean-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+            <span className="font-semibold text-glass-900">{t('bookingDetails')}</span>
           </div>
+          <span className="text-glass-400">→</span>
+          <div className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-full bg-glass-200 text-glass-500 flex items-center justify-center text-sm font-bold">3</span>
+            <span className="text-glass-500">{t('paymentMethods')}</span>
+          </div>
+        </div>
+
+        <div className="py-8 space-y-8">
 
           {/* Revalidation warnings */}
           {hasPriceChanges && (
@@ -633,12 +619,12 @@ export default function CheckoutPage() {
                   return (
                     <div key={item.itemKey} className="bg-white border border-red-300 rounded-lg p-4">
                       <p className="text-sm font-medium text-red-900 mb-2">
-                        {item.availabilityError || 'No sessions available on this date'}
+                        {item.availabilityError || t('noSessionsAvailable')}
                       </p>
                       
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-red-800">
-                          Select another available date:
+                          {t('selectDate')}
                         </label>
                         <select
                           value={currentRecoveryDate || ''}
@@ -679,7 +665,7 @@ export default function CheckoutPage() {
                           }}
                           className="w-full px-3 py-2 border border-red-300 rounded-md text-sm"
                         >
-                          <option value="">Select a date...</option>
+                          <option value="">{t('selectDate')}</option>
                           {(item.availableDates || []).map((date) => (
                             <option key={date} value={date}>
                               {new Date(date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
@@ -689,7 +675,7 @@ export default function CheckoutPage() {
                         
                         {userHasInteracted && selectedRecoveryTimes[item.itemKey] && (
                           <p className="text-xs text-green-700">
-                            Date updated
+                            {t('dateUpdated')}
                           </p>
                         )}
                       </div>
@@ -706,12 +692,12 @@ export default function CheckoutPage() {
                   return (
                     <div key={item.itemKey} className="bg-white border border-red-300 rounded-lg p-4">
                       <p className="text-sm font-medium text-red-900 mb-2">
-                        {item.availabilityError || 'Session not available'}
+                        {item.availabilityError || t('sessionNotAvailable')}
                       </p>
                       
                       <div className="space-y-2">
                         <label className="block text-sm font-medium text-red-800">
-                          Select a new time for {item.tourDate || 'selected date'}:
+                          {t('selectNewTime', { date: item.tourDate || t('date') })}
                         </label>
                         <select
                           value={currentRecoveryTime}
@@ -744,7 +730,7 @@ export default function CheckoutPage() {
                         
                         {userHasInteracted && selectedRecoveryTimes[item.itemKey] && (
                           <p className="text-xs text-green-700">
-                            Time updated to {selectedRecoveryTimes[item.itemKey]}
+                            {t('timeUpdatedTo', { time: selectedRecoveryTimes[item.itemKey] })}
                           </p>
                         )}
                       </div>
@@ -758,16 +744,16 @@ export default function CheckoutPage() {
                 .map((item) => (
                   <div key={item.itemKey} className="bg-white border border-red-300 rounded-lg p-4">
                     <p className="text-sm font-medium text-red-900 mb-1">
-                      {item.availabilityError || 'Session not available'}
+                      {item.availabilityError || t('sessionNotAvailable')}
                     </p>
                     {item.availabilityReason === 'time_not_found' && (
                       <p className="text-xs text-red-700 mt-1">
-                        Time is required for this booking. Please select a different date or contact support.
+                        {t('timeRequiredMessage')}
                       </p>
                     )}
                     {item.availabilityReason === 'no_sessions' && (
                       <p className="text-xs text-red-700 mt-1">
-                        No sessions available on this date. Please select a different date.
+                        {t('noSessionsMessage')}
                       </p>
                     )}
                   </div>
@@ -776,172 +762,144 @@ export default function CheckoutPage() {
           )}
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main form */}
+            {/* Left: Booking Details */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Customer Information */}
-              <div className="bg-white border border-glass-200 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-glass-900 mb-4">{t('customerInfo')}</h2>
+              <div className="bg-white border border-glass-200 rounded-xl p-6 shadow-sm">
+                <h2 className="text-xl font-bold text-glass-900 mb-6">{t('bookingDetails')}</h2>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">
-                      {t('name')} *
-                    </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
-                      required
-                    />
-                    {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-glass-700 mb-1">{t('name')} *</label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
+                        required
+                      />
+                      {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-glass-700 mb-1">{t('surnames')}</label>
+                      <input
+                        type="text"
+                        value={surnames}
+                        onChange={(e) => setSurnames(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-glass-700 mb-1">
-                      {t('email')} *
+                      {t('email')} * <span className="text-glass-500 font-normal">({t('emailVoucher')})</span>
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
+                      className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
                       required
                     />
                     {formErrors.email && <p className="text-sm text-red-600 mt-1">{formErrors.email}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">
-                      {t('phone')} *
-                    </label>
+                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('phone')} *</label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
+                      className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
+                      placeholder="+34 702 123 456"
                       required
                     />
                     {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                   </div>
-                </div>
-              </div>
-
-              {/* Pickup Information */}
-              <div className="bg-white border border-glass-200 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-glass-900 mb-4">{t('pickupInfo')}</h2>
-                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('hotel')}</label>
+                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('hotel')} *</label>
                     <input
                       type="text"
                       value={hotel}
                       onChange={(e) => setHotel(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
+                      className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
+                      required
                     />
+                    {formErrors.hotel && <p className="text-sm text-red-600 mt-1">{formErrors.hotel}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('room')}</label>
-                    <input
-                      type="text"
-                      value={room}
-                      onChange={(e) => setRoom(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">
-                      {t('meetingPoint')}
-                    </label>
-                    <input
-                      type="text"
-                      value={mpoint}
-                      onChange={(e) => setMpoint(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">
-                      {t('meetingTime')}
-                    </label>
-                    <input
-                      type="text"
-                      value={mtime}
-                      onChange={(e) => setMtime(e.target.value)}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('notes')}</label>
+                    <label className="block text-sm font-medium text-glass-700 mb-1">{t('comments')}</label>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
-                      className="w-full px-3 py-2 border border-glass-300 rounded-md"
+                      className="w-full px-3 py-2.5 border border-glass-300 rounded-lg"
+                      placeholder={t('additionalInfoPlaceholder')}
                     />
                   </div>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={acceptTerms}
+                      onChange={(e) => setAcceptTerms(e.target.checked)}
+                      className="mt-1 rounded"
+                    />
+                    <span className="text-sm text-glass-700">
+                      {t('acceptTermsPrefix')}
+                      <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-ocean-600 hover:underline font-medium">
+                        {t('termsLink')}
+                      </Link>
+                    </span>
+                  </label>
+                  {formErrors.terms && <p className="text-sm text-red-600">{formErrors.terms}</p>}
                 </div>
+              </div>
+
+              {/* Action button */}
+              <div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  disabled={processing || hasAvailabilityIssues || revalidatedItems.some(item => !item.available)}
+                  className="flex-1 sm:flex-initial"
+                >
+                  {processing ? t('processing') : t('paymentMethods')}
+                </Button>
               </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Right: Activity Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white border border-glass-200 rounded-lg p-6 sticky top-4">
-                <h2 className="text-xl font-semibold text-glass-900 mb-4">{t('orderSummary')}</h2>
-                <div className="space-y-3 mb-6">
-                  {revalidatedItems.map((item) => {
-                    // Try to get option label (fallback to t_id if not available)
-                    const optionLabel = `Option eventId: ${item.t_id}`
-                    
-                    return (
-                      <div key={item.itemKey} className="text-sm">
-                        <p className="font-medium text-glass-900">
-                          {optionLabel}
-                        </p>
-                        <p className="text-xs text-glass-500 mt-1">
-                          {t('activity')}: {item.t_group} - {item.t_id}
-                        </p>
-                        <p className="text-glass-600 mt-2">
-                          {t('date')}: {item.tourDate}
-                        </p>
-                        {item.sesTime && item.sesTime !== '00:00' && (
-                          <p className="text-glass-600">
-                            {t('time')}: {item.sesTime}
-                          </p>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-                <div className="border-t border-glass-200 pt-4">
-                  <div className="flex justify-between items-center mb-4">
+              <div className="bg-white border border-glass-200 rounded-xl p-6 sticky top-4 shadow-sm">
+                <h2 className="text-lg font-bold text-glass-900 mb-4">{t('orderSummary')}</h2>
+                {revalidatedItems.map((item) => (
+                  <div key={item.itemKey} className="flex gap-4">
+                    <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-glass-100">
+                      <CartItemImage
+                        code={item.t_group}
+                        alt={item.tourName || `Tour ${item.t_group}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-glass-900 line-clamp-2">
+                        {item.tourName ? decodeTextFromApi(item.tourName) : `${item.t_group} - ${item.t_id}`}
+                      </h3>
+                      <p className="text-sm text-glass-600 mt-1">
+                        {item.adults + item.childs + item.infants} Pax · {formatDate(item.tourDate)} · {item.language}
+                      </p>
+                      <p className="text-lg font-bold text-ocean-600 mt-1">
+                        {item.priceSnapshot.total.toFixed(2)} {currency}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                <div className="border-t border-glass-200 pt-4 mt-4">
+                  <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-glass-900">{t('total')}</span>
                     <span className="text-xl font-bold text-glass-900">
                       {total.toFixed(2)} {currency}
                     </span>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      checked={acceptTerms}
-                      onChange={(e) => setAcceptTerms(e.target.checked)}
-                      className="mt-1"
-                    />
-                    <span className="text-sm text-glass-700">{t('acceptTerms')}</span>
-                  </label>
-                  {formErrors.terms && (
-                    <p className="text-sm text-red-600">{formErrors.terms}</p>
-                  )}
-
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    disabled={processing || hasAvailabilityIssues || revalidatedItems.some(item => !item.available)}
-                  >
-                    {processing ? t('processing') : t('pay')}
-                  </Button>
                 </div>
               </div>
             </div>
@@ -949,6 +907,5 @@ export default function CheckoutPage() {
         </div>
       </Container>
     </Section>
-    </>
   )
 }

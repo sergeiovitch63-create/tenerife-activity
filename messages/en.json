@@ -14,7 +14,7 @@
     "subtitle": "Discover extraordinary experiences in the heart of the Canary Islands",
     "searchPlaceholder": "Search experiences, activities, or locations...",
     "chooseYourVibe": "Choose Your Vibe",
-    "chooseYourVibeDescription": "Explore curated experiences tailored to your travel intentions",
+    "chooseYourVibeDescription": "Choose your vibe among more than 265 activities",
     "notSureWhatToPick": "Not sure what to pick?",
     "getCuratedRecommendations": "Get curated recommendations based on your mood, time, and group.",
     "exploreVibes": "Explore Vibes"
@@ -98,8 +98,8 @@
   "search": {
     "title": "Search results",
     "for": "for",
-    "noResults": "No experiences found",
-    "noResultsDesc": "We couldn't find any experiences matching your filters. Try adjusting your selection.",
+    "noResults": "No activities found",
+    "noResultsDesc": "We couldn't find any activities matching your search. Try a different keyword.",
     "emptyStateDescription": "Search for experiences, activities, or locations in Tenerife.",
     "resultsCount": "{count} experience found",
     "resultsCount_plural": "{count} experiences found",
@@ -307,7 +307,8 @@
         "value": "Increase your listing value & stand out instantly"
       },
       "trust": "No cost. No commitment. No risk.",
-      "button": "Become a partner"
+      "button": "Become a partner",
+      "trustedPartnersTitle": "Our Trusted Partners"
     }
   },
   "demo": {
@@ -578,6 +579,17 @@
     "addToCart": "Add to Cart",
     "finalizePurchases": "Finalize Your Purchases",
     "addedToCart": "Added to cart ✅",
+    "orderSummary": "Order Summary",
+    "basketSummary": "Basket Summary",
+    "product": "Product",
+    "products": "Products",
+    "inCart": "in cart",
+    "bookingDetails": "Booking Details",
+    "payment": "Payment",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loroParque": "Loro Parque",
+    "end": "End",
     "errors": {
       "noOption": "Please select an option",
       "noDate": "Please select a date",
@@ -595,26 +607,48 @@
     "priceDiff": "Price difference: {diff}",
     "availabilityIssue": "Availability Issue",
     "availabilityIssueDesc": "One or more items are no longer available. Please update your selection.",
+    "pleaseSelectAvailableTime": "Please select an available time above.",
+    "pleaseSelectValidTime": "Please select a valid time",
+    "sessionTimeRequired": "Session time is required but not available for this date",
+    "noSessionsAvailable": "No sessions available on this date",
+    "selectDate": "Select a date...",
+    "dateUpdated": "Date updated",
+    "sessionNotAvailable": "Session not available",
+    "selectNewTime": "Select a new time for {date}:",
+    "timeUpdatedTo": "Time updated to {time}",
+    "timeRequiredMessage": "Time is required for this booking. Please select a different date or contact support.",
+    "noSessionsMessage": "No sessions available on this date. Please select a different date.",
+    "additionalInfoPlaceholder": "Additional information...",
     "orderSummary": "Order Summary",
     "activity": "Activity",
     "date": "Date",
     "time": "Time",
     "total": "Total",
     "customerInfo": "Customer Information",
-    "name": "Full Name",
+    "name": "Name",
+    "surnames": "Surnames",
     "email": "Email",
+    "emailVoucher": "Required to send the voucher",
     "phone": "Phone",
-    "pickupInfo": "Pickup Information (Optional)",
-    "hotel": "Hotel",
+    "pickupInfo": "Pickup Information",
+    "hotel": "Hotel in Destination",
     "room": "Room",
+    "comments": "Comments",
+    "bookingDetails": "Booking Details",
+    "needInvoice": "Do you need an invoice?",
+    "acceptPromotions": "I accept to receive promotions and news from Atlantico Excursiones.",
+    "paymentMethods": "Payment methods",
     "meetingPoint": "Meeting Point",
     "meetingTime": "Meeting Time",
     "notes": "Additional Notes",
     "acceptTerms": "I accept the terms and conditions",
+    "acceptTermsPrefix": "I accept the ",
+    "termsLink": "terms and conditions",
     "processing": "Processing...",
     "pay": "Pay",
     "errors": {
       "nameRequired": "Name is required",
+      "hotelRequired": "Hotel in Destination is required",
       "emailRequired": "Email is required",
       "emailInvalid": "Please enter a valid email address",
       "phoneRequired": "Phone is required",
@@ -637,5 +671,115 @@
       "backToCart": "Back to Cart",
       "backToHome": "Back to Home"
     }
+  },
+  "groupDetails": {
+    "badgeVip": "VIP Experience",
+    "heroCertifiedBy": "Certified by Tenerife Activity",
+    "labels": {
+      "duration": "Duration",
+      "hours": "hours",
+      "startingFrom": "Starting from",
+      "childShort": "Child",
+      "childAge": "Child age"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "description": "Description",
+      "included": "What's Included",
+      "cancellation": "Cancellation Policy",
+      "prices": "Prices",
+      "whatYouDo": "What you do"
+    },
+    "overview": {
+      "title": "Overview",
+      "itineraryTitle": "ITINERARY:",
+      "noOverview": "No overview available.",
+      "itinerary508": "Meeting point in Puerto de la Cruz > San Pedro Viewpoint > Icod de los Vinos > Drago Tree > Garachico > Masca > Santiago del Teide > Restaurant > Chío > Pico Viejo > Teide National Park > Roques de García > La Palma Viewpoint > La Orotava > Puerto de la Cruz"
+    },
+    "description": {
+      "title": "Description",
+      "noDescription": "No additional description.",
+      "noDescriptionShort": "No description available."
+    },
+    "included": {
+      "title": "What's Included",
+      "noInfo": "No information available."
+    },
+    "cancellation": {
+      "title": "Cancellation Policy",
+      "noInfo": "Cancellation policy information not available.",
+      "noInfoDebug": "Cancellation policy not in groupDetails. Check eventDetails for per-option policy."
+    },
+    "prices": {
+      "title": "Prices",
+      "headerPerDay": "Per day",
+      "headerAdults": "Adults",
+      "headerChildren": "Children ({childAge})",
+      "headerInfants": "Infants ({infantAge})",
+      "loading": "Loading prices..."
+    },
+    "options": {
+      "title": "Choose from {count} option",
+      "title_plural": "Choose from {count} options",
+      "placeholderTitle": "Option {id}",
+      "readMore": "Read more",
+      "timesOne": "Departure time",
+      "timesMany": "Departure times",
+      "includedTitle": "Included / Not included",
+      "includedInPrice": "Included in the price:",
+      "notIncludedInPrice": "Not included in the price:",
+      "priceFrom": "From {price}",
+      "perPerson": "per person",
+      "perDay": "per day",
+      "perQuantity": "per quantity"
+    },
+    "manage": {
+      "title": "Manage your booking",
+      "noEvents": "No event options in groupDetails.ids. Add eventIds to enable full booking."
+    },
+    "cta": {
+      "seeAvailability": "See availability"
+    },
+    "icons": {
+      "drinks": "Drinks",
+      "eat": "Food",
+      "teleferico": "Cable car",
+      "free_bus": "Bus",
+      "interprete": "Professional guide",
+      "punto_interes": "Points of interest",
+      "paisaje": "Landscape",
+      "telescopio": "Telescope",
+      "observatorio": "Observatory",
+      "boat": "Boat",
+      "swiming": "Swimming",
+      "discapacitados": "Reduced mobility",
+      "cocktails": "Cocktails",
+      "entrada": "Entrance",
+      "zoo": "Zoo",
+      "kayak": "Kayak",
+      "history": "History",
+      "mirador": "Viewpoint",
+      "monitor": "Instructor"
+    },
+    "ferryIdentityNotice": "IMPORTANT: Proof of identity is required. Without this documentation, access to the ferry may be denied."
+  },
+  "activite": {
+    "notYetLinked": "This activity is not yet linked to a classification.",
+    "backToActivities": "← Back to activities",
+    "noToursAvailable": "No tours available for this activity.",
+    "noDescription": "No description.",
+    "startingFrom": "Starting from",
+    "priceNotAvailable": "Price not available",
+    "loadError": "Unable to load tour details.",
+    "backToHome": "← Back to Home",
+    "missingCode": "Missing tour code.",
+    "home": "Home",
+    "noImage": "No image",
+    "hours": "h"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "description": "Legal notice and terms of use - Atlantic Dolphin Travel SL",
+    "backToHome": "Back to Home"
   }
 }

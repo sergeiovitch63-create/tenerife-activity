@@ -14,7 +14,7 @@
     "subtitle": "Откройте для себя необыкновенные впечатления в сердце Канарских островов",
     "searchPlaceholder": "Поиск впечатлений, активностей или мест...",
     "chooseYourVibe": "Выберите настроение",
-    "chooseYourVibeDescription": "Исследуйте отобранные впечатления, адаптированные под ваши намерения путешествия",
+    "chooseYourVibeDescription": "Выберите атмосферу среди более 265 видов деятельности",
     "notSureWhatToPick": "Не уверены, что выбрать?",
     "getCuratedRecommendations": "Получите персонализированные рекомендации на основе вашего настроения, времени и группы.",
     "exploreVibes": "Исследовать атмосферы"
@@ -23,7 +23,8 @@
     "mustSee": "Обязательно посмотреть",
     "getInspired": "Вдохновиться",
     "trustLine": "Отобранные впечатления · Надежные местные партнеры",
-    "toggleMenu": "Переключить меню"
+    "toggleMenu": "Переключить меню",
+    "contact": "Контакты"
   },
   "mustSee": {
     "title": "Обязательные впечатления на Тенерифе",
@@ -306,7 +307,8 @@
         "value": "Увеличьте стоимость вашего объявления и выделитесь мгновенно"
       },
       "trust": "Без затрат. Без обязательств. Без риска.",
-      "button": "Стать партнером"
+      "button": "Стать партнером",
+      "trustedPartnersTitle": "Наши надежные партнеры"
     }
   },
   "demo": {
@@ -394,22 +396,42 @@
           "1": {
             "title": "Тейде ночью",
             "description": "Переживите волшебный закат и наблюдение за звездами с горы Тейде, самой высокой вершины Испании. Полюбуйтесь захватывающими видами и самыми чистыми небесами в Европе.",
-            "tags": ["Приключение", "Природа", "Наблюдение за звездами", "Закат"]
+            "tags": [
+              "Приключение",
+              "Природа",
+              "Наблюдение за звездами",
+              "Закат"
+            ]
           },
           "2": {
             "title": "Сиам Парк",
             "description": "Лучший аквапарк Европы с захватывающими горками, ленивыми реками и тропическими пейзажами. Идеально подходит для семей и любителей острых ощущений.",
-            "tags": ["Аквапарк", "Семья", "Веселье", "Развлечения"]
+            "tags": [
+              "Аквапарк",
+              "Семья",
+              "Веселье",
+              "Развлечения"
+            ]
           },
           "3": {
             "title": "Лоро Парке",
             "description": "Всемирно известный зоопарк и центр сохранения природы. Откройте для себя экзотических животных, потрясающие шоу и узнайте о сохранении дикой природы.",
-            "tags": ["Зоопарк", "Животные", "Семья", "Образование"]
+            "tags": [
+              "Зоопарк",
+              "Животные",
+              "Семья",
+              "Образование"
+            ]
           },
           "4": {
             "title": "Роскошный круиз на катамаране",
             "description": "Поплывите вдоль потрясающего побережья Тенерифе на роскошном катамаране. Увидьте китов и дельфинов, насладитесь премиальными удобствами и расслабьтесь со стилем.",
-            "tags": ["Лодка", "Роскошь", "Дикая природа", "Отдых"]
+            "tags": [
+              "Лодка",
+              "Роскошь",
+              "Дикая природа",
+              "Отдых"
+            ]
           }
         }
       }
@@ -526,6 +548,30 @@
         "category": "Водные виды спорта",
         "badge": "Горячее предложение",
         "description": "Комбинируйте лучшие океанские впечатления острова (Джет-ски + Парасейлинг стиль комбо) по специальной цене."
+      },
+      "twinTicket": {
+        "title": "Twin Ticket",
+        "category": "Theme Parks",
+        "badge": "Best Seller",
+        "description": "One ticket, two iconic parks: Siam Park + Loro Parque. The easiest way to see Tenerife's top attractions."
+      },
+      "twoParksTicket": {
+        "title": "Two Parks Ticket",
+        "category": "Theme Parks",
+        "badge": "Great Value",
+        "description": "Combine two parks in one smart deal (e.g., Jungle Park + Aqualand). Perfect for families and groups."
+      },
+      "specialPacks": {
+        "title": "Special Packs",
+        "category": "Water Sports",
+        "badge": "Most Popular",
+        "description": "Curated water-activity bundles (Parasailing, Jet Ski, Fly Fish and more). Big thrills, better price."
+      },
+      "boosterPacks": {
+        "title": "Booster Packs",
+        "category": "Water Sports",
+        "badge": "Hot Deal",
+        "description": "Mix and match the island's best ocean experiences (Jet Ski + Parasailing style combos) at a special rate."
       }
     }
   },
@@ -538,5 +584,246 @@
     "forPartners": "Для партнеров",
     "forPartnersDescription": "Вы поставщик жилья, заинтересованный в сотрудничестве с нами?",
     "partnersCta": "Узнать больше о партнерстве"
+  },
+  "activities": {
+    "gomeraVipTour": {
+      "includes": {
+        "title": "INCLUDES:",
+        "items": {
+          "ferry": "Round-trip ferry from Tenerife to La Gomera from Los Cristianos pier in premium class with an open bar of food and drinks on board.",
+          "stops": "Stops at San Sebastián de La Gomera, Abrante viewpoint, Garajonay National Park, Roque de Agando, and other points of interest in La Gomera.",
+          "driver": "One driver per vehicle.",
+          "lunch": "Lunch.",
+          "explanations": "Explanations in Spanish, German, and French.",
+          "vehicle": "Spacious air-conditioned, four-wheel-drive minivan.",
+          "transport": "Transport from your hotel or nearby.",
+          "insurance": "Civil liability insurance."
+        }
+      }
+    }
+  },
+  "cart": {
+    "title": "Корзина",
+    "description": "Просмотрите выбранные активности",
+    "loading": "Загрузка корзины...",
+    "empty": "Ваша корзина пуста",
+    "continueShopping": "Продолжить покупки",
+    "itemTitle": "Активность {t_group} - {t_id}",
+    "date": "Дата",
+    "time": "Время",
+    "participants": "Участники",
+    "adults": "взрослые",
+    "children": "дети",
+    "infants": "младенцы",
+    "language": "Язык",
+    "edit": "Редактировать",
+    "remove": "Удалить",
+    "total": "Итого",
+    "proceedToCheckout": "Перейти к оплате",
+    "addToCart": "Добавить в корзину",
+    "finalizePurchases": "Завершить покупки",
+    "addedToCart": "Добавлено в корзину ✅",
+    "orderSummary": "Сводка заказа",
+    "basketSummary": "Сводка корзины",
+    "product": "Товар",
+    "products": "Товары",
+    "inCart": "в корзине",
+    "bookingDetails": "Детали бронирования",
+    "payment": "Оплата",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "loroParque": "Loro Parque",
+    "end": "Конец",
+    "errors": {
+      "noOption": "Пожалуйста, выберите опцию",
+      "noDate": "Пожалуйста, выберите дату",
+      "noParticipants": "Пожалуйста, выберите хотя бы 1 взрослого",
+      "addFailed": "Не удалось добавить в корзину"
+    }
+  },
+  "checkout": {
+    "title": "Оплата",
+    "description": "Завершите бронирование",
+    "empty": "Ваша корзина пуста",
+    "backToCart": "Вернуться в корзину",
+    "revalidating": "Проверка вашего бронирования...",
+    "priceUpdated": "Цена была обновлена",
+    "priceDiff": "Разница в цене: {diff}",
+    "availabilityIssue": "Проблема с доступностью",
+    "availabilityIssueDesc": "Один или несколько товаров больше не доступны. Обновите свой выбор.",
+    "pleaseSelectAvailableTime": "Пожалуйста, выберите доступное время выше.",
+    "pleaseSelectValidTime": "Пожалуйста, выберите действительное время",
+    "sessionTimeRequired": "Время сеанса требуется, но недоступно для этой даты",
+    "noSessionsAvailable": "Нет доступных сеансов в этот день",
+    "selectDate": "Выберите дату...",
+    "dateUpdated": "Дата обновлена",
+    "sessionNotAvailable": "Сеанс недоступен",
+    "selectNewTime": "Выберите новое время для {date}:",
+    "timeUpdatedTo": "Время обновлено до {time}",
+    "timeRequiredMessage": "Время требуется для этого бронирования. Выберите другую дату или свяжитесь со службой поддержки.",
+    "noSessionsMessage": "Нет доступных сеансов в этот день. Выберите другую дату.",
+    "additionalInfoPlaceholder": "Дополнительная информация...",
+    "orderSummary": "Сводка заказа",
+    "activity": "Активность",
+    "date": "Дата",
+    "time": "Время",
+    "total": "Итого",
+    "customerInfo": "Информация о клиенте",
+    "name": "Имя",
+    "surnames": "Фамилия",
+    "email": "Электронная почта",
+    "emailVoucher": "Требуется для отправки ваучера",
+    "phone": "Телефон",
+    "pickupInfo": "Информация о встрече",
+    "hotel": "Отель в пункте назначения",
+    "room": "Номер",
+    "comments": "Комментарии",
+    "bookingDetails": "Детали бронирования",
+    "needInvoice": "Нужен ли вам счет?",
+    "acceptPromotions": "Я согласен получать акции и новости от Atlantico Excursiones.",
+    "paymentMethods": "Способы оплаты",
+    "meetingPoint": "Место встречи",
+    "meetingTime": "Время встречи",
+    "notes": "Дополнительные примечания",
+    "acceptTerms": "Я принимаю условия",
+    "acceptTermsPrefix": "Я принимаю ",
+    "termsLink": "условия",
+    "processing": "Обработка...",
+    "pay": "Оплатить",
+    "errors": {
+      "nameRequired": "Имя обязательно",
+      "hotelRequired": "Отель в пункте назначения обязателен",
+      "emailRequired": "Электронная почта обязательна",
+      "emailInvalid": "Пожалуйста, введите действительный адрес электронной почты",
+      "phoneRequired": "Телефон обязателен",
+      "termsRequired": "Вы должны принять условия",
+      "cartEmpty": "Ваша корзина пуста",
+      "multiItemNotSupported": "Только одна активность может быть забронирована за раз. Удалите другие товары из корзины.",
+      "paymentFailed": "Инициирование платежа не удалось. Пожалуйста, попробуйте снова."
+    },
+    "success": {
+      "title": "Платеж успешен",
+      "description": "Ваш платеж был успешно обработан",
+      "message": "Спасибо за бронирование! Ваш платеж был успешно обработан. Вы получите письмо с подтверждением в ближайшее время.",
+      "backToHome": "Вернуться на главную",
+      "viewCart": "Просмотреть корзину"
+    },
+    "cancel": {
+      "title": "Платеж отменен",
+      "description": "Ваш платеж был отменен",
+      "message": "Ваш платеж был отменен. Платежи не были произведены. Вы можете вернуться в корзину, чтобы завершить бронирование позже.",
+      "backToCart": "Вернуться в корзину",
+      "backToHome": "Вернуться на главную"
+    }
+  },
+  "groupDetails": {
+    "badgeVip": "VIP-опыт",
+    "heroCertifiedBy": "Сертифицировано Tenerife Activity",
+    "labels": {
+      "duration": "Продолжительность",
+      "hours": "часов",
+      "startingFrom": "От",
+      "childShort": "Ребенок",
+      "childAge": "Возраст ребенка"
+    },
+    "tabs": {
+      "overview": "Обзор",
+      "description": "Описание",
+      "included": "Что включено",
+      "cancellation": "Условия отмены",
+      "prices": "Цены",
+      "whatYouDo": "Что вы делаете"
+    },
+    "overview": {
+      "title": "Обзор",
+      "itineraryTitle": "МАРШРУТ:",
+      "noOverview": "Обзор недоступен.",
+      "itinerary508": "Место встречи в Пуэрто-де-ла-Крус > Смотровая площадка Сан-Педро > Икод-де-лос-Винос > Драконово дерево > Гарачико > Маска > Сантьяго-дель-Тейде > Ресторан > Чио > Пико-Вьехо > Национальный парк Тейде > Рокес-де-Гарсия > Смотровая площадка Ла-Пальма > Ла-Оротава > Пуэрто-де-ла-Крус"
+    },
+    "description": {
+      "title": "Описание",
+      "noDescription": "Нет дополнительного описания.",
+      "noDescriptionShort": "Описание недоступно."
+    },
+    "included": {
+      "title": "Что включено",
+      "noInfo": "Информация недоступна."
+    },
+    "cancellation": {
+      "title": "Условия отмены",
+      "noInfo": "Информация об условиях отмены недоступна.",
+      "noInfoDebug": "Политика отмены отсутствует в groupDetails. Проверьте eventDetails для политики по опциям."
+    },
+    "prices": {
+      "title": "Цены",
+      "headerPerDay": "За день",
+      "headerAdults": "Взрослые",
+      "headerChildren": "Дети ({childAge})",
+      "headerInfants": "Младенцы ({infantAge})",
+      "loading": "Загрузка цен..."
+    },
+    "options": {
+      "title": "Выберите из {count} варианта",
+      "title_plural": "Выберите из {count} вариантов",
+      "placeholderTitle": "Вариант {id}",
+      "readMore": "Читать далее",
+      "timesOne": "Время отправления",
+      "timesMany": "Время отправления",
+      "includedTitle": "Включено / Не включено",
+      "includedInPrice": "Включено в цену:",
+      "notIncludedInPrice": "Не включено в цену:",
+      "priceFrom": "От {price}",
+      "perPerson": "с человека",
+      "perDay": "за день",
+      "perQuantity": "за количество"
+    },
+    "manage": {
+      "title": "Управление бронированием",
+      "noEvents": "Нет вариантов событий в groupDetails.ids. Добавьте eventIds для включения полного бронирования."
+    },
+    "cta": {
+      "seeAvailability": "Проверить доступность"
+    },
+    "icons": {
+      "drinks": "Напитки",
+      "eat": "Еда",
+      "teleferico": "Канатная дорога",
+      "free_bus": "Автобус",
+      "interprete": "Профессиональный гид",
+      "punto_interes": "Достопримечательности",
+      "paisaje": "Пейзаж",
+      "telescopio": "Телескоп",
+      "observatorio": "Обсерватория",
+      "boat": "Лодка",
+      "swiming": "Плавание",
+      "discapacitados": "Ограниченная подвижность",
+      "cocktails": "Коктейли",
+      "entrada": "Вход",
+      "zoo": "Зоопарк",
+      "kayak": "Каяк",
+      "history": "История",
+      "mirador": "Смотровая площадка",
+      "monitor": "Инструктор"
+    },
+    "ferryIdentityNotice": "ВАЖНО: Требуется удостоверение личности. Без этой документации доступ на паром может быть запрещен."
+  },
+  "activite": {
+    "notYetLinked": "Эта активность еще не связана с классификацией.",
+    "backToActivities": "← Вернуться к активностям",
+    "noToursAvailable": "Нет доступных туров для этой активности.",
+    "noDescription": "Нет описания.",
+    "startingFrom": "От",
+    "priceNotAvailable": "Цена недоступна",
+    "loadError": "Не удалось загрузить детали тура.",
+    "backToHome": "← Вернуться на главную",
+    "missingCode": "Отсутствует код тура.",
+    "home": "Главная",
+    "noImage": "Нет изображения",
+    "hours": "ч"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "description": "Legal notice and terms of use - Atlantic Dolphin Travel SL",
+    "backToHome": "Back to Home"
   }
 }

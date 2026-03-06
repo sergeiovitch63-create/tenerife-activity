@@ -14,7 +14,7 @@
     "subtitle": "Scopri esperienze straordinarie nel cuore delle Isole Canarie",
     "searchPlaceholder": "Cerca esperienze, attività o luoghi...",
     "chooseYourVibe": "Scegli la tua atmosfera",
-    "chooseYourVibeDescription": "Esplora esperienze selezionate adattate alle tue intenzioni di viaggio",
+    "chooseYourVibeDescription": "Scegli la tua atmosfera tra oltre 265 attività",
     "notSureWhatToPick": "Non sei sicuro di cosa scegliere?",
     "getCuratedRecommendations": "Ottieni raccomandazioni personalizzate in base al tuo umore, tempo e gruppo.",
     "exploreVibes": "Esplora le atmosfere"
@@ -23,7 +23,8 @@
     "mustSee": "Da vedere",
     "getInspired": "Lasciati ispirare",
     "trustLine": "Esperienze selezionate · Partner locali fidati",
-    "toggleMenu": "Attiva/disattiva menu"
+    "toggleMenu": "Attiva/disattiva menu",
+    "contact": "Contatti"
   },
   "mustSee": {
     "title": "Esperienze da vedere a Tenerife",
@@ -306,7 +307,8 @@
         "value": "Aumenta il valore della tua struttura e distinguiti istantaneamente"
       },
       "trust": "Nessun costo. Nessun impegno. Nessun rischio.",
-      "button": "Diventa partner"
+      "button": "Diventa partner",
+      "trustedPartnersTitle": "I nostri partner fidati"
     }
   },
   "demo": {
@@ -394,22 +396,42 @@
           "1": {
             "title": "Teide di notte",
             "description": "Vivi il tramonto magico e l'osservazione delle stelle dal monte Teide, la vetta più alta della Spagna. Ammira viste mozzafiato e i cieli più limpidi d'Europa.",
-            "tags": ["Avventura", "Natura", "Osservazione delle stelle", "Tramonto"]
+            "tags": [
+              "Avventura",
+              "Natura",
+              "Osservazione delle stelle",
+              "Tramonto"
+            ]
           },
           "2": {
             "title": "Siam Park",
             "description": "Il migliore parco acquatico d'Europa con scivoli emozionanti, fiumi lenti e paesaggi tropicali. Perfetto per famiglie e amanti dell'adrenalina.",
-            "tags": ["Parco acquatico", "Famiglia", "Divertimento", "Intrattenimento"]
+            "tags": [
+              "Parco acquatico",
+              "Famiglia",
+              "Divertimento",
+              "Intrattenimento"
+            ]
           },
           "3": {
             "title": "Loro Parque",
             "description": "Parco zoologico e centro di conservazione di fama mondiale. Scopri animali esotici, spettacoli straordinari e impara sulla conservazione della fauna selvatica.",
-            "tags": ["Zoo", "Animali", "Famiglia", "Educazione"]
+            "tags": [
+              "Zoo",
+              "Animali",
+              "Famiglia",
+              "Educazione"
+            ]
           },
           "4": {
             "title": "Crociera in catamarano di lusso",
             "description": "Naviga lungo la splendida costa di Tenerife su un catamarano di lusso. Avvista balene e delfini, goditi servizi premium e rilassati con stile.",
-            "tags": ["Barca", "Lusso", "Fauna selvatica", "Relax"]
+            "tags": [
+              "Barca",
+              "Lusso",
+              "Fauna selvatica",
+              "Relax"
+            ]
           }
         }
       }
@@ -526,6 +548,30 @@
         "category": "Sport Acquatici",
         "badge": "Offerta Speciale",
         "description": "Combina le migliori esperienze oceaniche dell'isola (Jet Ski + Parasailing style combos) a un prezzo speciale."
+      },
+      "twinTicket": {
+        "title": "Twin Ticket",
+        "category": "Theme Parks",
+        "badge": "Best Seller",
+        "description": "One ticket, two iconic parks: Siam Park + Loro Parque. The easiest way to see Tenerife's top attractions."
+      },
+      "twoParksTicket": {
+        "title": "Two Parks Ticket",
+        "category": "Theme Parks",
+        "badge": "Great Value",
+        "description": "Combine two parks in one smart deal (e.g., Jungle Park + Aqualand). Perfect for families and groups."
+      },
+      "specialPacks": {
+        "title": "Special Packs",
+        "category": "Water Sports",
+        "badge": "Most Popular",
+        "description": "Curated water-activity bundles (Parasailing, Jet Ski, Fly Fish and more). Big thrills, better price."
+      },
+      "boosterPacks": {
+        "title": "Booster Packs",
+        "category": "Water Sports",
+        "badge": "Hot Deal",
+        "description": "Mix and match the island's best ocean experiences (Jet Ski + Parasailing style combos) at a special rate."
       }
     }
   },
@@ -538,5 +584,246 @@
     "forPartners": "Per i partner",
     "forPartnersDescription": "Sei un fornitore di alloggi interessato a collaborare con noi?",
     "partnersCta": "Scopri di più sulle partnership"
+  },
+  "activities": {
+    "gomeraVipTour": {
+      "includes": {
+        "title": "INCLUDES:",
+        "items": {
+          "ferry": "Round-trip ferry from Tenerife to La Gomera from Los Cristianos pier in premium class with an open bar of food and drinks on board.",
+          "stops": "Stops at San Sebastián de La Gomera, Abrante viewpoint, Garajonay National Park, Roque de Agando, and other points of interest in La Gomera.",
+          "driver": "One driver per vehicle.",
+          "lunch": "Lunch.",
+          "explanations": "Explanations in Spanish, German, and French.",
+          "vehicle": "Spacious air-conditioned, four-wheel-drive minivan.",
+          "transport": "Transport from your hotel or nearby.",
+          "insurance": "Civil liability insurance."
+        }
+      }
+    }
+  },
+  "cart": {
+    "title": "Carrello",
+    "description": "Rivedi le tue attività selezionate",
+    "loading": "Caricamento carrello...",
+    "empty": "Il tuo carrello è vuoto",
+    "continueShopping": "Continua gli acquisti",
+    "itemTitle": "Attività {t_group} - {t_id}",
+    "date": "Data",
+    "time": "Ora",
+    "participants": "Partecipanti",
+    "adults": "adulti",
+    "children": "bambini",
+    "infants": "neonati",
+    "language": "Lingua",
+    "edit": "Modifica",
+    "remove": "Rimuovi",
+    "total": "Totale",
+    "proceedToCheckout": "Procedi al pagamento",
+    "addToCart": "Aggiungi al carrello",
+    "finalizePurchases": "Finalizza i tuoi acquisti",
+    "addedToCart": "Aggiunto al carrello ✅",
+    "orderSummary": "Riepilogo ordine",
+    "basketSummary": "Riepilogo carrello",
+    "product": "Prodotto",
+    "products": "Prodotti",
+    "inCart": "nel carrello",
+    "bookingDetails": "Dettagli della prenotazione",
+    "payment": "Pagamento",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loroParque": "Loro Parque",
+    "end": "Fine",
+    "errors": {
+      "noOption": "Seleziona un'opzione",
+      "noDate": "Seleziona una data",
+      "noParticipants": "Seleziona almeno 1 adulto",
+      "addFailed": "Impossibile aggiungere al carrello"
+    }
+  },
+  "checkout": {
+    "title": "Pagamento",
+    "description": "Completa la tua prenotazione",
+    "empty": "Il tuo carrello è vuoto",
+    "backToCart": "Torna al carrello",
+    "revalidating": "Validazione della tua prenotazione...",
+    "priceUpdated": "Il prezzo è stato aggiornato",
+    "priceDiff": "Differenza di prezzo: {diff}",
+    "availabilityIssue": "Problema di disponibilità",
+    "availabilityIssueDesc": "Uno o più articoli non sono più disponibili. Aggiorna la tua selezione.",
+    "pleaseSelectAvailableTime": "Seleziona un'ora disponibile sopra.",
+    "pleaseSelectValidTime": "Seleziona un'ora valida",
+    "sessionTimeRequired": "L'ora della sessione è richiesta ma non è disponibile per questa data",
+    "noSessionsAvailable": "Nessuna sessione disponibile in questa data",
+    "selectDate": "Seleziona una data...",
+    "dateUpdated": "Data aggiornata",
+    "sessionNotAvailable": "Sessione non disponibile",
+    "selectNewTime": "Seleziona una nuova ora per {date}:",
+    "timeUpdatedTo": "Ora aggiornata a {time}",
+    "timeRequiredMessage": "L'ora è richiesta per questa prenotazione. Seleziona una data diversa o contatta il supporto.",
+    "noSessionsMessage": "Nessuna sessione disponibile in questa data. Seleziona una data diversa.",
+    "additionalInfoPlaceholder": "Informazioni aggiuntive...",
+    "orderSummary": "Riepilogo ordine",
+    "activity": "Attività",
+    "date": "Data",
+    "time": "Ora",
+    "total": "Totale",
+    "customerInfo": "Informazioni cliente",
+    "name": "Nome",
+    "surnames": "Cognome",
+    "email": "Email",
+    "emailVoucher": "Richiesto per inviare il voucher",
+    "phone": "Telefono",
+    "pickupInfo": "Informazioni di ritiro",
+    "hotel": "Hotel a destinazione",
+    "room": "Camera",
+    "comments": "Commenti",
+    "bookingDetails": "Dettagli della prenotazione",
+    "needInvoice": "Hai bisogno di una fattura?",
+    "acceptPromotions": "Accetto di ricevere promozioni e notizie da Atlantico Excursiones.",
+    "paymentMethods": "Metodi di pagamento",
+    "meetingPoint": "Punto di incontro",
+    "meetingTime": "Ora di incontro",
+    "notes": "Note aggiuntive",
+    "acceptTerms": "Accetto i termini e le condizioni",
+    "acceptTermsPrefix": "Accetto i ",
+    "termsLink": "termini e condizioni",
+    "processing": "Elaborazione...",
+    "pay": "Paga",
+    "errors": {
+      "nameRequired": "Il nome è richiesto",
+      "hotelRequired": "L'hotel a destinazione è richiesto",
+      "emailRequired": "L'email è richiesta",
+      "emailInvalid": "Inserisci un indirizzo email valido",
+      "phoneRequired": "Il telefono è richiesto",
+      "termsRequired": "Devi accettare i termini e le condizioni",
+      "cartEmpty": "Il tuo carrello è vuoto",
+      "multiItemNotSupported": "Solo un'attività può essere prenotata alla volta. Rimuovi altri articoli dal carrello.",
+      "paymentFailed": "Inizializzazione del pagamento fallita. Riprova."
+    },
+    "success": {
+      "title": "Pagamento riuscito",
+      "description": "Il tuo pagamento è stato elaborato con successo",
+      "message": "Grazie per la tua prenotazione! Il tuo pagamento è stato elaborato con successo. Riceverai un'email di conferma a breve.",
+      "backToHome": "Torna alla home",
+      "viewCart": "Visualizza carrello"
+    },
+    "cancel": {
+      "title": "Pagamento annullato",
+      "description": "Il tuo pagamento è stato annullato",
+      "message": "Il tuo pagamento è stato annullato. Nessun addebito è stato effettuato. Puoi tornare al carrello per completare la prenotazione più tardi.",
+      "backToCart": "Torna al carrello",
+      "backToHome": "Torna alla home"
+    }
+  },
+  "groupDetails": {
+    "badgeVip": "Esperienza VIP",
+    "heroCertifiedBy": "Certificato da Tenerife Activity",
+    "labels": {
+      "duration": "Durata",
+      "hours": "ore",
+      "startingFrom": "A partire da",
+      "childShort": "Bambino",
+      "childAge": "Età del bambino"
+    },
+    "tabs": {
+      "overview": "Panoramica",
+      "description": "Descrizione",
+      "included": "Cosa è incluso",
+      "cancellation": "Politica di cancellazione",
+      "prices": "Prezzi",
+      "whatYouDo": "Cosa fai"
+    },
+    "overview": {
+      "title": "Panoramica",
+      "itineraryTitle": "ITINERARIO:",
+      "noOverview": "Nessuna panoramica disponibile.",
+      "itinerary508": "Punto di incontro a Puerto de la Cruz > Belvedere San Pedro > Icod de los Vinos > Albero Drago > Garachico > Masca > Santiago del Teide > Ristorante > Chío > Pico Viejo > Parco Nazionale del Teide > Roques de García > Belvedere La Palma > La Orotava > Puerto de la Cruz"
+    },
+    "description": {
+      "title": "Descrizione",
+      "noDescription": "Nessuna descrizione aggiuntiva.",
+      "noDescriptionShort": "Nessuna descrizione disponibile."
+    },
+    "included": {
+      "title": "Cosa è incluso",
+      "noInfo": "Nessuna informazione disponibile."
+    },
+    "cancellation": {
+      "title": "Politica di cancellazione",
+      "noInfo": "Informazioni sulla politica di cancellazione non disponibili.",
+      "noInfoDebug": "Politica di cancellazione non presente in groupDetails. Controllare eventDetails per la politica per opzione."
+    },
+    "prices": {
+      "title": "Prezzi",
+      "headerPerDay": "Per giorno",
+      "headerAdults": "Adulti",
+      "headerChildren": "Bambini ({childAge})",
+      "headerInfants": "Neonati ({infantAge})",
+      "loading": "Caricamento prezzi..."
+    },
+    "options": {
+      "title": "Scegli tra {count} opzione",
+      "title_plural": "Scegli tra {count} opzioni",
+      "placeholderTitle": "Opzione {id}",
+      "readMore": "Leggi di più",
+      "timesOne": "Orario di partenza",
+      "timesMany": "Orari di partenza",
+      "includedTitle": "Incluso / Non incluso",
+      "includedInPrice": "Incluso nel prezzo:",
+      "notIncludedInPrice": "Non incluso nel prezzo:",
+      "priceFrom": "Da {price}",
+      "perPerson": "per persona",
+      "perDay": "per giorno",
+      "perQuantity": "per quantità"
+    },
+    "manage": {
+      "title": "Gestisci la tua prenotazione",
+      "noEvents": "Nessuna opzione evento in groupDetails.ids. Aggiungere eventIds per abilitare la prenotazione completa."
+    },
+    "cta": {
+      "seeAvailability": "Vedi disponibilità"
+    },
+    "icons": {
+      "drinks": "Bevande",
+      "eat": "Cibo",
+      "teleferico": "Funivia",
+      "free_bus": "Autobus",
+      "interprete": "Guida professionale",
+      "punto_interes": "Punti di interesse",
+      "paisaje": "Paesaggio",
+      "telescopio": "Telescopio",
+      "observatorio": "Osservatorio",
+      "boat": "Barca",
+      "swiming": "Nuoto",
+      "discapacitados": "Mobilità ridotta",
+      "cocktails": "Cocktail",
+      "entrada": "Ingresso",
+      "zoo": "Zoo",
+      "kayak": "Kayak",
+      "history": "Storia",
+      "mirador": "Belvedere",
+      "monitor": "Istruttore"
+    },
+    "ferryIdentityNotice": "IMPORTANTE: È richiesto un documento di identità. Senza questa documentazione, l'accesso al traghetto può essere negato."
+  },
+  "activite": {
+    "notYetLinked": "Questa attività non è ancora collegata a una classificazione.",
+    "backToActivities": "← Torna alle attività",
+    "noToursAvailable": "Nessun tour disponibile per questa attività.",
+    "noDescription": "Nessuna descrizione.",
+    "startingFrom": "A partire da",
+    "priceNotAvailable": "Prezzo non disponibile",
+    "loadError": "Impossibile caricare i dettagli del tour.",
+    "backToHome": "← Torna alla home",
+    "missingCode": "Codice tour mancante.",
+    "home": "Home",
+    "noImage": "Nessuna immagine",
+    "hours": "h"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "description": "Legal notice and terms of use - Atlantic Dolphin Travel SL",
+    "backToHome": "Back to Home"
   }
 }
