@@ -30,12 +30,13 @@ const nextConfig = {
   // Using outputFileTracingExcludes for maximum effect
   // Note: serverExternalPackages is only available in Next.js 15+, so we use outputFileTracingExcludes instead
   
-  // Exclude debug routes and heavy dependencies from production build
-  // This prevents Next.js from trying to collect page data for debug routes during build
-  // and reduces bundle size for API routes
-  // Target: reduce Serverless Functions below 250MB limit
+  // Experimental features for better performance
   ...(process.env.NODE_ENV === 'production' && {
     experimental: {
+      // Exclude debug routes and heavy dependencies from production build
+      // This prevents Next.js from trying to collect page data for debug routes during build
+      // and reduces bundle size for API routes
+      // Target: reduce Serverless Functions below 250MB limit
       outputFileTracingExcludes: {
         // Exclude large static assets from ALL Serverless Functions
         // public/images/pictures is 261MB and should not be bundled in functions
@@ -139,6 +140,13 @@ const nextConfig = {
         // (admin/curation/*, debug/supabase, debug/env)
         // These routes will include Supabase but still exclude React/dev deps
       },
+      // Optimize package imports (tree shaking)
+      optimizePackageImports: [
+        'next-intl',
+        'react',
+        'react-dom',
+        '@supabase/supabase-js',
+      ],
     },
   }),
   
@@ -252,28 +260,11 @@ const nextConfig = {
     return config
   },
   
-  // Experimental features for better performance
-  ...(process.env.NODE_ENV === 'production' && {
-    experimental: {
-      ...(nextConfig.experimental || {}),
-      // Optimize package imports (tree shaking)
-      optimizePackageImports: [
-        'next-intl',
-        'react',
-        'react-dom',
-        '@supabase/supabase-js',
-      ],
-    },
-  }),
-  
   // Compression and optimization
   compress: true, // Enable gzip compression (Vercel handles this automatically)
   
-  // Power optimization: reduce JavaScript bundle size
-  ...(process.env.NODE_ENV === 'production' && {
-    // Reduce JavaScript bundle size
-    output: 'standalone', // Optimize for production deployment
-  }),
+  // Note: output: 'standalone' removed - causes EPERM symlink errors on Windows
+  // Vercel handles deployment optimization automatically, so this is not needed
 }
 
 export default withNextIntl(nextConfig)
