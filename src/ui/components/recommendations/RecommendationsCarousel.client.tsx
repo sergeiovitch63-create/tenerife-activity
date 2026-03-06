@@ -118,16 +118,17 @@ export function RecommendationsCarousel() {
             <div key={linkKey} className="marquee-item">
               <Link
                 ref={(el) => {
-                  if (el) linkRefs.current.set(linkKey, el)
-                  else linkRefs.current.delete(linkKey)
+                  if (el) {
+                    linkRefs.current.set(linkKey, el)
+                    // Setup prefetch on mount for instant navigation
+                    setupPrefetchOnInteraction(el, href)
+                  } else {
+                    linkRefs.current.delete(linkKey)
+                  }
                 }}
                 href={href}
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
-                onTouchStart={() => {
-                  const link = linkRefs.current.get(linkKey)
-                  if (link) setupPrefetchOnInteraction(link, href)
-                }}
               >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
@@ -137,9 +138,10 @@ export function RecommendationsCarousel() {
                     width={160}
                     height={160}
                     className="w-full h-full object-cover"
-                    sizes="(max-width: 768px) 128px, 160px"
-                    loading="lazy"
+                    sizes="(max-width: 640px) 128px, 160px"
+                    loading={index < 4 ? 'eager' : 'lazy'}
                     priority={index < 4}
+                    quality={index < 4 ? 90 : 80}
                   />
                 </div>
                 {/* Title Below Card */}
@@ -171,16 +173,17 @@ export function RecommendationsCarousel() {
             <div key={linkKey} className="marquee-item">
               <Link
                 ref={(el) => {
-                  if (el) linkRefs.current.set(linkKey, el)
-                  else linkRefs.current.delete(linkKey)
+                  if (el) {
+                    linkRefs.current.set(linkKey, el)
+                    // Setup prefetch on mount for instant navigation
+                    setupPrefetchOnInteraction(el, href)
+                  } else {
+                    linkRefs.current.delete(linkKey)
+                  }
                 }}
                 href={href}
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
-                onTouchStart={() => {
-                  const link = linkRefs.current.get(linkKey)
-                  if (link) setupPrefetchOnInteraction(link, href)
-                }}
               >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
@@ -190,9 +193,10 @@ export function RecommendationsCarousel() {
                     width={160}
                     height={160}
                     className="w-full h-full object-cover"
-                    sizes="(max-width: 768px) 128px, 160px"
-                    loading="lazy"
+                    sizes="(max-width: 640px) 128px, 160px"
+                    loading={index < 4 ? 'eager' : 'lazy'}
                     priority={index < 4}
+                    quality={index < 4 ? 90 : 80}
                   />
                 </div>
                 {/* Title Below Card */}
