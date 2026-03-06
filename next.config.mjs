@@ -16,12 +16,14 @@ const nextConfig = {
   /* config options here */
   
   // Exclude heavy dependencies from Serverless Functions to stay under 250MB limit
-  // Using both serverExternalPackages (if available) and outputFileTracingExcludes
+  // Using both serverExternalPackages and outputFileTracingExcludes for maximum effect
   
-  // Try serverExternalPackages first (better approach, available in Next.js 14+)
+  // serverExternalPackages: exclude packages from Serverless Functions completely
+  // Available in Next.js 14.2.0+
   serverExternalPackages: [
     'react',
     'react-dom',
+    'react/jsx-runtime',
     'zustand',
     '@supabase/supabase-js',
     'playwright',
@@ -33,6 +35,9 @@ const nextConfig = {
     'tailwindcss',
     'autoprefixer',
     'postcss',
+    'next-intl',
+    'clsx',
+    'tailwind-merge',
   ],
   
   // Exclude debug routes and heavy dependencies from production build
@@ -53,8 +58,10 @@ const nextConfig = {
           // Exclude React/React-DOM from ALL API routes (not needed) - saves ~50mb
           '**/node_modules/react/**',
           '**/node_modules/react-dom/**',
+          '**/node_modules/react/jsx-runtime/**',
           '**/node_modules/.pnpm/**/react/**',
           '**/node_modules/.pnpm/**/react-dom/**',
+          '**/node_modules/.pnpm/**/react/jsx-runtime/**',
           // Exclude Zustand (client-side state management, not needed in API) - saves ~5mb
           '**/node_modules/zustand/**',
           '**/node_modules/.pnpm/**/zustand/**',
@@ -89,24 +96,45 @@ const nextConfig = {
           '**/node_modules/.pnpm/**/clsx/**',
           '**/node_modules/tailwind-merge/**',
           '**/node_modules/.pnpm/**/tailwind-merge/**',
+          // Exclude source files that import React (client components)
+          // Only exclude if they're not needed by API routes
+          '**/src/**/*.client.tsx',
+          '**/src/**/*.client.ts',
+          '**/src/ui/**',
+          '**/src/components/**',
+          // Exclude Next.js client-side code
+          '**/node_modules/next/dist/client/**',
+          '**/node_modules/.pnpm/**/next/**/dist/client/**',
+          // Exclude other heavy dependencies that might be pulled in
+          '**/node_modules/@types/**',
+          '**/node_modules/.pnpm/**/@types/**',
         ],
         // Exclude Supabase from routes that don't use it (most routes)
         // Only keep Supabase for routes that explicitly need it
         '**/api/atlantico/**': [
           '**/node_modules/@supabase/**',
           '**/node_modules/.pnpm/**/@supabase/**',
+          '**/src/lib/supabase/**',
         ],
         '**/api/catalog/**': [
           '**/node_modules/@supabase/**',
           '**/node_modules/.pnpm/**/@supabase/**',
+          '**/src/lib/supabase/**',
         ],
         '**/api/backoffice/**': [
           '**/node_modules/@supabase/**',
           '**/node_modules/.pnpm/**/@supabase/**',
+          '**/src/lib/supabase/**',
         ],
         '**/api/debug/**': [
           '**/node_modules/@supabase/**',
           '**/node_modules/.pnpm/**/@supabase/**',
+          '**/src/lib/supabase/**',
+        ],
+        '**/api/curation/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+          '**/src/lib/supabase/**',
         ],
         // Routes that NEED Supabase - don't exclude it
         // (admin/curation/*, debug/supabase, debug/env)
