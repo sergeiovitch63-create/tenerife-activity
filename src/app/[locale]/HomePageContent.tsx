@@ -6,13 +6,11 @@ import { HeroVideoBackground } from '@/ui/components/hero'
 import { Link } from '@/navigation'
 import { Button } from '@/ui/components/shared/Button'
 import { applyCuration, sortExperiencesWithCuration } from '@/lib/vibes/curation'
+import { ActivityPacksSection } from '@/ui/sections/ActivityPacksSection'
 import type { Vibe } from '@/core/entities/vibe'
 import type { Experience } from '@/core/entities/experience'
 
-// Lazy load sections that are below the fold
-const ActivityPacksSection = lazy(() => 
-  import('@/ui/sections/ActivityPacksSection').then(m => ({ default: m.ActivityPacksSection }))
-)
+// Lazy load client components that are below the fold
 const PartnersSection = lazy(() => 
   import('@/ui/sections/PartnersSection').then(m => ({ default: m.PartnersSection }))
 )
@@ -124,7 +122,7 @@ export function HomePageContent({
         </div>
       </Section>
 
-      {/* Activity Packs Section - Lazy loaded */}
+      {/* Activity Packs Section */}
       <Suspense fallback={<div className="min-h-[400px]" />}>
         <ActivityPacksSection locale={locale} />
       </Suspense>
