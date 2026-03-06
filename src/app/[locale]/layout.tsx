@@ -84,6 +84,13 @@ export default async function LocaleLayout({
       <link rel="preconnect" href="https://api.atlanticoexcursiones.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://testapi.atlanticoexcursiones.com" crossOrigin="anonymous" />
       
+      {/* PWA Manifest */}
+      <link rel="manifest" href="/manifest.json" />
+      
+      {/* Optimize resource hints */}
+      <link rel="preload" href="/logo.png" as="image" fetchPriority="high" />
+      <link rel="preload" href="/images/hero-poster.jpg" as="image" fetchPriority="high" />
+      
       <Suspense fallback={null}>
         <AttributionCapture />
       </Suspense>
