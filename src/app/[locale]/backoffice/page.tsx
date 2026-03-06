@@ -727,7 +727,7 @@ export default function BackofficePage() {
                         )}
                           </button>
                           <a
-                            href={`/${locale}/debug/group-details?code=${encodeURIComponent(groupCode)}`}
+                            href={`/debug/group-details?code=${encodeURIComponent(groupCode)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex-shrink-0 text-xs text-ocean-600 hover:underline"

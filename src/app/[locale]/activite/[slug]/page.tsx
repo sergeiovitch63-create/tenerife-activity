@@ -157,7 +157,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
                 return (
                   <Link
                     key={`${t.id}-${t.code}`}
-                    href={`/${locale}/activite/group-details?code=${encodeURIComponent(codeStr)}`}
+                    href={`/activite/group-details?code=${encodeURIComponent(codeStr)}`}
                     className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-2xl"
                   >
                     <article className="glass-panel rounded-2xl border border-glass-200 overflow-hidden flex flex-col bg-white/90 hover:shadow-lg hover:-translate-y-1 smooth-transition cursor-pointer h-full">
