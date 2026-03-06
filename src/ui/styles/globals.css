@@ -59,11 +59,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Prevent layout shift during font load */
+    font-display: swap;
   }
   
   /* Font display optimization - show fallback immediately, swap when loaded */
   @font-face {
     font-family: system-ui;
+    font-display: swap;
+  }
+  
+  /* Optimize font loading - use system fonts for instant rendering */
+  * {
     font-display: swap;
   }
 

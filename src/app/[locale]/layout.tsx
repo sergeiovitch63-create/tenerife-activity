@@ -33,13 +33,24 @@ export async function generateMetadata({
     description: t('defaultDescription'),
   })
   
-  // Add icons metadata to prevent 404 for favicon
+  // Add icons and PWA metadata
   return {
     ...metadata,
     icons: {
       icon: '/icon.svg',
       shortcut: '/icon.svg',
       apple: '/icon.svg',
+    },
+    manifest: '/manifest.json',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: t('siteName'),
+    },
+    other: {
+      'mobile-web-app-capable': 'yes',
+      'apple-mobile-web-app-capable': 'yes',
+      'apple-mobile-web-app-status-bar-style': 'default',
     },
   }
 }

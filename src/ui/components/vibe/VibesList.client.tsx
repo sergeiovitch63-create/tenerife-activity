@@ -3,15 +3,17 @@
 import { useProgressiveRender } from '@/ui/hooks/useProgressiveRender'
 import { VibeRow } from './VibeRow'
 import type { Vibe } from '@/core/entities/vibe'
-import { useMemo, memo } from 'react'
+import { useMemo, memo, useRef } from 'react'
 
 interface VibesListProps {
   vibes: Vibe[]
 }
 
 function VibesListComponent({ vibes }: VibesListProps) {
+  // Use progressive rendering for better performance
+  // This renders items in batches as user scrolls
   const { visibleCount } = useProgressiveRender({
-    initialCount: Math.max(15, vibes.length),
+    initialCount: Math.max(15, Math.min(vibes.length, 20)), // Render first 15-20 items
     batchSize: 6,
     threshold: 500,
     totalCount: vibes.length,

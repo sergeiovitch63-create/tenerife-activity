@@ -1,4 +1,12 @@
 import '../ui/styles/globals.css'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  // Optimize font loading
+  other: {
+    'font-display': 'swap',
+  },
+}
 
 export default function RootLayout({
   children,
@@ -7,6 +15,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload critical fonts */}
+        <link
+          rel="preload"
+          href="/fonts/inter-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+      </head>
       <body>
         <div className="relative z-10 min-h-screen">{children}</div>
       </body>

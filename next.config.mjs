@@ -152,7 +152,7 @@ const nextConfig = {
     // Image sizes for responsive images
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Compression quality (75-85% is optimal for web)
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1 year cache for better performance
     // Enable image optimization even for local images
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
