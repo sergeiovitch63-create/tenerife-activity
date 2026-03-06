@@ -16,29 +16,8 @@ const nextConfig = {
   /* config options here */
   
   // Exclude heavy dependencies from Serverless Functions to stay under 250MB limit
-  // Using both serverExternalPackages and outputFileTracingExcludes for maximum effect
-  
-  // serverExternalPackages: exclude packages from Serverless Functions completely
-  // Available in Next.js 14.2.0+
-  serverExternalPackages: [
-    'react',
-    'react-dom',
-    'react/jsx-runtime',
-    'zustand',
-    '@supabase/supabase-js',
-    'playwright',
-    '@playwright/test',
-    'tsx',
-    'typescript',
-    'eslint',
-    'prettier',
-    'tailwindcss',
-    'autoprefixer',
-    'postcss',
-    'next-intl',
-    'clsx',
-    'tailwind-merge',
-  ],
+  // Using outputFileTracingExcludes for maximum effect
+  // Note: serverExternalPackages is only available in Next.js 15+, so we use outputFileTracingExcludes instead
   
   // Exclude debug routes and heavy dependencies from production build
   // This prevents Next.js from trying to collect page data for debug routes during build

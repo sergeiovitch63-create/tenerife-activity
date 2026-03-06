@@ -115,8 +115,8 @@ export function RecommendationsCarousel() {
             const href = getMustSeeHref(item.title)
             const linkKey = `row1-${item.title}-${index}`
             return (
-            <div key={linkKey} className="marquee-item">
-              <Link
+              <div key={linkKey} className="marquee-item">
+                <Link
                 ref={(el) => {
                   if (el) {
                     linkRefs.current.set(linkKey, el)
@@ -155,9 +155,10 @@ export function RecommendationsCarousel() {
                     </p>
                   )}
                 </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -170,8 +171,8 @@ export function RecommendationsCarousel() {
             const href = getMustSeeHref(item.title)
             const linkKey = `row2-${item.title}-${index}`
             return (
-            <div key={linkKey} className="marquee-item">
-              <Link
+              <div key={linkKey} className="marquee-item">
+                <Link
                 ref={(el) => {
                   if (el) {
                     linkRefs.current.set(linkKey, el)
@@ -210,9 +211,10 @@ export function RecommendationsCarousel() {
                     </p>
                   )}
                 </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
