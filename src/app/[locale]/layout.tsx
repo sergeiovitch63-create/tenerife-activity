@@ -67,6 +67,12 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      {/* DNS Prefetch and Preconnect for faster API connections */}
+      <link rel="dns-prefetch" href="https://api.atlanticoexcursiones.com" />
+      <link rel="dns-prefetch" href="https://testapi.atlanticoexcursiones.com" />
+      <link rel="preconnect" href="https://api.atlanticoexcursiones.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://testapi.atlanticoexcursiones.com" crossOrigin="anonymous" />
+      
       <Suspense fallback={null}>
         <AttributionCapture />
       </Suspense>
