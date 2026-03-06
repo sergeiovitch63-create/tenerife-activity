@@ -155,6 +155,17 @@ const nextConfig = {
   // Image configuration for remote domains
   // Required for Next/Image component
   images: {
+    // Enable modern image formats (AVIF > WebP > JPEG)
+    formats: ['image/avif', 'image/webp'],
+    // Device sizes optimized for mobile-first approach
+    deviceSizes: [320, 420, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Image sizes for responsive images
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Compression quality (75-85% is optimal for web)
+    minimumCacheTTL: 60,
+    // Enable image optimization even for local images
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       // Atlantico API / assets hosts (env-driven - highest priority)
       ...[

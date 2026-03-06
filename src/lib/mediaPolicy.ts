@@ -35,7 +35,13 @@ export function isSlowConnection(): boolean {
  * Check if videos should be disabled (slow connection or save-data)
  */
 export function shouldDisableVideos(): boolean {
-  return hasSaveData() || isSlowConnection()
+  // Import dynamically to avoid circular dependency
+  try {
+    const { shouldDisableVideosForConnection } = require('@/lib/mobile/connection')
+    return hasSaveData() || isSlowConnection() || shouldDisableVideosForConnection()
+  } catch {
+    return hasSaveData() || isSlowConnection()
+  }
 }
 
 /**

@@ -65,11 +65,10 @@ export function SafeImage({ src, fallbackSrc = DEFAULT_FALLBACK, fill, sizes, ..
     }
   }
 
-  // Bypass Next/Image optimization for local images and API routes
-  // This prevents /_next/image 400 errors when src is /images/... or /api/...
-  const isLocal = typeof currentSrc === 'string' && currentSrc.startsWith('/images/')
+  // Only bypass optimization for API routes (dynamic content)
+  // Local images in /images/ should be optimized by Next.js
   const isApi = typeof currentSrc === 'string' && currentSrc.startsWith('/api/')
-  const unoptimized = isLocal || isApi
+  const unoptimized = isApi
 
   // Ensure sizes is set when fill is used
   const finalSizes = fill && !sizes ? '100vw' : sizes

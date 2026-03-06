@@ -11,6 +11,8 @@ import { vibeSlugToTranslationKey } from './vibe-translations'
 import { vibeThumbnails } from '@/data/vibeThumbnails'
 import Image from 'next/image'
 import { devWarn, devError } from '@/lib/dev'
+import { setupPrefetchOnInteraction } from '@/lib/mobile/prefetch'
+import { useEffect } from 'react'
 
 // Mapping of vibe slugs to video files
 // MISSING VIDEOS NOW ADDED: vip-tours, car-rental, bike-rental, transfers-transport
@@ -64,9 +66,17 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
   
   const [isVideoReady, setIsVideoReady] = useState(false)
   const [hasVideoError, setHasVideoError] = useState(false)
+  const linkRef = useRef<HTMLAnchorElement>(null)
 
   // Register with video playback manager
   const containerRef = useVibeVideoPlayback(vibe.id, videoRef)
+
+  // Setup intelligent prefetching for mobile
+  useEffect(() => {
+    if (!linkRef.current) return
+    const cleanup = setupPrefetchOnInteraction(linkRef.current, `/activite/${vibe.slug}`)
+    return cleanup
+  }, [vibe.slug])
 
   const handleClick = () => {
     trackingProvider.track({ type: 'vibe_opened', vibeId: vibe.id })
@@ -74,6 +84,7 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
 
   return (
     <Link
+      ref={linkRef}
       href={`/activite/${vibe.slug}`}
       prefetch={true}
       onClick={handleClick}

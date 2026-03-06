@@ -55,6 +55,16 @@
   body {
     @apply text-glass-900 antialiased;
     position: relative;
+    /* Optimize font rendering for mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Font display optimization - show fallback immediately, swap when loaded */
+  @font-face {
+    font-family: system-ui;
+    font-display: swap;
   }
 
   /* Dark overlay for readability - reduced opacity to reveal ocean colors */

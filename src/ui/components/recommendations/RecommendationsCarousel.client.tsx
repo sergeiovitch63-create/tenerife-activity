@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { getMustSeeHref } from '@/data/must-see-group-mapping'
+import { setupPrefetchOnInteraction } from '@/lib/mobile/prefetch'
 
 interface MustSeeItem {
   title: string
@@ -62,6 +63,7 @@ const mustSeeRow2: MustSeeItem[] = [
 export function RecommendationsCarousel() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
 
   // Duplicate items multiple times for seamless looping (4x for smooth infinite feel)
   const row1Duplicated = [
@@ -109,11 +111,23 @@ export function RecommendationsCarousel() {
         className={`marquee-row ${prefersReducedMotion ? 'marquee-disabled' : 'marquee-left'} ${isHovered && !prefersReducedMotion ? 'marquee-paused' : ''}`}
       >
         <div className="marquee-track">
-          {row1Duplicated.map((item, index) => (
-            <div key={`row1-${item.title}-${index}`} className="marquee-item">
+          {row1Duplicated.map((item, index) => {
+            const href = getMustSeeHref(item.title)
+            const linkKey = `row1-${item.title}-${index}`
+            return (
+            <div key={linkKey} className="marquee-item">
               <Link
-                href={getMustSeeHref(item.title)}
+                ref={(el) => {
+                  if (el) linkRefs.current.set(linkKey, el)
+                  else linkRefs.current.delete(linkKey)
+                }}
+                href={href}
+                prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
+                onTouchStart={() => {
+                  const link = linkRefs.current.get(linkKey)
+                  if (link) setupPrefetchOnInteraction(link, href)
+                }}
               >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
@@ -150,11 +164,23 @@ export function RecommendationsCarousel() {
         className={`marquee-row mt-4 ${prefersReducedMotion ? 'marquee-disabled' : 'marquee-right'} ${isHovered && !prefersReducedMotion ? 'marquee-paused' : ''}`}
       >
         <div className="marquee-track">
-          {row2Duplicated.map((item, index) => (
-            <div key={`row2-${item.title}-${index}`} className="marquee-item">
+          {row2Duplicated.map((item, index) => {
+            const href = getMustSeeHref(item.title)
+            const linkKey = `row2-${item.title}-${index}`
+            return (
+            <div key={linkKey} className="marquee-item">
               <Link
-                href={getMustSeeHref(item.title)}
+                ref={(el) => {
+                  if (el) linkRefs.current.set(linkKey, el)
+                  else linkRefs.current.delete(linkKey)
+                }}
+                href={href}
+                prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
+                onTouchStart={() => {
+                  const link = linkRefs.current.get(linkKey)
+                  if (link) setupPrefetchOnInteraction(link, href)
+                }}
               >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">

@@ -124,7 +124,7 @@ export function Header() {
       )
     }
     return (
-      <Link href={href} className={linkClass}>
+      <Link href={href} prefetch={true} className={linkClass}>
         {children}
       </Link>
     )
