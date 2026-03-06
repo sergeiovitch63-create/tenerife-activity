@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 
@@ -64,7 +64,7 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
         {tours.map((t) => (
             <Link
               key={`${t.id}-${t.code}`}
-              href={`/${locale}/debug/group-details?code=${encodeURIComponent(String(t.code))}`}
+              href={`/debug/group-details?code=${encodeURIComponent(String(t.code))}`}
               className="block rounded-xl border border-glass-200 overflow-hidden bg-white hover:shadow-md hover:border-ocean-200 transition-all"
             >
               <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
