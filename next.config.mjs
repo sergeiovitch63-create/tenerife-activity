@@ -47,9 +47,18 @@ const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
     experimental: {
       outputFileTracingExcludes: {
+        // Exclude large static assets from ALL Serverless Functions
+        // public/images/pictures is 261MB and should not be bundled in functions
+        // These are static assets served directly by Vercel, not needed in functions
         '*': [
           '**/api/debug/**',
           '**/api/atlantico/debug/**',
+          '**/public/images/pictures/**',
+          '**/public/images/**/*.jpg',
+          '**/public/images/**/*.jpeg',
+          '**/public/images/**/*.png',
+          '**/public/images/**/*.webp',
+          '**/public/images/**/*.gif',
         ],
         // Exclude heavy dependencies from ALL API routes by default
         // This significantly reduces bundle size for Vercel Functions (250mb limit)
