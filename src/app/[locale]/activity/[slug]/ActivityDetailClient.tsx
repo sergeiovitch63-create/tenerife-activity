@@ -2,7 +2,7 @@
 
 /**
  * Activity Detail Client Component
- * 
+ *
  * Displays activity details with:
  * - Hero image
  * - Title
@@ -16,12 +16,16 @@
 
 import { SafeImage } from '@/components/SafeImage'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
-import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { decodeTextFromApi, sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { FaqSections } from '@/components/atlantico/FaqSections'
+import { OverviewInfoBar } from '@/components/atlantico/OverviewInfoBar'
 import { buildWhatsAppUrl, buildCallUrl } from '@/lib/booking/contactHelpers'
 import { MeetingPointsDisplay } from '@/components/booking/MeetingPointsDisplay'
 import { extractImageUrls } from '@/lib/atlantico/images.client'
+import { GROUP_DETAILS_IMAGES } from '@/data/group-details-images.generated'
 
 type EventOption = {
   eventId: string
@@ -137,6 +141,7 @@ export function ActivityDetailClient({
   eventOptions,
   heroImageUrl,
 }: ActivityDetailClientProps) {
+  const tGroup = useTranslations('groupDetails')
   const [selectedTab, setSelectedTab] = useState<'overview' | 'whats-included' | 'description' | 'what-you-do' | 'details' | 'prices' | 'cancellation' | 'reviews'>('overview')
   
   // Check if this is activity 508 for custom tab layout
@@ -1080,7 +1085,9 @@ export function ActivityDetailClient({
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="text-white font-semibold text-sm">VIP Experience</span>
+                  <span className="text-white font-semibold text-sm">
+                    {tGroup('badgeVip')}
+                  </span>
                 </div>
                 
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
@@ -1094,7 +1101,9 @@ export function ActivityDetailClient({
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-white font-medium">{groupDetails.duration} hours</span>
+                      <span className="text-white font-medium">
+                        {groupDetails.duration} {tGroup('labels.hours')}
+                      </span>
                     </div>
                   )}
                   {groupBasePrice && (
@@ -1102,7 +1111,9 @@ export function ActivityDetailClient({
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-white font-medium">From {formatEUR(groupBasePrice)}</span>
+                      <span className="text-white font-medium">
+                        {tGroup('options.priceFrom', { price: formatEUR(groupBasePrice) })}
+                      </span>
                     </div>
                   )}
                   {groupDetails?.childAge && (
@@ -1110,7 +1121,9 @@ export function ActivityDetailClient({
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                      <span className="text-white font-medium">Child: {groupDetails.childAge}</span>
+                      <span className="text-white font-medium">
+                        {tGroup('labels.childShort')}: {groupDetails.childAge}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1127,7 +1140,9 @@ export function ActivityDetailClient({
               {/* Premium Tabs */}
               <div className="border-b-2 border-glass-200">
                 <div className="flex space-x-1">
-                  {(['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const).map((tab) => (
+                  {(['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const)
+                    .filter((tab) => tab !== 'what-you-do' || item.groupCode !== '340')
+                    .map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setSelectedTab(tab)}
@@ -1137,10 +1152,15 @@ export function ActivityDetailClient({
                           : 'text-glass-500 border-transparent hover:text-glass-700 hover:border-glass-300'
                       }`}
                     >
-                      {tab === 'whats-included' ? "What's Included" : 
-                       tab === 'what-you-do' ? "What You Do" :
-                       tab === 'cancellation' ? 'Cancellation' :
-                       tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {tab === 'whats-included'
+                        ? tGroup('tabs.included')
+                        : tab === 'what-you-do'
+                        ? tGroup('tabs.whatYouDo')
+                        : tab === 'cancellation'
+                        ? tGroup('tabs.cancellation')
+                        : tab === 'description'
+                        ? tGroup('tabs.description')
+                        : tGroup('tabs.overview')}
                       {selectedTab === tab && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-ocean-600" />
                       )}
@@ -1153,6 +1173,34 @@ export function ActivityDetailClient({
               <div className="pt-8">
                 {selectedTab === 'overview' && (
                   <div className="space-y-8">
+                    {/* What you do - above Overview */}
+                    {groupDetails?.willDo && item.groupCode !== '340' && (
+                      <div>
+                        <h2 className="text-3xl font-bold text-glass-900 mb-6">
+                          {tGroup('tabs.whatYouDo')}
+                        </h2>
+                        <div
+                          className="prose prose-lg max-w-none text-glass-700 leading-relaxed"
+                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.willDo)}
+                        />
+                      </div>
+                    )}
+                    {/* Overview highlights (first 2 sentences of desc) */}
+                    {groupDetails?.desc && (() => {
+                      const raw = decodeTextFromApi(groupDetails.desc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                      const sentences = raw.split('. ').filter(Boolean)
+                      const highlights = sentences.slice(0, 2)
+                      return highlights.length > 0 ? (
+                        <div className="space-y-3 mb-6">
+                          {highlights.map((s, i) => (
+                            <div key={i} className="flex items-start gap-2">
+                              <span>🌟</span>
+                              <span className="font-semibold text-gray-800">{s}{!s.endsWith('.') ? '.' : ''}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null
+                    })()}
                     {/* Icons */}
                     {groupDetails?.icons && Array.isArray(groupDetails.icons) && groupDetails.icons.length > 0 && (
                       <div className="flex flex-wrap gap-3">
@@ -1165,7 +1213,9 @@ export function ActivityDetailClient({
                     {/* Gallery */}
                     {allImages.length > 0 && (
                       <div>
-                        <h3 className="text-3xl font-bold text-glass-900 mb-6">Photo Gallery</h3>
+                        <h3 className="text-3xl font-bold text-glass-900 mb-6">
+                          {tGroup('overview.photoGallery', { default: 'Photo Gallery' })}
+                        </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                           {allImages.map((imgUrl: string, idx: number) => {
                             if (!imgUrl || !imgUrl.trim()) return null
@@ -1190,50 +1240,31 @@ export function ActivityDetailClient({
 
                 {selectedTab === 'whats-included' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-glass-900 mb-8">What's Included</h2>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">
+                      {tGroup('included.title')}
+                    </h2>
+                    {item.groupCode === '326' && (
+                      <p className="text-sm font-semibold text-amber-700 bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
+                        IMPORTANT: Proof of identity is required. Without this documentation, access to the ferry may be denied.
+                      </p>
+                    )}
                     {groupDetails?.faq ? (
                       <div className="space-y-4">
-                        {(() => {
-                          const includesList = parseIncludesList(groupDetails.faq)
-                          if (includesList.length > 0) {
-                            return (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {includesList.map((item, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-start gap-4 p-6 bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl border border-ocean-100 hover:border-ocean-200 hover:shadow-lg transition-all group"
-                                  >
-                                    <div className="flex-shrink-0 mt-1">
-                                      <div className="w-8 h-8 rounded-full bg-ocean-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                      </div>
-                                    </div>
-                                    <p className="text-glass-800 font-medium leading-relaxed text-lg flex-1">{item}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            )
-                          } else {
-                            return (
-                              <div
-                                className="prose prose-lg max-w-none"
-                                dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.faq)}
-                              />
-                            )
-                          }
-                        })()}
+                        <FaqSections faq={groupDetails.faq} fallbackRaw />
                       </div>
                     ) : (
-                      <p className="text-glass-500">Information not available.</p>
+                      <p className="text-glass-500">
+                        {tGroup('included.noInfo')}
+                      </p>
                     )}
                   </div>
                 )}
 
                 {selectedTab === 'cancellation' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-glass-900 mb-8">Cancellation Policy</h2>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">
+                      {tGroup('cancellation.title')}
+                    </h2>
                     {groupDetails?.canDesc || groupDetails?.canTitle ? (
                       <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-8 border-2 border-green-200 shadow-lg">
                         {groupDetails.canTitle && (
@@ -1254,19 +1285,35 @@ export function ActivityDetailClient({
                         )}
                       </div>
                     ) : (
-                      <p className="text-glass-500">Cancellation policy information not available.</p>
+                      <p className="text-glass-500">
+                        {tGroup('cancellation.noInfo')}
+                      </p>
                     )}
                   </div>
                 )}
 
                 {selectedTab === 'description' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-glass-900 mb-8">Description</h2>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">
+                      {tGroup('description.title')}
+                    </h2>
                     {groupDetails?.desc ? (
                       <div className="space-y-6">
-                        <div className="prose prose-lg max-w-none text-glass-800 leading-relaxed">
-                          <div dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)} />
-                        </div>
+                        {(() => {
+                          const raw = decodeTextFromApi(groupDetails.desc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                          const sentences = raw.split('. ').filter(Boolean)
+                          const rest = sentences.slice(2).join('. ')
+                          return rest ? (
+                            <p className="text-gray-500 leading-relaxed prose prose-lg max-w-none">
+                              {rest}
+                              {!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}
+                            </p>
+                          ) : (
+                            <p className="text-glass-500">
+                              {tGroup('description.noDescription')}
+                            </p>
+                          )
+                        })()}
                         
                         {/* Info Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
@@ -1279,8 +1326,12 @@ export function ActivityDetailClient({
                                   </svg>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-glass-600 font-medium">Duration</p>
-                                  <p className="text-2xl font-bold text-glass-900">{groupDetails.duration} hours</p>
+                                  <p className="text-sm text-glass-600 font-medium">
+                                    {tGroup('labels.duration')}
+                                  </p>
+                                  <p className="text-2xl font-bold text-glass-900">
+                                    {groupDetails.duration} {tGroup('labels.hours')}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -1295,7 +1346,9 @@ export function ActivityDetailClient({
                                   </svg>
                                 </div>
                                 <div>
-                                  <p className="text-sm text-glass-600 font-medium">Child Age</p>
+                                  <p className="text-sm text-glass-600 font-medium">
+                                    {tGroup('labels.childAge')}
+                                  </p>
                                   <p className="text-2xl font-bold text-glass-900">{groupDetails.childAge}</p>
                                 </div>
                               </div>
@@ -1304,14 +1357,18 @@ export function ActivityDetailClient({
                         </div>
                       </div>
                     ) : (
-                      <p className="text-glass-500">No description available.</p>
+                      <p className="text-glass-500">
+                        {tGroup('description.noDescriptionShort')}
+                      </p>
                     )}
                   </div>
                 )}
 
-                {selectedTab === 'what-you-do' && (
+                {selectedTab === 'what-you-do' && item.groupCode !== '340' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-glass-900 mb-8">What You Do</h2>
+                    <h2 className="text-3xl font-bold text-glass-900 mb-8">
+                      {tGroup('tabs.whatYouDo')}
+                    </h2>
                     {groupDetails?.willDo ? (
                       <div className="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 rounded-2xl p-8 border-2 border-purple-200 shadow-lg">
                         <div
@@ -1320,7 +1377,9 @@ export function ActivityDetailClient({
                         />
                       </div>
                     ) : (
-                      <p className="text-glass-500">Information not available.</p>
+                      <p className="text-glass-500">
+                        {tGroup('included.noInfo')}
+                      </p>
                     )}
                   </div>
                 )}
@@ -1396,10 +1455,10 @@ export function ActivityDetailClient({
                               </button>
                             </div>
                             
-                            {/* Calendar Grid */}
+                            {/* Calendar Grid - Monday first */}
                             <div className="grid grid-cols-7 gap-1 mb-2">
-                              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
-                                <div key={day} className="text-center text-xs font-semibold text-glass-600 py-1">
+                              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+                                <div key={`${day}-${i}`} className="text-center text-xs font-semibold text-glass-600 py-1">
                                   {day}
                                 </div>
                               ))}
@@ -1413,7 +1472,8 @@ export function ActivityDetailClient({
                                 const firstDay = new Date(year, month - 1, 1)
                                 const lastDay = new Date(year, month, 0)
                                 const daysInMonth = lastDay.getDate()
-                                const startingDayOfWeek = firstDay.getDay()
+                                // Monday=0, Sunday=6 (European week start)
+                                const startingDayOfWeek = (firstDay.getDay() + 6) % 7
                                 const today = new Date()
                                 today.setHours(0, 0, 0, 0)
                                 
@@ -1641,11 +1701,19 @@ export function ActivityDetailClient({
   }
 
   // Default layout for other activities
+  // Desktop: gallery = big image left + vertical grid right; options (title, price, duration, selector, tabs) on the right
+  const galleryImages = allImages.length > 0 ? allImages : (heroImage ? [heroImage] : [])
+  const mainGalleryImage = galleryImages[0] ?? heroImage
+  const sideGalleryImages = galleryImages.slice(1, 5) // up to 4 small images on the right
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="relative w-full h-96 bg-ocean-600 overflow-hidden">
-        {/* SPECIAL CASE: Event 303 - Image Carousel */}
-        {item.groupCode === '303' ? (
+      {/* Hero / Gallery section */}
+      <div className="relative w-full overflow-hidden">
+        {/* Mobile: single hero as before */}
+        <div className="relative w-full h-96 lg:hidden">
+          {/* SPECIAL CASE: Event 303 - Image Carousel */}
+          {item.groupCode === '303' ? (
           <>
             {/* Carousel Images */}
             <div className="absolute inset-0" style={{ zIndex: 0 }}>
@@ -1748,8 +1816,8 @@ export function ActivityDetailClient({
           </>
         )}
         
-        {/* Title overlay on hero */}
-        <div className="absolute bottom-0 left-0 right-0 p-8" style={{ zIndex: 2 }}>
+        {/* Title overlay on hero - mobile only */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 lg:hidden" style={{ zIndex: 2 }}>
           <h1 className="text-4xl font-bold text-white mb-2">{item.title}</h1>
           {eventDetails?.times && eventDetails.times.length > 0 && (
             <p className="text-white/90">Duration: {eventDetails.times.length}</p>
@@ -1757,25 +1825,112 @@ export function ActivityDetailClient({
         </div>
       </div>
 
-      <div className="container mx-auto px-4 max-w-7xl py-8">
-        {/* Title */}
-        <h1 className="text-4xl font-bold text-glass-900 mb-4">{item.title}</h1>
-
-        {/* Price "from" */}
-        {groupBasePrice && groupBasePrice > 0 && (
-          <div className="mb-6">
-            <span className="text-2xl font-semibold text-ocean-600">
-              From {formatEUR(groupBasePrice)}
-            </span>
+        {/* Desktop: gallery (big left + grid right) + options panel right */}
+        <div className="hidden lg:grid lg:grid-cols-12 lg:min-h-[420px] lg:gap-0">
+          {/* Left: main image */}
+          <div className="relative lg:col-span-8 min-h-[320px] bg-ocean-600">
+            {mainGalleryImage && (
+              <>
+                <SafeImage
+                  src={mainGalleryImage}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                {(groupDetails?.duration || eventDetails?.times) && (
+                  <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-glass-800 text-sm font-medium">
+                    <svg className="w-4 h-4 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {groupDetails?.duration ? `${groupDetails.duration} hrs` : eventDetails?.times?.length ? `${eventDetails.times.length} hrs` : null}
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
+          {/* Right: vertical image grid */}
+          <div className="lg:col-span-2 flex flex-col gap-1 bg-glass-100">
+            {sideGalleryImages.map((src, idx) => (
+              <div key={idx} className="relative flex-1 min-h-[80px] w-full">
+                <SafeImage
+                  src={src}
+                  alt={`${item.title} ${idx + 2}`}
+                  fill
+                  sizes="16vw"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          {/* Right: options panel */}
+          <div className="lg:col-span-2 flex flex-col bg-white border-l border-glass-200 p-6 overflow-y-auto">
+            <h1 className="text-2xl font-bold text-glass-900 mb-2">{item.title}</h1>
+            {groupBasePrice != null && groupBasePrice > 0 && (
+              <p className="text-xl font-semibold text-ocean-600 mb-4">desde: {formatEUR(groupBasePrice)}</p>
+            )}
+            {groupDetails?.duration && (
+              <p className="text-sm text-glass-600 mb-4">{groupDetails.duration} hrs</p>
+            )}
+            {eventOptions.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-glass-500 uppercase tracking-wide mb-2">Options</p>
+                <div className="flex flex-col gap-2">
+                  {eventOptions.map((opt) => (
+                    <button
+                      key={opt.eventId}
+                      type="button"
+                      onClick={() => setSelectedEventId(opt.eventId)}
+                      className={`text-left px-3 py-2 rounded-lg border text-sm transition-all ${
+                        selectedEventId === opt.eventId
+                          ? 'border-ocean-600 bg-ocean-50 text-ocean-700 font-medium'
+                          : 'border-glass-300 hover:border-ocean-300 text-glass-800'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Tabs in options panel */}
+            <div className="border-t border-glass-200 pt-4 mt-auto">
+              <div className="flex flex-wrap gap-1">
+                {(['overview', 'description', 'details', 'prices', 'cancellation', 'reviews'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setSelectedTab(tab)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      selectedTab === tab
+                        ? 'bg-ocean-600 text-white'
+                        : 'bg-glass-100 text-glass-700 hover:bg-glass-200'
+                    }`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+      </div>
+      </div>
+
+      <div className="container mx-auto px-4 max-w-7xl py-8">
+        {/* Title + Price - mobile only (on desktop they are in the options panel) */}
+        <div className="lg:hidden mb-6">
+          <h1 className="text-4xl font-bold text-glass-900 mb-4">{item.title}</h1>
+          {groupBasePrice != null && groupBasePrice > 0 && (
+            <span className="text-2xl font-semibold text-ocean-600">From {formatEUR(groupBasePrice)}</span>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Available Options */}
+            {/* Available Options - mobile/tablet only (on desktop they are in the right options panel) */}
             {eventOptions.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-6 lg:hidden">
                 <h2 className="text-xl font-semibold text-glass-900 mb-2">Available Options</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {eventOptions.map((opt) => (
@@ -1826,12 +1981,14 @@ export function ActivityDetailClient({
               </div>
             )}
 
-            {/* Tabs */}
-            <div className="border-b border-glass-200 mb-6">
+            {/* Tabs - mobile/tablet only (on desktop tabs are in the right options panel) */}
+            <div className="border-b border-glass-200 mb-6 lg:hidden">
               <div className="flex space-x-4">
                 {isActivity508 ? (
                   // Custom tab order for activity 508
-                  (['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const).map((tab) => (
+                  (['overview', 'whats-included', 'cancellation', 'description', 'what-you-do'] as const)
+                    .filter((tab) => tab !== 'what-you-do' || item.groupCode !== '340')
+                    .map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setSelectedTab(tab)}
@@ -1841,10 +1998,15 @@ export function ActivityDetailClient({
                           : 'border-transparent text-glass-600 hover:text-glass-900'
                       }`}
                     >
-                      {tab === 'whats-included' ? "What's Included" : 
-                       tab === 'what-you-do' ? "What you do" :
-                       tab === 'cancellation' ? 'Cancellation Policy' :
-                       tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      {tab === 'whats-included'
+                        ? tGroup('tabs.included')
+                        : tab === 'what-you-do'
+                        ? tGroup('tabs.whatYouDo')
+                        : tab === 'cancellation'
+                        ? tGroup('tabs.cancellation')
+                        : tab === 'description'
+                        ? tGroup('tabs.description')
+                        : tGroup('tabs.overview')}
                     </button>
                   ))
                 ) : (
@@ -1873,6 +2035,34 @@ export function ActivityDetailClient({
                   {isActivity508 ? (
                     // Premium layout for activity 508
                     <>
+                      {/* What you do - above Overview */}
+                      {groupDetails?.willDo && item.groupCode !== '340' && (
+                        <div className="mb-8">
+                          <h2 className="text-2xl font-bold text-glass-900 mb-4">
+                            {tGroup('tabs.whatYouDo')}
+                          </h2>
+                          <div
+                            className="prose prose-sm max-w-none text-glass-700 leading-relaxed"
+                            dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.willDo)}
+                          />
+                        </div>
+                      )}
+                      {/* Overview highlights (first 2 sentences of desc) */}
+                      {groupDetails?.desc && (() => {
+                        const raw = decodeTextFromApi(groupDetails.desc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                        const sentences = raw.split('. ').filter(Boolean)
+                        const highlights = sentences.slice(0, 2)
+                        return highlights.length > 0 ? (
+                          <div className="space-y-3 mb-6">
+                            {highlights.map((s, i) => (
+                              <div key={i} className="flex items-start gap-2">
+                                <span>🌟</span>
+                                <span className="font-semibold text-gray-800">{s}{!s.endsWith('.') ? '.' : ''}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null
+                      })()}
                       {/* Hero section with key info */}
                       <div className="mb-8">
                         <div className="flex flex-wrap items-center gap-4 mb-4">
@@ -1881,7 +2071,9 @@ export function ActivityDetailClient({
                               <svg className="w-5 h-5 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
-                              <span className="font-medium">{groupDetails.duration} hours</span>
+                              <span className="font-medium">
+                                {groupDetails.duration} {tGroup('labels.hours')}
+                              </span>
                             </div>
                           )}
                           {groupDetails?.childAge && (
@@ -1889,7 +2081,9 @@ export function ActivityDetailClient({
                               <svg className="w-5 h-5 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                               </svg>
-                              <span className="font-medium">Child: {groupDetails.childAge}</span>
+                              <span className="font-medium">
+                                {tGroup('labels.childShort')}: {groupDetails.childAge}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -1969,14 +2163,16 @@ export function ActivityDetailClient({
 
               {selectedTab === 'description' && (
                 <div>
-                  <h2>Description</h2>
+                  <h2>{tGroup('description.title')}</h2>
                   {item.description ? (
                     <div
                       className="prose prose-sm max-w-none"
                       dangerouslySetInnerHTML={sanitizeAtlanticoHtml(item.description)}
                     />
                   ) : (
-                    <p className="text-glass-500">No description available.</p>
+                    <p className="text-glass-500">
+                      {tGroup('description.noDescriptionShort')}
+                    </p>
                   )}
                 </div>
               )}
@@ -2351,49 +2547,31 @@ export function ActivityDetailClient({
 
               {selectedTab === 'whats-included' && (
                 <div>
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">What's Included</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">
+                    {tGroup('included.title')}
+                  </h2>
+                  {item.groupCode === '326' && (
+                    <p className="text-sm font-semibold text-amber-700 bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
+                      IMPORTANT: Proof of identity is required. Without this documentation, access to the ferry may be denied.
+                    </p>
+                  )}
                   {groupDetails?.faq ? (
                     <div className="space-y-4">
-                      {(() => {
-                        const includesList = parseIncludesList(groupDetails.faq)
-                        if (includesList.length > 0) {
-                          return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {includesList.map((item, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-start gap-3 p-4 bg-gradient-to-br from-ocean-50 to-blue-50 rounded-lg border border-ocean-100 hover:border-ocean-200 transition-colors"
-                                >
-                                  <div className="flex-shrink-0 mt-0.5">
-                                    <svg className="w-5 h-5 text-ocean-600" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                  </div>
-                                  <p className="text-glass-800 font-medium leading-relaxed">{item}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )
-                        } else {
-                          // Fallback to HTML rendering if parsing didn't work
-                          return (
-                            <div
-                              className="prose prose-lg max-w-none"
-                              dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.faq)}
-                            />
-                          )
-                        }
-                      })()}
+                      <FaqSections faq={groupDetails.faq} fallbackRaw />
                     </div>
                   ) : (
-                    <p className="text-glass-500">Information not available.</p>
+                    <p className="text-glass-500">
+                      {tGroup('included.noInfo')}
+                    </p>
                   )}
                 </div>
               )}
 
               {selectedTab === 'cancellation' && (
                 <div>
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">Cancellation Policy</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">
+                    {tGroup('cancellation.title')}
+                  </h2>
                   {groupDetails?.canDesc || groupDetails?.canTitle ? (
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
                       {groupDetails.canTitle && (
@@ -2414,14 +2592,18 @@ export function ActivityDetailClient({
                       )}
                     </div>
                   ) : (
-                    <p className="text-glass-500">Cancellation policy information not available.</p>
+                    <p className="text-glass-500">
+                      {tGroup('cancellation.noInfo')}
+                    </p>
                   )}
                 </div>
               )}
 
-              {selectedTab === 'what-you-do' && isActivity508 && (
+              {selectedTab === 'what-you-do' && isActivity508 && item.groupCode !== '340' && (
                 <div>
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">What you do</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">
+                    {tGroup('tabs.whatYouDo')}
+                  </h2>
                   {groupDetails?.willDo ? (
                     <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-8 border border-purple-200">
                       <div
@@ -2430,7 +2612,9 @@ export function ActivityDetailClient({
                       />
                     </div>
                   ) : (
-                    <p className="text-glass-500">Information not available.</p>
+                    <p className="text-glass-500">
+                      {tGroup('included.noInfo')}
+                    </p>
                   )}
                 </div>
               )}
@@ -2442,9 +2626,16 @@ export function ActivityDetailClient({
                     // Premium layout for activity 508
                     groupDetails?.desc ? (
                       <div className="space-y-6">
-                        <div className="prose prose-lg max-w-none text-glass-800 leading-relaxed">
-                          <div dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)} />
-                        </div>
+                        {(() => {
+                          const raw = decodeTextFromApi(groupDetails.desc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                          const sentences = raw.split('. ').filter(Boolean)
+                          const rest = sentences.slice(2).join('. ')
+                          return rest ? (
+                            <p className="text-gray-500 leading-relaxed prose prose-lg max-w-none">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
+                          ) : (
+                            <p className="text-glass-500">No additional description.</p>
+                          )
+                        })()}
                         
                         {/* Additional info cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
@@ -2606,7 +2797,7 @@ export function ActivityDetailClient({
                   </div>
                 {/* Calendar Header */}
                 <div className="grid grid-cols-7 gap-1 mb-2">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                     <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">
                       {day}
                     </div>
@@ -2622,7 +2813,8 @@ export function ActivityDetailClient({
                     const firstDay = new Date(year, month - 1, 1)
                     const lastDay = new Date(year, month, 0)
                     const daysInMonth = lastDay.getDate()
-                    const startingDayOfWeek = firstDay.getDay() // 0 = Sunday
+                    // Monday=0, Sunday=6 (European week start)
+                    const startingDayOfWeek = (firstDay.getDay() + 6) % 7
                     const today = new Date()
                     today.setHours(0, 0, 0, 0)
 
