@@ -61,7 +61,7 @@ export function HeroVideoBackground({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           controls={false}
           disablePictureInPicture
           poster={poster}

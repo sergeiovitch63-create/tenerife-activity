@@ -125,6 +125,7 @@ export function RecommendationsCarousel() {
                     className="w-full h-full object-cover"
                     sizes="(max-width: 768px) 128px, 160px"
                     loading="lazy"
+                    priority={index < 4}
                   />
                 </div>
                 {/* Title Below Card */}
@@ -165,6 +166,7 @@ export function RecommendationsCarousel() {
                     className="w-full h-full object-cover"
                     sizes="(max-width: 768px) 128px, 160px"
                     loading="lazy"
+                    priority={index < 4}
                   />
                 </div>
                 {/* Title Below Card */}

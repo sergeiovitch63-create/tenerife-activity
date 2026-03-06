@@ -145,7 +145,18 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
                       sizes="(max-width: 768px) 100vw, 41.666667vw"
                       loading="lazy"
                       decoding="async"
+                      priority={index < 3}
                     />
+                  </div>
+                )}
+                
+                {/* Skeleton loader - shows while video is loading */}
+                {!isVideoReady && !hasVideoError && !vibeThumbnail && (
+                  <div
+                    className="absolute inset-0 w-full h-full pointer-events-none animate-pulse"
+                    style={{ zIndex: 1 }}
+                  >
+                    <div className="w-full h-full bg-gradient-to-br from-ocean-200 via-ocean-300 to-ocean-400" />
                   </div>
                 )}
 

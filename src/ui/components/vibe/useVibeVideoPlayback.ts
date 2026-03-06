@@ -143,20 +143,37 @@ class VideoPlaybackManager {
     video.muted = true
     video.loop = true
     video.playsInline = true
-    video.preload = 'none' // Changed to 'none' for better performance
+    video.preload = 'metadata' // Load metadata for faster playback when visible
+
+    // Prefetch video when container is near viewport (within 200px)
+    const prefetchObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && video.preload === 'metadata') {
+            // Prefetch video when it's close to viewport
+            video.preload = 'auto'
+            prefetchObserver.disconnect()
+          }
+        })
+      },
+      { rootMargin: '200px' }
+    )
+    prefetchObserver.observe(container)
 
     // Create observer if it doesn't exist
     if (!this.observer) {
       this.observer = new IntersectionObserver(this.handleIntersection, {
         threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        rootMargin: '0px',
+        rootMargin: '100px', // Start loading 100px before entering viewport
       })
     }
 
     // Only proceed if autoplay is allowed
     if (!shouldAutoplayVideo()) {
-      // Return no-op cleanup - video will show poster only
-      return () => {}
+      // Return cleanup that also disconnects prefetch observer
+      return () => {
+        prefetchObserver.disconnect()
+      }
     }
 
     // Store video entry with initial intersection state
@@ -175,6 +192,7 @@ class VideoPlaybackManager {
 
     // Return cleanup function
     return () => {
+      prefetchObserver.disconnect()
       this.videos.delete(id)
       if (this.observer) {
         this.observer.unobserve(container)
