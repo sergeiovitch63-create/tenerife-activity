@@ -111,6 +111,37 @@ function parsePerDay(text: string): PricesPerDayResponse | null {
 }
 
 /**
+ * Parse per-day prices from JSON (car rental / per_day events)
+ * Handles: { tiers: [{days, price}...] } or { PVP, PVPA, price, priceA } as daily rate
+ */
+function parsePerDayFromJson(raw: any): PricesPerDayResponse | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return null
+  }
+  // Try explicit tiers array
+  if (Array.isArray(raw.tiers) && raw.tiers.length > 0) {
+    const tiers: Array<{ days: number; price: number }> = []
+    for (const t of raw.tiers) {
+      const days = typeof t?.days === 'number' ? t.days : typeof t?.upToDays === 'number' ? t.upToDays : parseFloat(String(t?.days ?? t?.upToDays ?? 1))
+      const price = typeof t?.price === 'number' ? t.price : parseFloat(String(t?.price ?? 0))
+      if (!isNaN(days) && days > 0 && !isNaN(price) && price > 0) {
+        tiers.push({ days, price })
+      }
+    }
+    if (tiers.length > 0) {
+      return { type: 'per_day', tiers }
+    }
+  }
+  // Try single daily rate: PVP, PVPA, price, priceA
+  const val = raw.PVP ?? raw.pvp ?? raw.PVPA ?? raw.pvpa ?? raw.price ?? raw.priceA ?? raw.PVPOS
+  const num = typeof val === 'number' ? val : typeof val === 'string' ? parseFloat(val) : NaN
+  if (!isNaN(num) && num > 0) {
+    return { type: 'per_day', tiers: [{ days: 1, price: num }] }
+  }
+  return null
+}
+
+/**
  * Parse JSON response for per-person prices
  */
 function parsePerPersonFromJson(raw: any): PricesPerPersonResponse | null {
@@ -233,12 +264,25 @@ export async function GET(request: NextRequest) {
         } else {
           response = { type: 'unknown', raw }
         }
+      } else if (typeof raw === 'object') {
+        const parsed = parsePerDayFromJson(raw)
+        if (parsed) {
+          response = parsed
+        } else {
+          response = { type: 'unknown', raw }
+        }
       } else {
         response = { type: 'unknown', raw }
       }
     } else {
-      // Unknown pProd or no pProd, return raw
-      response = { type: 'unknown', raw }
+      // Unknown pProd or no pProd: try per-person parsing as fallback (e.g. JSON PVPA/PVPC/PVPOS)
+      let fallback: PricesPerPersonResponse | null = null
+      if (typeof raw === 'object') {
+        fallback = parsePerPersonFromJson(raw)
+      } else if (typeof raw === 'string') {
+        fallback = parsePerPerson(raw)
+      }
+      response = fallback ?? { type: 'unknown', raw }
     }
 
     return NextResponse.json(response, {

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Link } from '@/navigation'
 import { Container } from '@/ui/components/layout'
 import { useTranslations } from 'next-intl'
@@ -61,6 +62,25 @@ export function Footer({ locale }: FooterProps) {
                 </a>
               </div>
             </nav>
+          </div>
+
+          {/* Footer image + reference (clickable → PDF) */}
+          <div className="mt-8 flex flex-col items-center gap-2">
+            <a
+              href="/images/INTERMEDIADOR 2.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded"
+            >
+              <Image
+                src="/images/footer.JPG"
+                alt="Voir le document INTERMEDIADOR 2"
+                width={360}
+                height={180}
+                className="h-auto w-auto max-h-48 object-contain hover:opacity-90 transition-opacity"
+              />
+            </a>
+            <p className="text-2xl font-mono text-glass-500">I-0005274.1</p>
           </div>
 
           {/* Trust Line */}

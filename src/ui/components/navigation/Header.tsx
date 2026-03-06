@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { usePathname, Link } from '@/navigation'
+import { usePathname, Link, useRouter } from '@/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { Container } from '@/ui/components/layout'
 import { cn } from '@/ui/lib/cn'
 import { LanguageDropdown } from './LanguageDropdown'
 import { HeaderSearch } from '@/ui/components/search'
+import { HeaderCartIcon } from '@/components/cart/HeaderCartIcon.client'
+import { FlyToCartAnimation } from '@/components/cart/FlyToCartAnimation'
 
 export function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('nav')
   const tHome = useTranslations('home')
@@ -44,8 +47,9 @@ export function Header() {
     if (!isMobileMenuOpen) return
 
     const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('[data-mobile-menu]') && !target.closest('[data-mobile-menu-button]')) {
+      const target = e.target as Node
+      const el = target instanceof Element ? target : target.parentElement
+      if (el && !el.closest('[data-mobile-menu]') && !el.closest('[data-mobile-menu-button]')) {
         setIsMobileMenuOpen(false)
       }
     }
@@ -80,33 +84,47 @@ export function Header() {
   const NavLink = ({
     href,
     children,
+    isMobile = false,
   }: {
     href: string
     children: React.ReactNode
+    isMobile?: boolean
   }) => {
     const isActive = pathname === href
+    const linkClass = cn(
+      'text-base font-medium transition-colors',
+      isMobile && 'block w-full py-4 min-h-[44px] flex items-center cursor-pointer text-left',
+      isHeroVisible
+        ? // White background: dark text
+          cn(
+            isActive
+              ? 'text-slate-900 border-b-2 border-slate-900 pb-1'
+              : 'text-slate-700 hover:text-slate-900'
+          )
+        : // Transparent background: white text
+          cn(
+            'drop-shadow-sm',
+            isActive
+              ? 'text-white border-b-2 border-white pb-1'
+              : 'text-white/90 hover:text-white'
+          )
+    )
+    if (isMobile) {
+      return (
+        <button
+          type="button"
+          className={linkClass}
+          onClick={() => {
+            setIsMobileMenuOpen(false)
+            router.push(href)
+          }}
+        >
+          {children}
+        </button>
+      )
+    }
     return (
-      <Link
-        href={href}
-        className={cn(
-          'text-base font-medium transition-colors',
-          isHeroVisible
-            ? // White background: dark text
-              cn(
-                isActive
-                  ? 'text-slate-900 border-b-2 border-slate-900 pb-1'
-                  : 'text-slate-700 hover:text-slate-900'
-              )
-            : // Transparent background: white text
-              cn(
-                'drop-shadow-sm',
-                isActive
-                  ? 'text-white border-b-2 border-white pb-1'
-                  : 'text-white/90 hover:text-white'
-              )
-        )}
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
+      <Link href={href} className={linkClass}>
         {children}
       </Link>
     )
@@ -115,7 +133,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        'w-full z-50 transition-all duration-300',
+        'relative w-full z-50 transition-all duration-300',
         isHeroVisible
           ? 'bg-white/95 backdrop-blur-sm border-b border-slate-200/50'
           : 'bg-transparent'
@@ -179,8 +197,10 @@ export function Header() {
             <LanguageDropdown isHeroVisible={isHeroVisible} />
           </nav>
 
-          {/* Mobile: Search Icon, Language Switcher, and Menu Button */}
+          {/* Mobile: Cart, Search Icon, Language Switcher, and Menu Button */}
           <div className="md:hidden flex items-center gap-1.5 min-w-0">
+            {/* Cart Icon */}
+            <HeaderCartIcon isHeroVisible={isHeroVisible} />
             {/* Search Icon */}
             <button
               data-search-button
@@ -244,19 +264,25 @@ export function Header() {
           <div
             data-mobile-menu
             className={cn(
-              'md:hidden absolute top-[80px] left-0 right-0 shadow-lg',
+              'md:hidden absolute top-[80px] left-0 right-0 z-[60] shadow-lg pointer-events-auto',
               isHeroVisible
                 ? 'bg-white/95 backdrop-blur-sm border-b border-slate-200/50'
-                : 'bg-transparent'
+                : 'bg-slate-900/95 backdrop-blur-sm border-b border-white/10'
             )}
-            style={!isHeroVisible ? { backdropFilter: 'none' } : undefined}
+            style={isHeroVisible ? undefined : { backdropFilter: 'blur(8px)' }}
           >
-            <nav className="flex flex-col py-4">
+            <nav className="flex flex-col py-2">
               <Container size="lg" padding={true}>
-                <div className="flex flex-col gap-4">
-                  <NavLink href="/must-see">{t('mustSee')}</NavLink>
-                  <NavLink href="/get-inspired">{t('getInspired')}</NavLink>
-                  <NavLink href="/contact">{t('contact')}</NavLink>
+                <div className="flex flex-col">
+                  <NavLink href="/must-see" isMobile>
+                    {t('mustSee')}
+                  </NavLink>
+                  <NavLink href="/get-inspired" isMobile>
+                    {t('getInspired')}
+                  </NavLink>
+                  <NavLink href="/contact" isMobile>
+                    {t('contact')}
+                  </NavLink>
                 </div>
               </Container>
             </nav>
@@ -270,6 +296,7 @@ export function Header() {
         onClose={() => setIsSearchOpen(false)}
         placeholder={tHome('searchPlaceholder')}
       />
+      <FlyToCartAnimation />
     </header>
   )
 }

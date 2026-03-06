@@ -6,8 +6,12 @@ import { useParams } from 'next/navigation'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { normalizeGroups, type NormalizedGroup } from '@/lib/catalog/normalize'
 import { BookingWidget } from '@/components/catalog/BookingWidget'
-import { ClientImage } from '../ClientImage'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
+import { GROUP_DETAILS_IMAGES } from '@/data/group-details-images.generated'
+import { decodeTextFromApi, sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { extractImageUrls } from '@/lib/atlantico/images.client'
+import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
+import { GroupDetailsHeroCarousel } from '@/app/[locale]/debug/group-details/GroupDetailsHeroCarousel.client'
 
 type Classification = {
   id?: string | number
@@ -85,6 +89,7 @@ export default function CatalogDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'description' | 'details' | 'prices' | 'reviews'>('overview')
   const [resolvedImage, setResolvedImage] = useState<string | null>(null)
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([])
 
   const groupDetailsMap = useMemo(() => {
     if (!data) return null
@@ -105,6 +110,125 @@ export default function CatalogDetailPage() {
     
     return allGroups.find((ng) => ng.key === groupKey) || null
   }, [data, groupKey, groupDetailsMap])
+
+  // Visibility from backoffice
+  const [hiddenEventIds, setHiddenEventIds] = useState<string[]>([])
+  useEffect(() => {
+    fetch('/api/backoffice/visibility')
+      .then((r) => r.ok ? r.json() : null)
+      .then((v) => setHiddenEventIds(v?.hiddenEventIds || []))
+      .catch(() => {})
+  }, [])
+
+  // Filter options for specific groups (same exclusions/allowed as activity page) + backoffice visibility
+  const bookingOptions = useMemo(() => {
+    let opts = (normalizedGroup?.options ?? []).filter((opt) => !hiddenEventIds.includes(opt.id))
+    if (groupKey === '35') {
+      const allowed = ['Spa Entrance', 'Spa Vip', 'Spa Resident', 'Spa Vip Resident']
+      const filtered = opts.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      return filtered.length > 0 ? filtered : opts
+    }
+    if (groupKey === '330') {
+      const allowed = ['Ticket', 'Entrada + Hamaca Residente', 'Adult > 65 years old']
+      const filtered = opts.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      return filtered.length > 0 ? filtered : opts
+    }
+    if (groupKey === '362') {
+      return opts.filter((opt) => (opt.label || '').trim().toLowerCase() !== 'entrada brunch')
+    }
+    if (groupKey === '281') {
+      const allowed = ['Astronomical Observation at El Teide']
+      const filtered = opts.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      return filtered.length > 0 ? filtered : opts
+    }
+    if (groupKey === '134') {
+      const allowed = [
+        'Ticket (Guided tour)',
+        'Ticket +Teide Tour from the South area',
+        'Ticket + Teide Tour from Puerto de la Cruz',
+      ]
+      const filtered = opts.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      return filtered.length > 0 ? filtered : opts
+    }
+    if (groupKey === '165') {
+      const exclude = [
+        'Oferta Especial 4 días Nissan Micra o Fiat Panda por 89€',
+        'Oferta Especial 3 días Nissan Micra o Fiat Panda por 79€',
+        'Jeep Renegade',
+      ]
+      return opts.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    }
+    if (groupKey === '166') {
+      const exclude = [
+        'Skoda Fabia Combi o similar',
+        'VW T-CROSS o similar',
+        'Renault Megane o similar',
+        'Suzuki Vitara (SUV)',
+        'FIAT 500 o similar',
+        'Mercedes Vito AUT',
+        'VW T-Rock Cabrio',
+      ]
+      return opts.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    }
+    if (groupKey === '189') {
+      const exclude = [
+        'Grupo A - Honda PCX 125 cc',
+        'Grupo B - Honda Forza 300 cc',
+        'Grupo C - Suzuki Bourgman 400 cc',
+        'Grupo D - Honda CB 125 F',
+        'Grupo E - Honda CB 500 X',
+      ]
+      return opts.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    }
+    if (groupKey === '127') {
+      const exclude = [
+        'Road Bike Carbono Disc Break',
+        'Road Bike Aluminum',
+        'E-City Bicicleta eléctrica',
+        'E-City Bicicleta elécrtica',
+        'Mountain Bike',
+        'City Bike (from Periphery)',
+        'Mountain Bike (from Periphery)',
+        'Pro Mountain Bike (from Periphery)',
+        'Road Bike (from Periphery)',
+        'E-Mountain Bike Bicicleta eléctrica',
+        'Kids Bike (from Periphery)',
+      ]
+      return opts.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    }
+    if (groupKey === '97') {
+      const allowed = [
+        'Dîner pique-nique + bus de la zone nord',
+        'Dîner pique-nique + bus de la zone sud',
+      ]
+      const filtered = opts.filter((opt) => allowed.some((a) => (opt.label || '').trim() === a))
+      return filtered.length > 0 ? filtered : opts
+    }
+    if (groupKey === '310') {
+      const exclude = [
+        'Lone Star - Solo observación',
+        'Lone Star - Dinner Included (self drive)',
+      ]
+      return opts.filter((opt) => !exclude.some((ex) => (opt.label || '').trim() === ex))
+    }
+    return opts
+  }, [groupKey, normalizedGroup?.options, hiddenEventIds])
 
   // Resolve hero image filename -> public URL (async, client-safe)
   const heroFilename = useMemo(() => {
@@ -132,6 +256,86 @@ export default function CatalogDetailPage() {
       cancelled = true
     }
   }, [heroFilename, groupKey])
+
+  // Resolve galleryUrls for hero carousel - local folder first (no scan), then manifest, then API
+  const codeStr = normalizedGroup
+    ? String(normalizedGroup.group?.Code ?? normalizedGroup.group?.code ?? groupKey).trim()
+    : ''
+  useEffect(() => {
+    if (!normalizedGroup) {
+      setGalleryUrls([])
+      return
+    }
+    const { group, details } = normalizedGroup
+    let cancelled = false
+
+    const applyUrls = (urls: string[]) => {
+      if (urls.length === 0) return
+      const MANUAL_HERO_CODES = ['476', '492', '514', '551']
+      const isLocalFolderImage = urls[0]?.startsWith('/images/pictures/tours-vip/')
+      const filtered = isLocalFolderImage
+        ? urls
+        : urls.length > 1
+          ? urls.slice(1)
+          : MANUAL_HERO_CODES.includes(codeStr)
+            ? urls
+            : []
+      if (!cancelled) setGalleryUrls(filtered)
+    }
+
+    // 1. Local folder (no scan needed) - fetch API
+    if (codeStr) {
+      fetch(`/api/atlantico/local-group-images/${encodeURIComponent(codeStr)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data: { images?: string[] } | null) => {
+          if (cancelled) return
+          if (data?.images?.length) {
+            applyUrls(data.images)
+            return
+          }
+          // 2. Manifest
+          let urls: string[] = GROUP_DETAILS_IMAGES[codeStr] ?? []
+          if (urls.length === 0 && details) {
+            urls = extractImageUrls(details)
+          }
+          if (urls.length === 0 && (details?.image || group?.image)) {
+            const img = (details?.image ?? group?.image) as string
+            const built = buildAtlanticoImageUrl(String(img))
+            if (built) urls = [built]
+          }
+          if (urls.length > 0) {
+            applyUrls(urls)
+            return
+          }
+          // 3. group-images API fallback
+          fetch(`/api/atlantico/group-images/${encodeURIComponent(codeStr)}?lang=${encodeURIComponent(lang)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d: { images?: string[] } | null) => {
+              if (cancelled || !d?.images?.length) return
+              setGalleryUrls(d.images)
+            })
+            .catch(() => {})
+        })
+        .catch(() => {
+          if (cancelled) return
+          let urls: string[] = GROUP_DETAILS_IMAGES[codeStr] ?? []
+          if (urls.length === 0 && details) urls = extractImageUrls(details)
+          if (urls.length === 0 && (details?.image || group?.image)) {
+            const built = buildAtlanticoImageUrl(String((details?.image ?? group?.image) as string))
+            if (built) urls = [built]
+          }
+          if (urls.length > 0) applyUrls(urls)
+        })
+    } else {
+      let urls: string[] = GROUP_DETAILS_IMAGES[codeStr] ?? []
+      if (urls.length === 0 && details) urls = extractImageUrls(details)
+      if (urls.length > 0) applyUrls(urls)
+    }
+
+    return () => {
+      cancelled = true
+    }
+  }, [normalizedGroup, codeStr, lang])
 
   async function fetchBackoffice(classificationId?: string): Promise<void> {
     setLoading(true)
@@ -240,6 +444,7 @@ export default function CatalogDetailPage() {
   const { group, details, classificationName, eventIds } = normalizedGroup
   const title = group.name || details?.name || details?.Name || '—'
   const description = details?.desc || details?.description || ''
+  const willDo = groupKey !== '340' && typeof details?.willDo === 'string' ? details.willDo : ''
   const price = group.price ?? details?.price
 
   return (
@@ -259,16 +464,14 @@ export default function CatalogDetailPage() {
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left: Image + Content */}
+            {/* Left: Hero carousel + Content - same photo logic as all group details */}
             <div className="lg:col-span-2">
-              <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-gradient-to-br from-ocean-100 to-ocean-200 mb-6">
-                {resolvedImage ? (
-                  <ClientImage src={resolvedImage} alt={title} className="!aspect-auto !h-full" fullHeight />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-ocean-300 text-lg font-medium">No image available</div>
-                  </div>
-                )}
+              <div className="rounded-lg overflow-hidden mb-6">
+                <GroupDetailsHeroCarousel
+                  galleryUrls={galleryUrls}
+                  heroUrl={galleryUrls[0] ?? resolvedImage}
+                  alt={title}
+                />
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-glass-900 mb-4">{title}</h1>
@@ -302,10 +505,29 @@ export default function CatalogDetailPage() {
               <div className="prose max-w-none">
                 {activeTab === 'overview' && (
                   <div className="space-y-4">
-                    {description && (
+                    {willDo && (
                       <div>
                         <h2 className="text-xl font-semibold text-glass-900 mb-2">What you do</h2>
-                        <p className="text-glass-700 whitespace-pre-wrap">{description}</p>
+                        <div
+                          className="prose prose-sm max-w-none text-glass-700 leading-relaxed"
+                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(willDo)}
+                        />
+                      </div>
+                    )}
+                    {description && (
+                      <div>
+                        <h2 className="text-xl font-semibold text-glass-900 mb-2">Overview</h2>
+                        {(() => {
+                          const plainDesc = decodeTextFromApi(description).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                          const sentences = plainDesc.split('. ').filter(Boolean)
+                          const highlights = sentences.slice(0, 2)
+                          return highlights.map((s, i) => (
+                            <div key={i} className="flex items-start gap-2 mb-3">
+                              <span>🌟</span>
+                              <span className="font-semibold text-gray-800">{s}{!s.endsWith('.') ? '.' : ''}</span>
+                            </div>
+                          ))
+                        })()}
                       </div>
                     )}
                     {eventIds.length > 0 && (
@@ -333,7 +555,16 @@ export default function CatalogDetailPage() {
                 {activeTab === 'description' && (
                   <div>
                     {description ? (
-                      <div className="text-glass-700 whitespace-pre-wrap">{description}</div>
+                      (() => {
+                        const plainDesc = decodeTextFromApi(description).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                        const sentences = plainDesc.split('. ').filter(Boolean)
+                        const rest = sentences.slice(2).join('. ')
+                        return rest ? (
+                          <p className="text-gray-500 leading-relaxed">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
+                        ) : (
+                          <p className="text-glass-500">No additional description.</p>
+                        )
+                      })()
                     ) : (
                       <p className="text-glass-500">No description available.</p>
                     )}
@@ -378,7 +609,7 @@ export default function CatalogDetailPage() {
             {/* Right: Booking Sidebar */}
             <div className="lg:col-span-1">
               <BookingWidget
-                options={normalizedGroup.options}
+                options={bookingOptions}
                 groupKey={groupKey}
                 groupDetails={details}
                 lang={lang}

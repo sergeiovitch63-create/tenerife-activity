@@ -74,6 +74,17 @@ export default function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('name-asc')
   const [onlyWithAvailability, setOnlyWithAvailability] = useState(false)
+  const [visibility, setVisibility] = useState<{ hiddenGroupIds: string[]; hiddenEventIds: string[] }>({
+    hiddenGroupIds: [],
+    hiddenEventIds: [],
+  })
+
+  useEffect(() => {
+    fetch('/api/backoffice/visibility')
+      .then((r) => r.ok ? r.json() : null)
+      .then((v) => v && setVisibility({ hiddenGroupIds: v.hiddenGroupIds || [], hiddenEventIds: v.hiddenEventIds || [] }))
+      .catch(() => {})
+  }, [])
 
   const groupDetailsMap = useMemo(() => {
     if (!data) return null
@@ -85,14 +96,21 @@ export default function CatalogPage() {
   // Normalize groups for display
   const normalizedGroups = useMemo(() => {
     if (!data) return []
-    return normalizeGroups(
+    let groups = normalizeGroups(
       classifications,
       data.groupsByClassification,
       groupDetailsMap,
       selectedClassificationId,
       data.eventDetailsByEventId
     )
-  }, [data, classifications, groupDetailsMap, selectedClassificationId])
+    // Apply backoffice visibility
+    groups = groups.filter((ng) => !visibility.hiddenGroupIds.includes(ng.key))
+    groups = groups.map((ng) => ({
+      ...ng,
+      options: ng.options.filter((opt) => !visibility.hiddenEventIds.includes(opt.id)),
+    }))
+    return groups
+  }, [data, classifications, groupDetailsMap, selectedClassificationId, visibility])
 
   // Filter and sort groups
   const filteredAndSortedGroups = useMemo(() => {

@@ -284,28 +284,6 @@
     "thumbnail": "/videos/thumbnails/bike-rental.png",
     "video": "/videos/bike-rental.mp4",
     "translationKey": "bikeRental"
-  },
-  {
-    "index": 14,
-    "id": "14",
-    "slug": "transfers-transport",
-    "title": {
-      "en": "Transfers & Transport",
-      "es": "Traslados y transporte privado",
-      "fr": "Transferts et transport privé"
-    },
-    "description": {
-      "en": "Airport transfers and transport services",
-      "es": "Traslados al aeropuerto y servicios de transporte",
-      "fr": "Transferts aéroport et services de transport"
-    },
-    "tagline": {
-      "en": "Seamless journeys from start to finish"
-    },
-    "order": 14,
-    "thumbnail": "/videos/thumbnails/transfers-transport.png",
-    "video": "/videos/transfers-transport.mp4",
-    "translationKey": "transfersTransport"
   }
 ]
 

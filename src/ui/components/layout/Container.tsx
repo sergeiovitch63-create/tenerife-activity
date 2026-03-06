@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 interface ContainerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   padding?: boolean
+  className?: string
   children: ReactNode
 }
 
@@ -18,6 +19,7 @@ const sizeStyles = {
 export function Container({
   size = 'lg',
   padding = true,
+  className,
   children,
 }: ContainerProps) {
   return (
@@ -25,7 +27,8 @@ export function Container({
       className={cn(
         'mx-auto',
         sizeStyles[size],
-        padding && 'px-4 md:px-6'
+        padding && 'px-4 md:px-6',
+        className
       )}
     >
       {children}

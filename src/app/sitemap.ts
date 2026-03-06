@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const vibe of vibes) {
     for (const locale of locales) {
       entries.push({
-        url: `${baseUrl}/${locale}/vibe/${vibe.slug}`,
+        url: `${baseUrl}/${locale}/activite/${vibe.slug}`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.7,

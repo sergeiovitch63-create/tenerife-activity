@@ -25,6 +25,10 @@ interface PaymentBookingRequest {
   language: string
   tourDate: string | null
   sesTime: string | null
+  /** Combination (Twin Ticket): second date for Loro Parque */
+  tourDate2?: string | null
+  /** Date range (car rental): end date */
+  tourDateEnd?: string | null
   adults: number
   childs?: number
   infants?: number
@@ -127,6 +131,8 @@ async function parseRequestBody(request: NextRequest): Promise<PaymentBookingReq
     language: getStr('language') || '',
     tourDate: getStr('tourDate'),
     sesTime: getStr('sesTime'),
+    tourDate2: getStr('tourDate2'),
+    tourDateEnd: getStr('tourDateEnd'),
     adults: getNum('adults') ?? 0,
     childs: getNum('childs'),
     infants: getNum('infants'),
@@ -644,7 +650,27 @@ export async function POST(request: NextRequest) {
       final: finalTourDate,
     })
   }
-  
+
+  // Combination (Twin Ticket): second date for Loro Parque
+  if (body.tourDate2 && /^\d{4}-\d{2}-\d{2}$/.test(body.tourDate2)) {
+    const tourDate2Val = body.tourDate2.replace(/-/g, '')
+    formData.append('tourDate2', tourDate2Val)
+    console.log('[ATL_PAYMENT] tourDate2 (Loro Parque):', tourDate2Val)
+  } else if (body.tourDate2 && /^\d{8}$/.test(body.tourDate2)) {
+    formData.append('tourDate2', body.tourDate2)
+    console.log('[ATL_PAYMENT] tourDate2 (Loro Parque):', body.tourDate2)
+  }
+
+  // Date range (car rental): end date
+  if (body.tourDateEnd && /^\d{4}-\d{2}-\d{2}$/.test(body.tourDateEnd)) {
+    const tourDateEndVal = body.tourDateEnd.replace(/-/g, '')
+    formData.append('tourDateEnd', tourDateEndVal)
+    console.log('[ATL_PAYMENT] tourDateEnd (car rental):', tourDateEndVal)
+  } else if (body.tourDateEnd && /^\d{8}$/.test(body.tourDateEnd)) {
+    formData.append('tourDateEnd', body.tourDateEnd)
+    console.log('[ATL_PAYMENT] tourDateEnd (car rental):', body.tourDateEnd)
+  }
+
   // According to PDF section 2.7:
   // - For wdays_only mode: sesTime can be "00:00" OR omitted
   // - For sessions mode: sesTime must be a valid HH:mm time

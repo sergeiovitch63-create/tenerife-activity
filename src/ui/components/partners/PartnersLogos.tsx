@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 interface PartnerLogo {
   name: string
@@ -39,6 +40,7 @@ const partnerLogos: PartnerLogo[] = [
 ]
 
 export function PartnersLogos() {
+  const t = useTranslations('partners.section')
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -71,7 +73,7 @@ export function PartnersLogos() {
     >
       {/* Section Title */}
       <h2 className="mb-8 text-center text-2xl md:text-3xl font-semibold text-white tracking-tight">
-        Our Trusted Partners
+        {t('trustedPartnersTitle')}
       </h2>
 
       {/* Horizontal Carousel - Same pattern as Must See */}

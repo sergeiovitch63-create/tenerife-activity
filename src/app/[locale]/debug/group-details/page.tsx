@@ -240,7 +240,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
         price={details.price}
         desc={decodeTextFromApi(details.desc)}
         itinerary={itinerary}
-        willDo={codeStr !== '340' ? details.willDo : undefined}
+        willDo={codeStr !== '340' ? (details.willDo as string | undefined) : undefined}
         faq={decodeTextFromApi(details.faq)}
         cancellationPolicy={cancellationPolicy}
         childAge={decodeTextFromApi(details.childAge)}
@@ -252,6 +252,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
     )
   }
 
+  const detailsForDisplay = details as GroupDetails | null
   return (
     <>
       <Section variant="default" background="subtle">
@@ -261,15 +262,15 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
               <div className="space-y-2">
                 <p className="text-xs uppercase tracking-wide text-glass-500">Atlantico · Debug</p>
                 <h1 className="text-3xl md:text-4xl font-bold text-glass-900">
-                  {decodeTextFromApi(details?.name) || `Tour ${code}`}
+                  {detailsForDisplay ? decodeTextFromApi(detailsForDisplay.name) : `Tour ${code}`}
                 </h1>
                 <p className="text-sm text-glass-600 space-x-4">
                   <span>
-                    Code&nbsp;: <span className="font-mono">{details?.code || code}</span>
+                    Code&nbsp;: <span className="font-mono">{detailsForDisplay ? detailsForDisplay.code : code}</span>
                   </span>
-                  {details?.id && (
+                  {detailsForDisplay?.id && (
                     <span>
-                      ID&nbsp;: <span className="font-mono">{details.id}</span>
+                      ID&nbsp;: <span className="font-mono">{detailsForDisplay.id}</span>
                     </span>
                   )}
                   <span>
@@ -309,7 +310,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
             <GroupDetailsHeroCarousel
               galleryUrls={galleryUrls}
               heroUrl={heroUrl}
-              alt={details?.name || `Tour ${code}`}
+              alt={detailsForDisplay?.name || `Tour ${code}`}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent pointer-events-none" />
 
@@ -320,49 +321,49 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                   Tour VIP Atlantico
                 </p>
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight drop-shadow-sm">
-                  {details?.name || `Tour ${code}`}
+                  {detailsForDisplay?.name || `Tour ${code}`}
                 </h1>
                 <p className="text-xs md:text-sm text-white/80 space-x-3">
                   <span>
                     Code&nbsp;:{' '}
                     <span className="font-mono bg-white/10 px-1.5 py-0.5 rounded-full text-[11px] md:text-xs">
-                      {details?.code || code}
+                      {detailsForDisplay?.code || code}
                     </span>
                   </span>
-                  {details?.id && (
+                  {detailsForDisplay?.id && (
                     <span>
                       ID&nbsp;:{' '}
-                      <span className="font-mono text-[11px] md:text-xs opacity-80">{details.id}</span>
+                      <span className="font-mono text-[11px] md:text-xs opacity-80">{detailsForDisplay.id}</span>
                     </span>
                   )}
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-2 md:justify-end">
-                {details?.duration && (
+                {detailsForDisplay?.duration && (
                   <div className="px-3 py-1.5 rounded-full bg-white/12 backdrop-blur text-[11px] md:text-xs flex items-center gap-1.5">
                     <span className="font-medium">Durée</span>
-                    <span className="font-mono">{String(details.duration)} h</span>
+                    <span className="font-mono">{String(detailsForDisplay.duration)} h</span>
                   </div>
                 )}
-                {details?.price != null && (
+                {detailsForDisplay?.price != null && (
                   <div className="px-3 py-1.5 rounded-full bg-ocean-500/90 backdrop-blur text-[11px] md:text-xs font-semibold">
-                    À partir de {String(details.price)} €
+                    À partir de {String(detailsForDisplay.price)} €
                   </div>
                 )}
-                {details?.childAge && (
+                {detailsForDisplay?.childAge && (
                   <div className="px-3 py-1.5 rounded-full bg-white/12 backdrop-blur text-[11px] md:text-xs">
-                    Enfants : {decodeTextFromApi(details.childAge)}
+                    Enfants : {decodeTextFromApi(detailsForDisplay.childAge)}
                   </div>
                 )}
-                {details?.infantAge && (
+                {detailsForDisplay?.infantAge && (
                   <div className="px-3 py-1.5 rounded-full bg-white/12 backdrop-blur text-[11px] md:text-xs">
-                    Bébés&nbsp;: {details.infantAge}
+                    Bébés&nbsp;: {detailsForDisplay.infantAge}
                   </div>
                 )}
-                {details?.category && (
+                {detailsForDisplay?.category && (
                   <div className="px-3 py-1.5 rounded-full bg-white/12 backdrop-blur text-[11px] md:text-xs">
-                    Catégorie : {decodeTextFromApi(details.category)}
+                    Catégorie : {decodeTextFromApi(detailsForDisplay.category)}
                   </div>
                 )}
               </div>
@@ -373,14 +374,14 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             {/* Colonne gauche : description + photos */}
             <div className="space-y-6 lg:col-span-2">
-              {details?.willDo && codeStr !== '340' && (
+              {(detailsForDisplay as any)?.willDo && codeStr !== '340' && (
                 <div className="glass-panel rounded-2xl p-5 md:p-6 space-y-3">
                   <h2 className="text-lg md:text-xl font-semibold text-glass-900">
                     What you do
                   </h2>
                   <div
                     className="prose prose-sm max-w-none text-glass-700 leading-relaxed"
-                    dangerouslySetInnerHTML={sanitizeAtlanticoHtml(decodeTextFromApi(details.willDo))}
+                    dangerouslySetInnerHTML={sanitizeAtlanticoHtml(decodeTextFromApi((detailsForDisplay as any).willDo as string))}
                   />
                 </div>
               )}
@@ -388,9 +389,9 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                 <h2 className="text-lg md:text-xl font-semibold text-glass-900">
                   Overview
                 </h2>
-                    {details?.desc ? (
+                    {detailsForDisplay?.desc ? (
                   (() => {
-                    const plainDesc = decodeTextFromApi(details.desc).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                    const plainDesc = decodeTextFromApi(detailsForDisplay.desc).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
                     const sentences = plainDesc.split('. ').filter(Boolean)
                     const highlights = sentences.slice(0, 2)
                     return highlights.map((s, i) => (
@@ -405,8 +406,8 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                 )}
               </div>
 
-              {details?.desc && (() => {
-                const plainDesc = decodeTextFromApi(details.desc).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+              {detailsForDisplay?.desc && (() => {
+                const plainDesc = decodeTextFromApi(detailsForDisplay.desc).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
                 const sentences = plainDesc.split('. ').filter(Boolean)
                 const rest = sentences.slice(2).join('. ')
                 return rest ? (
@@ -424,8 +425,8 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                 <h2 className="text-lg md:text-xl font-semibold text-glass-900">
                   What's Included
                 </h2>
-                {details?.faq ? (
-                  <FaqSections faq={details.faq} fallbackRaw />
+                {detailsForDisplay?.faq ? (
+                  <FaqSections faq={detailsForDisplay.faq} fallbackRaw />
                 ) : (
                   <p className="text-sm text-glass-400 italic">
                     Aucune FAQ / informations incluses.
@@ -433,7 +434,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                 )}
               </div>
 
-              {details?.video && (
+              {detailsForDisplay?.video && (
                 <div className="glass-panel rounded-2xl p-4 md:p-5 space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="text-lg font-semibold text-glass-900">
@@ -442,7 +443,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
                   </div>
                   <div className="aspect-video rounded-xl overflow-hidden bg-black/80">
                     <iframe
-                      src={String(details.video)}
+                      src={String(detailsForDisplay.video)}
                       title="Tour video"
                       className="w-full h-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

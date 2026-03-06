@@ -23,7 +23,9 @@
     "test:gomera-dump": "tsx scripts/test-gomera-limits-dump.ts",
     "atl:limits:probe": "tsx scripts/probe-limits.ts",
     "audit:limits": "tsx scripts/audit-atlantico-limits.ts",
-    "audit2:dump": "tsx scripts/audit2-dump-raw.ts"
+    "audit2:dump": "tsx scripts/audit2-dump-raw.ts",
+    "download:group-details-images": "node scripts/download-group-details-images.mjs",
+    "scan:group-images": "node scripts/scan-group-details-folders.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",

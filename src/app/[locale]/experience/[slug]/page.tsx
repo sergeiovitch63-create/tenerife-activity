@@ -57,7 +57,7 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
   const breadcrumbItems = [
     { label: t('common.siteName'), href: '/' },
     ...(vibe
-      ? [{ label: getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title), href: `/vibe/${vibe.slug}` }]
+      ? [{ label: getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title), href: `/activite/${vibe.slug}` }]
       : []),
     { label: experience.title },
   ]

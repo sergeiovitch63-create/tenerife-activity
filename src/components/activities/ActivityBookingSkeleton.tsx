@@ -611,7 +611,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                             </button>
                           </div>
                           <div className="grid grid-cols-7 gap-1 mb-2">
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                               <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">
                                 {day}
                               </div>
@@ -622,7 +622,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                               if (dayData.day === 0) {
                                 return <div key={`empty-${idx}`} className="aspect-square" />
                               }
-                              return (
+    return (
                                 <div
                                   key={dayData.dateStr}
                                   className={`aspect-square p-1 rounded border text-sm flex items-center justify-center transition-colors ${
@@ -706,7 +706,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                   t_group={resolved.t_group}
                   initialEventId={resolved.t_id}
                   events={resolved.events}
-                  locale={locale}
+        locale={locale}
                   language={resolved.language}
                 />
               </div>

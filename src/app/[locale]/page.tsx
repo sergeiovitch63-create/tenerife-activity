@@ -10,7 +10,6 @@ import { RecommendationsCarousel } from '@/ui/components/recommendations'
 import { HeroVideoBackground } from '@/ui/components/hero'
 import { ActivityPacksSection } from '@/ui/sections/ActivityPacksSection'
 import { PartnersSection } from '@/ui/sections/PartnersSection'
-import { PartnersLogos } from '@/ui/components/partners'
 import { Link } from '@/navigation'
 import { Button } from '@/ui/components/shared/Button'
 import { buildMetadata } from '@/lib/seo'
@@ -135,15 +134,6 @@ export default async function HomePage({
         </Container>
       </Section>
 
-      {/* Our Partners Section */}
-      <Section variant="default" background="default">
-        <Container size="lg">
-          <div className="flex flex-col items-center gap-6 md:gap-8 pt-6 md:pt-10 pb-6 md:pb-10">
-            <PartnersLogos />
-          </div>
-        </Container>
-      </Section>
-
       {/* Choose Your Vibe Section */}
       <Section variant="loose" background="default" className="pt-2 md:pt-4">
         <div id="vibes" className="scroll-mt-24">
@@ -166,7 +156,7 @@ export default async function HomePage({
       </Section>
 
       {/* Activity Packs Section */}
-      <ActivityPacksSection />
+      <ActivityPacksSection locale={locale} />
 
       {/* Partners Section */}
       <PartnersSection />

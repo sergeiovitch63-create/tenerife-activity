@@ -4,11 +4,11 @@ import type { VibeRepository } from '@/core/ports/vibe.repository'
 // Locked order as per requirements
 const MOCK_VIBES: Vibe[] = [
   {
-    id: '1',
-    slug: 'vip-tours',
-    title: 'VIP Tours',
-    description: 'Exclusive premium tours',
-    tagline: 'Exclusive access to Tenerife\'s most coveted experiences',
+    id: '10',
+    slug: 'adventure-nature',
+    title: 'Adventure & Nature',
+    description: 'Outdoor adventures and nature experiences',
+    tagline: 'Connect with Tenerife\'s wild side',
     order: 1,
   },
   {
@@ -76,11 +76,11 @@ const MOCK_VIBES: Vibe[] = [
     order: 9,
   },
   {
-    id: '10',
-    slug: 'adventure-nature',
-    title: 'Adventure & Nature',
-    description: 'Outdoor adventures and nature experiences',
-    tagline: 'Connect with Tenerife\'s wild side',
+    id: '1',
+    slug: 'vip-tours',
+    title: 'VIP Tours',
+    description: 'Exclusive premium tours',
+    tagline: 'Exclusive access to Tenerife\'s most coveted experiences',
     order: 10,
   },
   {
@@ -106,14 +106,6 @@ const MOCK_VIBES: Vibe[] = [
     description: 'Bicycle rental services',
     tagline: 'Pedal through scenic routes',
     order: 13,
-  },
-  {
-    id: '14',
-    slug: 'transfers-transport',
-    title: 'Transfers & Transport',
-    description: 'Airport transfers and transport services',
-    tagline: 'Seamless journeys from start to finish',
-    order: 14,
   },
 ]
 

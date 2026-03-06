@@ -12,7 +12,8 @@ import { ActivityBookingPanel } from './ActivityBookingPanel'
 import type { ActivityResolved } from '@/lib/atlantico/resolve'
 import { SafeImage } from '@/components/SafeImage'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
-import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { decodeTextFromApi, sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
+import { FaqSections } from '@/components/atlantico/FaqSections'
 import { LuxuryHeroGallery } from './LuxuryHeroGallery'
 import { isVipTourGroup, getVipTourLocalImages } from '@/lib/atlantico/vip-tours-images'
 
@@ -369,7 +370,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
   const activityDescription = eventDetails?.desc || groupDetails?.desc || groupDetails?.description || eventDetails?.description || ''
   const activityFAQ = groupDetails?.faq || ''
   const activityCancellation = groupDetails?.canDesc || groupDetails?.canTitle || ''
-  const activityWillDo = groupDetails?.willDo || ''
+  const activityWillDo = groupCode !== '340' ? (groupDetails?.willDo || '') : ''
   const activityIcons = eventDetails?.icons || groupDetails?.icons || []
   const activityRoute = eventDetails?.route || groupDetails?.route || ''
   
@@ -377,7 +378,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
   // Normalize meeting points to ensure they're in the correct format
   const rawMeetingPoints = eventDetails?.meetingPoints || groupDetails?.meetingPoints || groupDetails?.meetingPoint || null
   const meetingPoints = useMemo(() => {
-    if (!rawMeetingPoints) return null
+    if (!rawMeetingPoints) return undefined
     
     // If it's already an array, return it
     if (Array.isArray(rawMeetingPoints)) {
@@ -394,7 +395,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
       return [rawMeetingPoints]
     }
     
-    return null
+    return undefined
   }, [rawMeetingPoints])
   
   // Debug log for meeting points
@@ -440,16 +441,19 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
   // Premium tabs - only what sells
   // For activity 508: What you do, Overview, What's Included, Description (Cancellation Policy moved to booking panel)
-  const tabs = isActivity508 ? [
-    { id: 'what-you-do', label: 'What you do' },
-    { id: 'overview', label: 'Overview' },
-    { id: 'included', label: 'What\'s Included' },
-    { id: 'description', label: 'Description' },
-  ] : [
-    { id: 'overview', label: 'Overview' },
-    { id: 'included', label: 'What\'s Included' },
-    { id: 'cancellation', label: 'Cancellation Policy' },
-  ]
+  const tabs = isActivity508
+    ? [
+        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: 'What you do' }] : []),
+        { id: 'overview' as const, label: 'Overview' },
+        { id: 'included' as const, label: "What's Included" },
+        { id: 'description' as const, label: 'Description' },
+      ]
+    : [
+        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: 'What you do' }] : []),
+        { id: 'overview' as const, label: 'Overview' },
+        { id: 'included' as const, label: "What's Included" },
+        { id: 'cancellation' as const, label: 'Cancellation Policy' },
+      ]
 
   return (
     <div className="min-h-screen bg-white">
@@ -519,8 +523,8 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
             {/* All Content - All sections visible */}
             <div className="space-y-12">
-              {/* What you do - First for activity 508 */}
-              {isActivity508 && (
+              {/* What you do - above Overview */}
+              {activityWillDo && (
                 <div id="section-what-you-do" className="scroll-mt-24">
                   <h2 className="text-3xl font-bold text-glass-900 mb-6">What you do</h2>
                   <div className="space-y-8">
@@ -546,14 +550,28 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
               <div id="section-overview" className="scroll-mt-24">
                 <h2 className="text-3xl font-bold text-glass-900 mb-6">Overview</h2>
                 <div className="space-y-8">
-                  {activityDescription && (
+                  {activityDescription && (isActivity508 ? (() => {
+                    const raw = decodeTextFromApi(activityDescription || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                    const sentences = raw.split('. ').filter(Boolean)
+                    const highlights = sentences.slice(0, 2)
+                    return highlights.length > 0 ? (
+                      <div className="space-y-3">
+                        {highlights.map((s, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span>🌟</span>
+                            <span className="font-semibold text-gray-800">{s}{!s.endsWith('.') ? '.' : ''}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null
+                  })() : (
                     <div className="prose prose-lg max-w-none">
                       <div
                         dangerouslySetInnerHTML={sanitizeAtlanticoHtml(activityDescription)}
                         className="text-glass-700 leading-relaxed text-base space-y-4 [&>p]:mb-6 [&>p]:text-lg [&>p]:leading-8 [&>ul]:space-y-3 [&>ul]:mb-6 [&>ul]:text-lg [&>ul]:leading-8 [&>li]:mb-2 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-glass-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-glass-900 [&>h3]:mb-3 [&>h3]:mt-6"
                       />
                     </div>
-                  )}
+                  ))}
                   
                   {/* Itinerary - Only for activity 508 */}
                   {isActivity508 && itinerary.length > 0 && (
@@ -569,51 +587,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                 <h2 className="text-3xl font-bold text-glass-900 mb-6">What&apos;s Included</h2>
                 <div className="space-y-8">
                   {activityFAQ ? (
-                    isActivity508 ? (
-                      // Clean point-by-point layout for activity 508
-                      (() => {
-                        const includesList = parseIncludesList(activityFAQ)
-                        if (includesList.length > 0) {
-                          return (
-                            <div className="space-y-3">
-                              {includesList.map((item, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-start gap-4 py-3"
-                                >
-                                  <div className="flex-shrink-0 mt-1">
-                                    <div className="w-6 h-6 rounded-full bg-ocean-500 flex items-center justify-center">
-                                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <p className="text-glass-800 text-base leading-relaxed flex-1">{item}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )
-                        } else {
-                          // Fallback to HTML rendering
-                          return (
-                            <div className="prose prose-lg max-w-none">
-                              <div
-                                dangerouslySetInnerHTML={sanitizeAtlanticoHtml(activityFAQ)}
-                                className="text-glass-700 leading-relaxed text-base space-y-4"
-                              />
-                            </div>
-                          )
-                        }
-                      })()
-                    ) : (
-                      // Standard layout for other activities
-                      <div className="prose prose-lg max-w-none">
-                        <div
-                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(activityFAQ)}
-                          className="text-glass-700 leading-relaxed text-base space-y-4 [&>p]:mb-6 [&>p]:text-lg [&>p]:leading-8 [&>ul]:space-y-4 [&>ul]:mb-6 [&>ul]:text-lg [&>ul]:leading-8 [&>li]:mb-3 [&>li]:pl-2 [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:text-glass-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:text-glass-900 [&>h3]:mb-3 [&>h3]:mt-6"
-                        />
-                      </div>
-                    )
+                    <FaqSections faq={activityFAQ} fallbackRaw />
                   ) : (
                     <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
                       <p className="text-lg">Information about what&apos;s included will be displayed here.</p>
@@ -628,12 +602,16 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                   <h2 className="text-3xl font-bold text-glass-900 mb-6">Description</h2>
                   <div className="space-y-8">
                     {groupDetails?.desc ? (
-                      <div className="prose prose-lg max-w-none">
-                        <div
-                          dangerouslySetInnerHTML={sanitizeAtlanticoHtml(groupDetails.desc)}
-                          className="text-glass-700 leading-relaxed text-base space-y-4"
-                        />
-                      </div>
+                      (() => {
+                        const raw = decodeTextFromApi(groupDetails.desc || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                        const sentences = raw.split('. ').filter(Boolean)
+                        const rest = sentences.slice(2).join('. ')
+                        return rest ? (
+                          <p className="text-gray-500 leading-relaxed">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
+                        ) : (
+                          <p className="text-glass-500">No additional description.</p>
+                        )
+                      })()
                     ) : (
                       <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
                         <p className="text-lg">No description available.</p>
@@ -660,6 +638,8 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                   startingPrice={typeof groupDetails?.price === 'number' ? groupDetails.price : (typeof groupDetails?.price === 'string' ? parseFloat(groupDetails.price) : undefined)}
                   cancellationPolicy={activityCancellation}
                   cancellationTitle={groupDetails?.canTitle}
+                  childAge={groupDetails?.childAge as string | undefined}
+                  infantAge={groupDetails?.infantAge as string | undefined}
                   meetingPoints={meetingPoints}
                 />
               </div>

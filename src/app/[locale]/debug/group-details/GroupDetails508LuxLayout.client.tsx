@@ -889,7 +889,7 @@ export function GroupDetails508LuxLayout({
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(eventOptions.length > 0 ? eventOptions : eventIds.map((eid) => ({ eventId: eid, name: tOptions('placeholderTitle', { id: eid }), desc: '', price: null as number | null, features: [] }))).map(
+                    {(eventOptions.length > 0 ? eventOptions : eventIds.map((eid) => ({ eventId: eid, name: tOptions('placeholderTitle', { id: eid }), desc: '', price: null as number | null, childPrice: null as number | null, infantPrice: null as number | null, features: [] }))).map(
                       (opt) => (
                         <OptionCard
                           key={opt.eventId}

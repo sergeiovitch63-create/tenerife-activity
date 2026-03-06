@@ -15,11 +15,19 @@ export interface CartItem {
   // Identifiers
   t_group: string // Tour group ID
   t_id: string // Event ID
-  
+  /** Tour/activity display name (from group details, stored when adding from group-details page) */
+  tourName?: string
+
   // Language and date/time
   language: string // Language code (e.g., 'ENG', 'ESP')
   tourDate: string | null // YYYY-MM-DD format or null for calendarMode === 'none'
   sesTime: string | null // HH:mm format or null for calendarMode === 'none'
+  /** Combination (Twin Ticket): second date for Loro Parque */
+  tourDate2?: string | null
+  isCombination?: boolean // true = Siam Park + Loro Parque (group 168)
+  /** Date range (car rental group 165): end date of rental */
+  tourDateEnd?: string | null
+  isDateRange?: boolean // true = car rental, requires tourDate + tourDateEnd
   calendarMode?: 'sessions' | 'dates' | 'wdays_only' | 'none' // Calendar mode from limits
   
   // Session identifiers (from loadLimits.sessionsByDate)
@@ -55,10 +63,12 @@ export interface CartItem {
  * Generate a unique key for a cart item
  * Handles null tourDate/sesTime for calendarMode === 'none'
  */
-export function generateCartItemKey(item: Pick<CartItem, 't_group' | 't_id' | 'tourDate' | 'sesTime'>): string {
+export function generateCartItemKey(item: Pick<CartItem, 't_group' | 't_id' | 'tourDate' | 'sesTime' | 'tourDate2' | 'tourDateEnd'>): string {
   const tourDate = item.tourDate ?? 'null'
   const sesTime = item.sesTime ?? 'null'
-  return `${item.t_group}-${item.t_id}-${tourDate}-${sesTime}`
+  const tourDate2 = item.tourDate2 ?? 'null'
+  const tourDateEnd = item.tourDateEnd ?? 'null'
+  return `${item.t_group}-${item.t_id}-${tourDate}-${sesTime}-${tourDate2}-${tourDateEnd}`
 }
 
 /**

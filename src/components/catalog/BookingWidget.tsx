@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from '@/navigation'
 import { useCartStore } from '@/lib/cart/store'
+import type { CartItem } from '@/lib/cart/types'
+import { isCombinationEvent } from '@/config/combination-tours'
+import { isDateRangeGroup } from '@/config/date-range-tours'
 import { CartToast } from '@/components/cart/CartToast'
+import { dispatchFlyToCart } from '@/components/cart/FlyToCartAnimation'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 import type { BookingOption } from '@/lib/catalog/normalize'
 import { buildWhatsAppUrl, buildCallUrl } from '@/lib/booking/contactHelpers'
@@ -133,6 +137,8 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   })
   const [selectedDate, setSelectedDate] = useState<string>('')
+  const [selectedDate2, setSelectedDate2] = useState<string>('') // Loro Parque (combinations)
+  const [selectedDateEnd, setSelectedDateEnd] = useState<string>('') // End date for date range (car rental)
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [adults, setAdults] = useState(1)
   const [childs, setChilds] = useState(0)
@@ -169,12 +175,19 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
   const [autoSwitchedMonth, setAutoSwitchedMonth] = useState<string | null>(null)
   const [noAvailabilityFound, setNoAvailabilityFound] = useState(false)
 
+  const isCombination =
+    isCombinationEvent(groupKey, selectedEventId) ||
+    (String(groupKey).includes('168') && ['21', '22', '23'].includes(String(selectedEventId).trim()))
+  const isDateRange = isDateRangeGroup(groupKey)
+
   // Fetch calendar (loadLimits) when eventId or month changes
   useEffect(() => {
     if (!selectedEventId) {
       setSessionsByDay({})
       setAvailableDates([])
       setSelectedDate('')
+      setSelectedDate2('')
+      setSelectedDateEnd('')
       setSelectedTime('')
       setAutoSwitchedMonth(null)
       setNoAvailabilityFound(false)
@@ -381,7 +394,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
         setPricesData(data)
         const mode = getPriceMode(selectedOption?.pProd, data.type)
         
-        if (mode === 'per_day') {
+        if (mode === 'per_day' && !isDateRangeGroup(groupKey)) {
           setPriceStatus('unsupported')
           return
         }
@@ -412,6 +425,14 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     return getPriceMode(selectedOption?.pProd, pricesData.type)
   }, [pricesData, selectedOption?.pProd])
 
+  const numberOfDays = useMemo(() => {
+    if (!isDateRange || !selectedDate || !selectedDateEnd) return 1
+    const d1 = new Date(selectedDate)
+    const d2 = new Date(selectedDateEnd)
+    const diff = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24))
+    return Math.max(1, diff + 1)
+  }, [isDateRange, selectedDate, selectedDateEnd])
+
   // Calculate total based on price mode
   const totalPrice = useMemo(() => {
     if (!selectedEventId || !selectedDate) return null
@@ -430,9 +451,21 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
       return adults * adult + childs * child + infants * infant
     }
 
-    // per_day: not calculated yet
+    if (mode === 'per_day' && isDateRange && pricesData.type === 'per_day' && 'tiers' in pricesData) {
+      const tiers = pricesData.tiers
+      if (!Array.isArray(tiers) || tiers.length === 0) return null
+      const tier = tiers[0] as { days: number; price: number }
+      const pricePerDay = tier.days > 0 ? tier.price / tier.days : tier.price
+      return pricePerDay * numberOfDays
+    }
+
     return null
-  }, [selectedEventId, selectedDate, priceStatus, pricesData, priceMode, adults, childs, infants])
+  }, [selectedEventId, selectedDate, priceStatus, pricesData, priceMode, adults, childs, infants, isDateRange, numberOfDays])
+
+  const pricePerDay = useMemo(() => {
+    if (!isDateRange || numberOfDays <= 0 || totalPrice === null) return null
+    return totalPrice / numberOfDays
+  }, [isDateRange, numberOfDays, totalPrice])
 
   // Should show pax selectors?
   const showPaxSelectors = useMemo(() => {
@@ -510,7 +543,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     // If calendarMode === 'none': allow without date/time (on-request booking)
     if (calendarMode === 'none') {
       // Only validate pax
-      if (priceMode === 'per_day') return false
+      if (priceMode === 'per_day' && !isDateRange) return false
       if (priceMode === 'per_person') {
         return adults >= 1
       }
@@ -519,6 +552,11 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     
     // For other modes: require selectedDate
     if (!selectedDate) return false
+
+    // Combination (Twin Ticket): require second date (Loro Parque)
+    if (isCombination && !selectedDate2) return false
+    // Combination: Siam Park and Loro Parque must be different days
+    if (isCombination && selectedDate && selectedDate2 && selectedDate === selectedDate2) return false
     
     // If requiresSessionTime === true => require selectedTime from available sessions for that date
     if (requiresSessionTime) {
@@ -530,12 +568,12 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     // Block if NO_SCHEDULE_PUBLISHED mode (but allow wdays_only)
     if (availabilityMode === 'NO_SCHEDULE_PUBLISHED' && calendarMode !== 'wdays_only') return false
     
-    if (priceMode === 'per_day') return false
+    if (priceMode === 'per_day' && !isDateRange) return false
     if (priceMode === 'per_person') {
       return adults >= 1
     }
     return true
-  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, priceStatus, priceMode, adults, hasValidTimes])
+  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, selectedDate2, selectedDateEnd, isCombination, isDateRange, priceStatus, priceMode, adults, hasValidTimes])
 
   // Validation for Buy Now (same as Add to Cart - customer fields collected at checkout)
   const canBuyNow = useMemo(() => {
@@ -545,7 +583,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     // If calendarMode === 'none': allow without date/time (on-request booking)
     if (calendarMode === 'none') {
       // Only validate pax
-      if (priceMode === 'per_day') return false
+      if (priceMode === 'per_day' && !isDateRange) return false
       if (priceMode === 'per_person') {
         return adults >= 1
       }
@@ -554,6 +592,15 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     
     // For other modes: require selectedDate
     if (!selectedDate) return false
+
+    // Combination (Twin Ticket): require second date (Loro Parque)
+    if (isCombination && !selectedDate2) return false
+    // Combination: Siam Park and Loro Parque must be different days
+    if (isCombination && selectedDate && selectedDate2 && selectedDate === selectedDate2) return false
+
+    // Date range (car rental): require end date and end >= start
+    if (isDateRange && !selectedDateEnd) return false
+    if (isDateRange && selectedDate && selectedDateEnd && selectedDateEnd < selectedDate) return false
     
     // If requiresSessionTime === true => require selectedTime from available sessions for that date
     if (requiresSessionTime) {
@@ -565,12 +612,12 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
     // Block if NO_SCHEDULE_PUBLISHED mode (but allow wdays_only)
     if (availabilityMode === 'NO_SCHEDULE_PUBLISHED' && calendarMode !== 'wdays_only') return false
     
-    if (priceMode === 'per_day') return false
+    if (priceMode === 'per_day' && !isDateRange) return false
     if (priceMode === 'per_person') {
       return adults >= 1
     }
     return true
-  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, priceStatus, priceMode, adults, hasValidTimes])
+  }, [calendarMode, requiresSessionTime, availabilityMode, selectedEventId, selectedDate, selectedDate2, selectedDateEnd, isCombination, isDateRange, priceStatus, priceMode, adults, hasValidTimes])
 
   // Age labels from groupDetails
   const childAgeLabel = groupDetails?.childAge ? `Children (${groupDetails.childAge})` : 'Children'
@@ -607,6 +654,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
           onChange={(e) => {
             setSelectedEventId(e.target.value)
             setSelectedDate('')
+            setSelectedDate2('')
           }}
           className="w-full px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
         >
@@ -685,9 +733,21 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
         </div>
       )}
 
-      {/* Calendar - show for wdays_only mode or normal mode (but hide if none mode) */}
+      {/* Calendar - Date range (car rental) or single date / Siam Park */}
       {selectedEventId && calendarMode !== 'none' && (
         <div className="mb-4">
+          {isDateRange ? (
+            <>
+              <label className="block text-sm font-medium text-glass-700 mb-2">
+                Select start and end date *
+              </label>
+              <p className="text-xs text-glass-500 mb-2">Click to select start date, then end date. Days in between will be highlighted.</p>
+            </>
+          ) : (
+            <label className="block text-sm font-medium text-glass-700 mb-2">
+              {isCombination ? 'Siam Park – Select date *' : 'Select date *'}
+            </label>
+          )}
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => changeMonth(-1)}
@@ -711,6 +771,9 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
               </svg>
             </button>
           </div>
+          {isDateRange && selectedDate && !selectedDateEnd && (
+            <p className="text-sm text-ocean-600 font-medium mb-2">Choose your end date</p>
+          )}
 
           {/* Calendar - only dates in availableDates are clickable */}
           {loadingCalendar ? (
@@ -731,26 +794,50 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                   if (day.day === 0) {
                     return <div key={idx} className="aspect-square" />
                   }
-                  // For wdays_only mode, use projectedAvailableDates; otherwise use availableDates
                   const datesToCheck = calendarMode === 'wdays_only' ? projectedAvailableDates : availableDates
                   const isAvailable = datesToCheck.includes(day.date)
+                  const blockedByLoro = isCombination && day.date === selectedDate2
+                  const isSelectable = isAvailable && !blockedByLoro
+                  const inRange = isDateRange && selectedDate && selectedDateEnd && day.date >= selectedDate && day.date <= selectedDateEnd
+                  const isStart = isDateRange && day.date === selectedDate
+                  const showBlue = inRange || (isStart && !selectedDateEnd)
+                  const handleClick = () => {
+                    if (!isSelectable) return
+                    if (isDateRange) {
+                      if (!selectedDate) {
+                        setSelectedDate(day.date)
+                        setSelectedDateEnd('')
+                      } else if (!selectedDateEnd) {
+                        if (day.date >= selectedDate) {
+                          setSelectedDateEnd(day.date)
+                        } else {
+                          setSelectedDate(day.date)
+                          setSelectedDateEnd('')
+                        }
+                      } else {
+                        setSelectedDate(day.date)
+                        setSelectedDateEnd('')
+                      }
+                    } else {
+                      setSelectedDate(day.date)
+                    }
+                  }
+                  const effectiveSelectable = isDateRange ? isAvailable : isSelectable
                   return (
                     <button
                       key={day.date}
-                      onClick={() => {
-                        if (isAvailable) {
-                          setSelectedDate(day.date)
-                        }
-                      }}
-                      disabled={!isAvailable}
+                      onClick={handleClick}
+                      disabled={!effectiveSelectable}
                       className={`aspect-square text-sm rounded transition-colors ${
-                        day.isSelected
-                          ? 'bg-ocean-600 text-white font-semibold'
-                          : day.isToday
-                            ? 'bg-ocean-100 text-ocean-900 font-medium'
-                            : isAvailable
-                              ? 'bg-glass-50 text-glass-900 hover:bg-ocean-50 cursor-pointer'
-                              : 'bg-glass-100 text-glass-400 cursor-not-allowed'
+                        showBlue
+                          ? 'bg-ocean-500 text-white font-semibold'
+                          : day.isSelected
+                            ? 'bg-ocean-600 text-white font-semibold'
+                            : day.isToday
+                              ? 'bg-ocean-100 text-ocean-900 font-medium'
+                              : effectiveSelectable
+                                ? 'bg-glass-50 text-glass-900 hover:bg-ocean-50 cursor-pointer'
+                                : 'bg-glass-100 text-glass-400 cursor-not-allowed'
                       }`}
                     >
                       {day.day}
@@ -759,6 +846,70 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                 })}
               </div>
             </>
+          )}
+        </div>
+      )}
+
+      {/* Second calendar - Loro Parque (combinations only) */}
+      {selectedEventId && isCombination && calendarMode !== 'none' && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-glass-700 mb-2">
+            Loro Parque – Select date *
+          </label>
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={() => changeMonth(-1)}
+              className="p-2 hover:bg-glass-100 rounded transition-colors"
+              aria-label="Previous month"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <h3 className="text-sm font-semibold text-glass-900">
+              {new Date(calendarGrid.year, calendarGrid.month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </h3>
+            <button
+              onClick={() => changeMonth(1)}
+              className="p-2 hover:bg-glass-100 rounded transition-colors"
+              aria-label="Next month"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          {loadingCalendar ? (
+            <div className="text-center py-4 text-sm text-glass-500">Loading...</div>
+          ) : (
+            <div className="grid grid-cols-7 gap-1">
+              {calendarGrid.days.map((day, idx) => {
+                if (day.day === 0) {
+                  return <div key={`e2-${idx}`} className="aspect-square" />
+                }
+                const datesToCheck = calendarMode === 'wdays_only' ? projectedAvailableDates : availableDates
+                const isAvailable = datesToCheck.includes(day.date)
+                const blockedBySiam = day.date === selectedDate
+                const isSelectable = isAvailable && !blockedBySiam
+                const isSelected2 = day.date === selectedDate2
+                return (
+                  <button
+                    key={day.date}
+                    onClick={() => isSelectable && setSelectedDate2(day.date)}
+                    disabled={!isSelectable}
+                    className={`aspect-square text-sm rounded transition-colors ${
+                      isSelected2
+                        ? 'bg-ocean-600 text-white font-semibold'
+                        : isSelectable
+                          ? 'bg-glass-50 text-glass-900 hover:bg-ocean-50 cursor-pointer'
+                          : 'bg-glass-100 text-glass-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {day.day}
+                  </button>
+                )
+              })}
+            </div>
           )}
         </div>
       )}
@@ -882,6 +1033,11 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
 
       {/* Total Price */}
       <div className="mb-4 pt-4 border-t border-glass-200">
+        {isDateRange && selectedDateEnd && pricePerDay !== null && totalPrice !== null && (
+          <p className="text-xs text-glass-500 mb-1">
+            {pricePerDay.toFixed(2)} €/day × {numberOfDays} day{numberOfDays > 1 ? 's' : ''} = {totalPrice.toFixed(2)} €
+          </p>
+        )}
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-glass-700">TOTAL</span>
           <span className={`text-xl font-bold ${
@@ -903,7 +1059,8 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
         <button
           type="button"
           disabled={!canAddToCart}
-          onClick={() => {
+          onClick={(e) => {
+            const button = e.currentTarget
             console.log('[BOOKING_WIDGET] ADD_TO_CART CLICK /catalog/[id]', {
               canAddToCart,
               selectedEventId,
@@ -1000,9 +1157,10 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                   total: totalPrice || 0,
                 }
 
-                const itemData = {
+                const itemData: Omit<CartItem, 'itemKey' | 'addedAt' | 'expiresAt'> = {
                   t_group: groupKey,
                   t_id: selectedEventId,
+                  tourName: activityName || (groupDetails as { name?: string; Name?: string })?.name || (groupDetails as { name?: string; Name?: string })?.Name || undefined,
                   language: atlanticoLang,
                   tourDate: selectedDate,
                   sesTime: sesTime,
@@ -1011,6 +1169,8 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                   infants,
                   priceSnapshot,
                   currency: pricesData.currency || 'EUR',
+                  ...(isCombination && selectedDate2 ? { tourDate2: selectedDate2, isCombination: true } : {}),
+                  ...(isDateRange && selectedDateEnd ? { tourDateEnd: selectedDateEnd, isDateRange: true } : {}),
                 }
 
                 // DEV log
@@ -1027,6 +1187,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                 console.log('[CART] before', cart.items.length)
                 console.log('[BOOKING_WIDGET] Adding to cart:', itemData)
                 cart.addItem(itemData)
+                dispatchFlyToCart(button)
                 console.log('[CART] after', cart.items.length)
                 setShowToast(true)
                 console.log('[BOOKING_WIDGET] Item added successfully')
@@ -1038,7 +1199,7 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
             }
           }}
           className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ pointerEvents: 'auto' }}
+          style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
         >
           Add to Cart
         </button>
@@ -1141,9 +1302,10 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                   total: totalPrice || 0,
                 }
 
-                const itemData = {
+                const itemData: Omit<CartItem, 'itemKey' | 'addedAt' | 'expiresAt'> = {
                   t_group: groupKey,
                   t_id: selectedEventId,
+                  tourName: activityName || (groupDetails as { name?: string; Name?: string })?.name || (groupDetails as { name?: string; Name?: string })?.Name || undefined,
                   language: atlanticoLang,
                   tourDate: selectedDate,
                   sesTime: sesTime,
@@ -1152,6 +1314,8 @@ export function BookingWidget({ options, groupKey, groupDetails, lang, locale, a
                   infants,
                   priceSnapshot,
                   currency: pricesData.currency || 'EUR',
+                  ...(isCombination && selectedDate2 ? { tourDate2: selectedDate2, isCombination: true } : {}),
+                  ...(isDateRange && selectedDateEnd ? { tourDateEnd: selectedDateEnd, isDateRange: true } : {}),
                 }
 
                 // DEV log

@@ -63,7 +63,7 @@ export const useCartStore = create<CartState>()(
             if (item.itemKey === itemKey) {
               const updated = { ...item, ...patch }
               // Regenerate key if t_group, t_id, tourDate, or sesTime changed
-              if (patch.t_group || patch.t_id || patch.tourDate || patch.sesTime) {
+              if (patch.t_group || patch.t_id || patch.tourDate || patch.sesTime || patch.tourDate2 || patch.tourDateEnd) {
                 updated.itemKey = generateCartItemKey(updated)
               }
               return updated

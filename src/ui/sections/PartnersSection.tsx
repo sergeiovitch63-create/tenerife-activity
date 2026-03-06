@@ -2,6 +2,7 @@
 
 import { Section, Container, Stack } from '@/ui/components/layout'
 import { Button } from '@/ui/components/shared/Button'
+import { PartnersLogos } from '@/ui/components/partners'
 import { useRouter } from '@/navigation'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
@@ -106,6 +107,11 @@ export function PartnersSection() {
             <Button variant="secondary" size="lg" onClick={handleWorkWithUs}>
               {t('button')}
             </Button>
+          </div>
+
+          {/* Our Trusted Partners Carousel */}
+          <div className="w-full pt-8 md:pt-12">
+            <PartnersLogos />
           </div>
         </Stack>
       </Container>

@@ -296,7 +296,147 @@ export default async function ActivityDetailPage({
       }
     }
 
-    eventOptions = options
+    // Group 216: keep only "From the South area" option
+    // Group 326: remove Naviera Armas - From The South Area & Naviera Armas - From Puerto de la Cruz
+    let finalOptions = options
+    if (item.groupCode === '216') {
+      const fromSouthArea = options.filter((opt) => (opt.label || '').trim() === 'from the south area')
+      if (fromSouthArea.length > 0) finalOptions = fromSouthArea
+    } else if (item.groupCode === '326') {
+      const exclude = ['Naviera Armas - From The South Area', 'Naviera Armas - From Puerto de la Cruz']
+      finalOptions = options.filter((opt) => !exclude.some((ex) => (opt.label || '').trim() === ex))
+    } else if (item.groupCode === '11') {
+      const fromSouthArea = options.filter((opt) => /From The South Area/i.test(opt.label || ''))
+      if (fromSouthArea.length > 0) finalOptions = fromSouthArea
+    } else if (item.groupCode === '78') {
+      finalOptions = options.filter((opt) => !/with lunch included from the South/i.test(opt.label || ''))
+    } else if (item.groupCode === '16') {
+      const desdeZonaSur = options.filter((opt) => /Desde zona sur/i.test(opt.label || ''))
+      if (desdeZonaSur.length > 0) finalOptions = desdeZonaSur
+    } else if (item.groupCode === '319') {
+      finalOptions = options.filter((opt) => !/^Los Tilos$/i.test((opt.label || '').trim()))
+    } else if (item.groupCode === '322') {
+      const exclude = [
+        'Visite nocturne VIP du Teide (personne supplémentaire)',
+        'Visite nocturne VIP du Teide',
+      ]
+      finalOptions = options.filter((opt) => !exclude.some((ex) => (opt.label || '').trim() === ex))
+    } else if (item.groupCode === '35') {
+      const allowed = ['Spa Entrance', 'Spa Vip', 'Spa Resident', 'Spa Vip Resident']
+      const filtered = options.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      if (filtered.length > 0) finalOptions = filtered
+    } else if (item.groupCode === '330') {
+      const allowed = ['Ticket', 'Entrada + Hamaca Residente', 'Adult > 65 years old']
+      const filtered = options.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      if (filtered.length > 0) finalOptions = filtered
+    } else if (item.groupCode === '362') {
+      finalOptions = options.filter((opt) => (opt.label || '').trim().toLowerCase() !== 'entrada brunch')
+    } else if (item.groupCode === '281') {
+      const allowed = ['Astronomical Observation at El Teide']
+      const filtered = options.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      if (filtered.length > 0) finalOptions = filtered
+    } else if (item.groupCode === '134') {
+      const allowed = [
+        'Ticket (Guided tour)',
+        'Ticket +Teide Tour from the South area',
+        'Ticket + Teide Tour from Puerto de la Cruz',
+      ]
+      const filtered = options.filter((opt) =>
+        allowed.some((a) => (opt.label || '').trim().toLowerCase() === a.toLowerCase())
+      )
+      if (filtered.length > 0) finalOptions = filtered
+    } else if (item.groupCode === '165') {
+      const exclude = [
+        'Oferta Especial 4 días Nissan Micra o Fiat Panda por 89€',
+        'Oferta Especial 3 días Nissan Micra o Fiat Panda por 79€',
+        'Jeep Renegade',
+      ]
+      finalOptions = options.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    } else if (item.groupCode === '166') {
+      const exclude = [
+        'Skoda Fabia Combi o similar',
+        'VW T-CROSS o similar',
+        'Renault Megane o similar',
+        'Suzuki Vitara (SUV)',
+        'FIAT 500 o similar',
+        'Mercedes Vito AUT',
+        'VW T-Rock Cabrio',
+      ]
+      finalOptions = options.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    } else if (item.groupCode === '189') {
+      const exclude = [
+        'Grupo A - Honda PCX 125 cc',
+        'Grupo B - Honda Forza 300 cc',
+        'Grupo C - Suzuki Bourgman 400 cc',
+        'Grupo D - Honda CB 125 F',
+        'Grupo E - Honda CB 500 X',
+      ]
+      finalOptions = options.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    } else if (item.groupCode === '127') {
+      const exclude = [
+        'Road Bike Carbono Disc Break',
+        'Road Bike Aluminum',
+        'E-City Bicicleta eléctrica',
+        'E-City Bicicleta elécrtica',
+        'Mountain Bike',
+        'City Bike (from Periphery)',
+        'Mountain Bike (from Periphery)',
+        'Pro Mountain Bike (from Periphery)',
+        'Road Bike (from Periphery)',
+        'E-Mountain Bike Bicicleta eléctrica',
+        'Kids Bike (from Periphery)',
+      ]
+      finalOptions = options.filter(
+        (opt) => !exclude.some((ex) => (opt.label || '').trim().toLowerCase() === ex.toLowerCase())
+      )
+    } else if (item.groupCode === '97') {
+      const allowed = [
+        'Dîner pique-nique + bus de la zone nord',
+        'Dîner pique-nique + bus de la zone sud',
+      ]
+      const filtered = options.filter((opt) => allowed.some((a) => (opt.label || '').trim() === a))
+      if (filtered.length > 0) finalOptions = filtered
+    } else if (item.groupCode === '310') {
+      const exclude = [
+        'Lone Star - Solo observación',
+        'Lone Star - Dinner Included (self drive)',
+      ]
+      finalOptions = options.filter((opt) => !exclude.some((ex) => (opt.label || '').trim() === ex))
+    } else if (item.groupCode === '137') {
+      const exclude = [
+        'VIP - Excursion privée - (Personne supplémentaire)',
+        'VIP - Excursion privée',
+      ]
+      finalOptions = options.filter((opt) => !exclude.some((ex) => (opt.label || '').trim() === ex))
+    } else if (item.groupCode === '245') {
+      const exclude = [/Ticket \+?Teide Tour from Puerto de la Cruz/i]
+      const allowed = [
+        /From South/i,
+        /From Puerto de La Cruz/i,
+        /Desde Playa Paraíso y Los Gigantes/i,
+        /Desde Santa Cruz y Candelaria/i,
+      ]
+      finalOptions = options.filter(
+        (opt) =>
+          allowed.some((re) => re.test(opt.label || '')) &&
+          !exclude.some((re) => re.test(opt.label || ''))
+      )
+    }
+    // Apply backoffice visibility
+    const visibility = (await import('@/lib/backoffice/visibility.server')).getVisibilityConfig()
+    eventOptions = finalOptions.filter((opt) => !visibility.hiddenEventIds.includes(opt.eventId))
 
     // DEV sanity check for first eventId: try loadPrices for today
     if (process.env.NODE_ENV === 'development' && uniqueIds.length > 0) {

@@ -1,9 +1,7 @@
 /**
  * Mapping from vibe slug to Atlantico classification name
- * 
- * This mapping is used to resolve which Atlantico classification
- * should be displayed when a user clicks on a vibe.
- * 
+ *
+ * Fallback when classificationId is not available.
  * The classification name is matched case-insensitively against
  * the name field from /clasificationList/{lang}/{Collaborator}
  */
@@ -21,10 +19,31 @@ export const VIBE_TO_CLASSIFICATION_MAPPING: Record<string, string> = {
   'car-rental': 'Car and Moto Rent',
   'bike-rental': 'Bike Tours and Rentals',
   'transfers-private-transport': 'Airport transfers',
+  'transfers-transport': 'Airport transfers',
+  'adventure-nature': 'Adventure and Nature',
 }
 
 /**
- * Get the Atlantico classification name for a vibe slug
+ * Mapping from vibe slug to Atlantico classification ID (direct, most reliable).
+ * When present, this is used instead of name lookup.
+ * Source: /en/debug/classifications → classificationId
+ */
+export const VIBE_TO_CLASSIFICATION_ID: Record<string, string> = {
+  'adventure-nature': '1312487407',
+  'cable-car-observatory': '1426163087',
+  'diving-fishing': '1265045434',
+  // Add more as needed: 'slug': 'classificationId'
+}
+
+/**
+ * Get the Atlantico classification ID for a vibe slug (preferred)
+ */
+export function getClassificationIdForVibe(vibeSlug: string): string | null {
+  return VIBE_TO_CLASSIFICATION_ID[vibeSlug] ?? null
+}
+
+/**
+ * Get the Atlantico classification name for a vibe slug (fallback)
  */
 export function getClassificationNameForVibe(vibeSlug: string): string | null {
   return VIBE_TO_CLASSIFICATION_MAPPING[vibeSlug] || null

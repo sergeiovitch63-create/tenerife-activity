@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/navigation'
+import { getMustSeeHref } from '@/data/must-see-group-mapping'
 
 interface MustSeeItem {
   title: string
@@ -109,7 +111,10 @@ export function RecommendationsCarousel() {
         <div className="marquee-track">
           {row1Duplicated.map((item, index) => (
             <div key={`row1-${item.title}-${index}`} className="marquee-item">
-              <div className="flex flex-col items-center gap-2">
+              <Link
+                href={getMustSeeHref(item.title)}
+                className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
+              >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
                   <Image
@@ -133,7 +138,7 @@ export function RecommendationsCarousel() {
                     </p>
                   )}
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>
@@ -146,7 +151,10 @@ export function RecommendationsCarousel() {
         <div className="marquee-track">
           {row2Duplicated.map((item, index) => (
             <div key={`row2-${item.title}-${index}`} className="marquee-item">
-              <div className="flex flex-col items-center gap-2">
+              <Link
+                href={getMustSeeHref(item.title)}
+                className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
+              >
                 {/* Square Image Card */}
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
                   <Image
@@ -170,7 +178,7 @@ export function RecommendationsCarousel() {
                     </p>
                   )}
                 </div>
-              </div>
+              </Link>
             </div>
           ))}
         </div>

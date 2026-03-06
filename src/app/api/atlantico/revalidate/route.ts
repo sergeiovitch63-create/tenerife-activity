@@ -538,13 +538,28 @@ export async function POST(request: NextRequest) {
           })
         }
         
-        // 1. Check availability
+        // 1. Check availability (both dates for combinations)
         const availability = await checkSessionAvailability(
           item.t_id,
           item.language,
           item.tourDate,
           item.sesTime
         )
+        let availability2: Awaited<ReturnType<typeof checkSessionAvailability>> | null = null
+        if (item.isCombination && item.tourDate2) {
+          availability2 = await checkSessionAvailability(
+            item.t_id,
+            item.language,
+            item.tourDate2,
+            item.sesTime || '00:00'
+          )
+          if (!availability2.available) {
+            // Merge failure: second date unavailable
+            availability.available = false
+            availability.error = availability2.error || `Date ${item.tourDate2} (Loro Parque) not available`
+            availability.reason = availability2.reason
+          }
+        }
         
         // DEV log: loadLimits response
         if (process.env.NODE_ENV === 'development') {
@@ -713,13 +728,15 @@ export async function POST(request: NextRequest) {
           ...(availability.rcId !== undefined && { rcId: availability.rcId }),
         }
         
-        // Update itemKey if sesTime or tourDate changed (since itemKey includes both)
+        // Update itemKey if sesTime or tourDate changed
         if (finalSesTime !== item.sesTime || finalTourDate !== item.tourDate) {
           revalidated.itemKey = generateCartItemKey({
             t_group: item.t_group,
             t_id: item.t_id,
             tourDate: finalTourDate,
             sesTime: finalSesTime,
+            tourDate2: item.tourDate2,
+            tourDateEnd: item.tourDateEnd,
           })
         }
         

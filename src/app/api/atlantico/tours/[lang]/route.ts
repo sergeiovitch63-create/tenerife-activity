@@ -17,6 +17,7 @@ import { NextRequest } from 'next/server'
 import { getAtlanticoConfig } from '@/lib/atlantico/config'
 import { fetchAtlantico } from '@/lib/atlantico/fetch'
 import { normalizePriceFromRaw } from '@/lib/atlantico/price-normalize'
+import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 
 /**
  * Atlantico image base URL
@@ -40,11 +41,13 @@ function getAllowedGroupIds(): string[] | null {
 }
 
 /**
- * Strip HTML tags from string
+ * Strip HTML tags from string and decode HTML entities
  */
 function stripHtmlTags(html: string): string {
   if (!html || typeof html !== 'string') return ''
-  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+  // First decode HTML entities, then strip HTML tags
+  const decoded = decodeTextFromApi(html)
+  return decoded.replace(/<[^>]*>/g, '').trim()
 }
 
 /**

@@ -13,23 +13,37 @@ import { useCartStore } from '@/lib/cart/store'
 import { createCartItem, type PriceSnapshot } from '@/lib/cart/types'
 import { Button } from '@/ui/components/shared/Button'
 import { CartToast } from '@/components/cart/CartToast'
+import { dispatchFlyToCart } from '@/components/cart/FlyToCartAnimation'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 import { sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
 
 import type { MeetingPoint } from '@/app/api/atlantico/event-details/route'
 import { MeetingPointsDisplay } from '@/components/booking/MeetingPointsDisplay'
+import { isDateRangeGroup } from '@/config/date-range-tours'
 
 interface ActivityBookingPanelProps {
   t_group: string
   initialEventId: string
   events: Array<{ t_id: string; title: string }>
   locale: string
+  /** Tour display name for cart (from group details page) */
+  tourName?: string
   language: string // Atlántico language param (e.g., 'ENG', 'ESP')
   duration?: string | number // Activity duration
   startingPrice?: number | string // Starting price
   cancellationPolicy?: string // Cancellation policy text
   cancellationTitle?: string // Cancellation policy title
+  childAge?: string // e.g. "0-11"
+  infantAge?: string // e.g. "0-2" or "NO"
   meetingPoints?: MeetingPoint[] // Meeting points and pickup points
+  /** Show Children selector. When false, only Adults. Based on Prices section. */
+  showChildSelector?: boolean
+  /** Show Infants selector. When false, hide. Based on Prices section. */
+  showInfantSelector?: boolean
+  /** Use "Quantity" instead of "Adults" when price > 200€ */
+  useQuantityLabel?: boolean
+  /** Twin Ticket (group 168): two dates - Siam Park + Loro Parque */
+  isCombination?: boolean
 }
 
 interface BookingReadinessState {
@@ -54,7 +68,11 @@ function getBookingReadinessState(
   priceSnapshot: PriceSnapshot | null,
   loadingPrices: boolean,
   loadingSessions: boolean,
-  forBuyNow: boolean = false
+  forBuyNow: boolean = false,
+  isCombination: boolean = false,
+  tourDate2: string | null = null,
+  isDateRange: boolean = false,
+  tourDateEnd: string | null = null
 ): BookingReadinessState {
   const missing: string[] = []
 
@@ -73,12 +91,31 @@ function getBookingReadinessState(
     missing.push('Please select a date')
   }
 
-  // Pax total must be >= 1
-  const paxTotal = adults + childs + infants
-  if (paxTotal < 1) {
-    missing.push('At least 1 participant is required')
-  } else if (adults < 1) {
-    missing.push('At least 1 adult is required')
+  // Combination: require second date (Loro Parque)
+  if (isCombination && !tourDate2) {
+    missing.push('Please select date for Loro Parque')
+  }
+  // Combination: Siam Park and Loro Parque must be different days
+  if (isCombination && tourDate && tourDate2 && tourDate === tourDate2) {
+    missing.push('Siam Park and Loro Parque must be on different days')
+  }
+
+  // Date range (car rental): require end date and end >= start
+  if (isDateRange && !tourDateEnd) {
+    missing.push('Please select end date')
+  }
+  if (isDateRange && tourDate && tourDateEnd && tourDateEnd < tourDate) {
+    missing.push('End date must be on or after start date')
+  }
+
+  // Pax total must be >= 1 (skip for date range: no participant selectors, use 1 by default)
+  if (!isDateRange) {
+    const paxTotal = adults + childs + infants
+    if (paxTotal < 1) {
+      missing.push('At least 1 participant is required')
+    } else if (adults < 1) {
+      missing.push('At least 1 adult is required')
+    }
   }
 
   // If sessions exist -> require sesTime
@@ -120,12 +157,21 @@ export function ActivityBookingPanel({
   startingPrice,
   cancellationPolicy,
   cancellationTitle,
+  childAge,
+  infantAge,
   meetingPoints,
+  showChildSelector = true,
+  showInfantSelector = true,
+  useQuantityLabel = false,
+  isCombination = false,
+  tourName,
 }: ActivityBookingPanelProps) {
   const router = useRouter()
   const { addItem } = useCartStore()
   const [selectedEventId, setSelectedEventId] = useState(initialEventId)
   const [selectedDate, setSelectedDate] = useState('')
+  const [selectedDate2, setSelectedDate2] = useState('') // Loro Parque date for combinations
+  const [selectedDateEnd, setSelectedDateEnd] = useState('') // End date for date range (car rental)
   const [selectedTime, setSelectedTime] = useState('')
   const [adults, setAdults] = useState(1)
   const [childs, setChilds] = useState(0)
@@ -314,18 +360,53 @@ export function ActivityBookingPanel({
 
     setLoadingPrices(true)
     try {
-      const response = await fetch(`/api/atlantico/prices?eventId=${currentTId}&date=${selectedDate}`)
+      const response = await fetch(`/api/atlantico/prices?eventId=${currentTId}&date=${selectedDate}&lang=${language}`)
       if (!response.ok) {
         throw new Error('Failed to load prices')
       }
       const data = await response.json()
       
-      // Parse prices from response (may be in various formats)
-      const adultPrice = data.adult || data.PVPA || data.priceAdult || 0
-      const childPrice = data.child || data.PVPC || data.priceChild || 0
-      const infantPrice = data.infant || data.PVPOS || data.priceInfant || 0
-      
-      const total = adultPrice * adults + childPrice * childs + infantPrice * infants
+      let adultPrice: number
+      let childPrice: number
+      let infantPrice: number
+      let total: number
+
+      if (data.type === 'per_day' && Array.isArray(data.tiers) && data.tiers.length > 0) {
+        const tier = data.tiers[0] as { days: number; price: number }
+        const pricePerDay = tier.days > 0 ? tier.price / tier.days : tier.price
+        adultPrice = pricePerDay
+        childPrice = 0
+        infantPrice = 0
+        total = pricePerDay
+      } else {
+        adultPrice = data.adult ?? data.PVPA ?? data.priceAdult ?? 0
+        childPrice = data.child ?? data.PVPC ?? data.priceChild ?? 0
+        infantPrice = data.infant ?? data.PVPOS ?? data.priceInfant ?? 0
+        total = adultPrice * adults + childPrice * childs + infantPrice * infants
+
+        // Fallback: API may return type:'unknown' with raw for per_day (car rental)
+        if (total === 0 && data.raw && typeof data.raw === 'object') {
+          const r = data.raw as Record<string, unknown>
+          const pvpa = r.PVPA ?? r.pvpa ?? r.VPVA ?? r.vpva ?? r.priceA ?? r.price ?? r.PVP
+          const p = typeof pvpa === 'number' ? pvpa : typeof pvpa === 'string' ? parseFloat(pvpa) : NaN
+          if (!isNaN(p) && p > 0) {
+            adultPrice = p
+            total = p
+          }
+        }
+      }
+
+      // Date range: if still 0, use startingPrice as daily rate fallback
+      const isDateRangeLocal = isDateRangeGroup(t_group)
+      if (isDateRangeLocal && total === 0 && startingPrice != null) {
+        const sp = typeof startingPrice === 'number' ? startingPrice : parseFloat(String(startingPrice))
+        if (!isNaN(sp) && sp > 0) {
+          adultPrice = sp
+          childPrice = 0
+          infantPrice = 0
+          total = sp
+        }
+      }
 
       setPriceSnapshot({
         adult: adultPrice,
@@ -342,6 +423,21 @@ export function ActivityBookingPanel({
     }
   }
 
+  const isDateRange = isDateRangeGroup(t_group)
+
+  const numberOfDays = useMemo(() => {
+    if (!isDateRange || !selectedDate || !selectedDateEnd) return 1
+    const d1 = new Date(selectedDate)
+    const d2 = new Date(selectedDateEnd)
+    const diff = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24))
+    return Math.max(1, diff + 1)
+  }, [isDateRange, selectedDate, selectedDateEnd])
+
+  const displayTotal = useMemo(() => {
+    if (!priceSnapshot) return 0
+    return isDateRange ? priceSnapshot.total * numberOfDays : priceSnapshot.total
+  }, [priceSnapshot, isDateRange, numberOfDays])
+
   // Calculate readiness state
   const readiness = useMemo(() => {
     const finalSesTime = hasSessions && selectedTime ? selectedTime : '00:00'
@@ -357,7 +453,11 @@ export function ActivityBookingPanel({
       priceSnapshot,
       loadingPrices,
       loadingSessions,
-      false
+      false,
+      isCombination,
+      isCombination ? selectedDate2 || null : null,
+      isDateRange,
+      isDateRange ? selectedDateEnd || null : null
     )
   }, [
     t_group,
@@ -371,6 +471,10 @@ export function ActivityBookingPanel({
     priceSnapshot,
     loadingPrices,
     loadingSessions,
+    isCombination,
+    selectedDate2,
+    isDateRange,
+    selectedDateEnd,
   ])
 
   // Debug click handler (DEV only)
@@ -387,15 +491,15 @@ export function ActivityBookingPanel({
     })
     
     if (process.env.NODE_ENV === 'development') {
-      alert(`${label} clicked - Check console for details`)
+      console.log(`[BOOKING_PANEL] ${label} - Check above for details`)
     }
   }
 
   // Handle Add to Cart
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const target = e.currentTarget as HTMLButtonElement
+    const button = e.currentTarget
     console.log('[BOOKING_PANEL] handleAddToCart called', {
-      disabled: target.disabled,
+      disabled: button.disabled,
       readiness: readiness,
       priceSnapshot: priceSnapshot,
     })
@@ -413,21 +517,35 @@ export function ActivityBookingPanel({
 
     try {
       const finalSesTime = hasSessions && selectedTime ? selectedTime : '00:00'
-      const itemData = {
+      const finalPriceSnapshot = priceSnapshot
+        ? { ...priceSnapshot, total: displayTotal }
+        : null
+      if (!finalPriceSnapshot) throw new Error('Price snapshot required')
+      const itemData: Parameters<typeof addItem>[0] = {
         t_group,
         t_id: currentTId,
+        tourName,
         language,
         tourDate: selectedDate,
         sesTime: finalSesTime,
-        adults,
-        childs,
-        infants,
-        priceSnapshot,
+        adults: isDateRange ? 1 : adults,
+        childs: isDateRange ? 0 : childs,
+        infants: isDateRange ? 0 : infants,
+        priceSnapshot: finalPriceSnapshot,
         currency,
+      }
+      if (isCombination && selectedDate2) {
+        itemData.tourDate2 = selectedDate2
+        itemData.isCombination = true
+      }
+      if (isDateRange && selectedDateEnd) {
+        itemData.tourDateEnd = selectedDateEnd
+        itemData.isDateRange = true
       }
 
       console.log('[BOOKING_PANEL] Adding item to cart:', itemData)
       addItem(itemData)
+      dispatchFlyToCart(button)
       setShowToast(true)
       console.log('[BOOKING_PANEL] Item added successfully')
     } catch (err) {
@@ -458,17 +576,30 @@ export function ActivityBookingPanel({
 
     try {
       const finalSesTime = hasSessions && selectedTime ? selectedTime : '00:00'
-      const itemData = {
+      const finalPriceSnapshot = priceSnapshot
+        ? { ...priceSnapshot, total: displayTotal }
+        : null
+      if (!finalPriceSnapshot) throw new Error('Price snapshot required')
+      const itemData: Parameters<typeof addItem>[0] = {
         t_group,
         t_id: currentTId,
+        tourName,
         language,
         tourDate: selectedDate,
         sesTime: finalSesTime,
-        adults,
-        childs,
-        infants,
-        priceSnapshot,
+        adults: isDateRange ? 1 : adults,
+        childs: isDateRange ? 0 : childs,
+        infants: isDateRange ? 0 : infants,
+        priceSnapshot: finalPriceSnapshot,
         currency,
+      }
+      if (isCombination && selectedDate2) {
+        itemData.tourDate2 = selectedDate2
+        itemData.isCombination = true
+      }
+      if (isDateRange && selectedDateEnd) {
+        itemData.tourDateEnd = selectedDateEnd
+        itemData.isDateRange = true
       }
 
       console.log('[BOOKING_PANEL] Adding item and navigating to checkout:', itemData)
@@ -530,7 +661,9 @@ export function ActivityBookingPanel({
           <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">⏰</span>
+                <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-ocean-600 uppercase tracking-wide mb-1">Duration</div>
@@ -542,13 +675,15 @@ export function ActivityBookingPanel({
           </div>
         )}
         {startingPrice && (
-          <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-100">
+          <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl">💎</span>
+              <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.25 7.756a4.5 4.5 0 1 0 0 8.488M7.5 10.5h5.25m-5.25 3h5.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1">Starting from</div>
+                <div className="text-xs font-medium text-ocean-600 uppercase tracking-wide mb-1">Starting from</div>
                 <div className="text-lg font-bold text-glass-900">
                   {formatPrice(startingPrice)}
                 </div>
@@ -557,19 +692,19 @@ export function ActivityBookingPanel({
           </div>
         )}
         {cancellationPolicy && (
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+          <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
                 {cancellationTitle && (
-                  <div className="text-sm font-bold text-green-800 mb-2">{cancellationTitle}</div>
+                  <div className="text-sm font-bold text-ocean-800 mb-2">{cancellationTitle}</div>
                 )}
                 <div 
-                  className="text-xs text-green-700 leading-relaxed prose prose-sm max-w-none"
+                  className="text-xs text-ocean-700 leading-relaxed prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={sanitizeAtlanticoHtml(cancellationPolicy)}
                 />
               </div>
@@ -578,35 +713,126 @@ export function ActivityBookingPanel({
         )}
       </div>
 
-      {/* Event Selection (if multiple events) */}
-      {events.length > 1 && (
+      {/* Date Selection - Calendar */}
+      {isDateRange ? (
+        /* Date range (car rental): start + end, days in between highlighted in blue */
         <div>
           <label className="block text-sm font-medium text-glass-700 mb-2">
-            Select option *
+            Select start and end date *
           </label>
-          <select
-            value={selectedEventId}
-            onChange={(e) => {
-              setSelectedEventId(e.target.value)
-              setSelectedTime('')
-              setPriceSnapshot(null)
-            }}
-            className="w-full px-3 py-2 border border-glass-300 rounded-md"
-            required
-          >
-            {events.map((event) => (
-              <option key={event.t_id} value={event.t_id}>
-                {event.title}
-              </option>
-            ))}
-          </select>
+          <p className="text-xs text-glass-500 mb-2">Click to select start date, then end date. Days in between will be highlighted.</p>
+          <div className="mb-3 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => {
+                const [y, m] = currentMonth.split('-').map(Number)
+                const d = new Date(y, m - 2, 1)
+                setCurrentMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`)
+              }}
+              className="px-2 py-1 text-sm text-glass-600 hover:text-glass-900"
+              disabled={loadingCalendar}
+            >
+              ← Prev
+            </button>
+            <span className="text-sm font-medium text-glass-900">
+              {new Date(currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                const [y, m] = currentMonth.split('-').map(Number)
+                const d = new Date(y, m, 1)
+                setCurrentMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`)
+              }}
+              className="px-2 py-1 text-sm text-glass-600 hover:text-glass-900"
+              disabled={loadingCalendar}
+            >
+              Next →
+            </button>
+          </div>
+          {selectedDate && !selectedDateEnd && (
+            <p className="text-sm text-ocean-600 font-medium mb-2">Choose your end date</p>
+          )}
+          {loadingCalendar ? (
+            <div className="text-sm text-glass-600 text-center py-4">Loading calendar...</div>
+          ) : (
+            <div className="border border-glass-200 rounded-lg p-2 bg-white">
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                  <div key={d} className="text-center text-xs font-medium text-glass-600 py-1">{d}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {(() => {
+                  const [year, month] = currentMonth.split('-').map(Number)
+                  const lastDay = new Date(year, month, 0)
+                  const daysInMonth = lastDay.getDate()
+                  const firstDay = new Date(year, month - 1, 1)
+                  const startingDayOfWeek = (firstDay.getDay() + 6) % 7
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  const days: JSX.Element[] = []
+                  for (let i = 0; i < startingDayOfWeek; i++) {
+                    days.push(<div key={`re-${i}`} className="aspect-square" />)
+                  }
+                  for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                    const date = new Date(year, month - 1, day)
+                    const isPast = date < today
+                    const available = !isPast && availableDates.includes(dateStr)
+                    const isStart = dateStr === selectedDate
+                    const isEnd = dateStr === selectedDateEnd
+                    const inRange = selectedDate && selectedDateEnd && dateStr >= selectedDate && dateStr <= selectedDateEnd
+                    const handleClick = () => {
+                      if (!available || isPast) return
+                      if (!selectedDate) {
+                        setSelectedDate(dateStr)
+                        setSelectedDateEnd('')
+                        setPriceSnapshot(null)
+                      } else if (!selectedDateEnd) {
+                        if (dateStr >= selectedDate) {
+                          setSelectedDateEnd(dateStr)
+                          // Do NOT clear priceSnapshot - daily rate stays same, displayTotal = total * numberOfDays
+                        } else {
+                          setSelectedDate(dateStr)
+                          setSelectedDateEnd('')
+                          setPriceSnapshot(null)
+                        }
+                      } else {
+                        setSelectedDate(dateStr)
+                        setSelectedDateEnd('')
+                        setPriceSnapshot(null)
+                      }
+                    }
+                    const isSelectable = available && !isPast
+                    const showBlue = inRange || (isStart && !selectedDateEnd)
+                    days.push(
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={handleClick}
+                        disabled={!isSelectable}
+                        className={`aspect-square p-1 rounded text-sm border transition-colors ${
+                          isPast ? 'bg-glass-100 text-glass-400 cursor-not-allowed' :
+                          showBlue ? 'bg-ocean-500 text-white border-ocean-500' :
+                          isSelectable ? 'bg-white text-glass-900 hover:bg-ocean-50 cursor-pointer border-glass-200' :
+                          'bg-glass-100 text-glass-400 cursor-not-allowed'
+                        } ${date.getTime() === today.getTime() ? 'ring-2 ring-ocean-300' : ''}`}
+                      >
+                        {day}
+                      </button>
+                    )
+                  }
+                  return days
+                })()}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Date Selection - Calendar */}
+      ) : (
       <div>
         <label className="block text-sm font-medium text-glass-700 mb-2">
-          Select a date *
+          {isCombination ? 'Siam Park – Select date *' : 'Select a date *'}
         </label>
         
         {/* Calendar Navigation */}
@@ -648,9 +874,9 @@ export function ActivityBookingPanel({
           </div>
         ) : (
           <div className="border border-glass-200 rounded-lg p-2 bg-white">
-            {/* Day headers */}
+            {/* Day headers - Monday first */}
             <div className="grid grid-cols-7 gap-1 mb-1">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                 <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">
                   {day}
                 </div>
@@ -664,7 +890,8 @@ export function ActivityBookingPanel({
                 const firstDay = new Date(year, month - 1, 1)
                 const lastDay = new Date(year, month, 0)
                 const daysInMonth = lastDay.getDate()
-                const startingDayOfWeek = firstDay.getDay()
+                // Monday=0, Sunday=6 (European week start)
+                const startingDayOfWeek = (firstDay.getDay() + 6) % 7
                 const today = new Date()
                 today.setHours(0, 0, 0, 0)
 
@@ -682,6 +909,8 @@ export function ActivityBookingPanel({
                   const isToday = date.getTime() === today.getTime()
                   const isPast = date < today
                   const available = !isPast && availableDates.includes(dateStr)
+                  const blockedByLoro = isCombination && dateStr === selectedDate2
+                  const isSelectable = available && !blockedByLoro
                   const isSelected = dateStr === selectedDate
 
                   days.push(
@@ -689,17 +918,17 @@ export function ActivityBookingPanel({
                       key={day}
                       type="button"
                       onClick={() => {
-                        if (available) {
+                        if (isSelectable) {
                           setSelectedDate(dateStr)
                           setSelectedTime('')
                           setPriceSnapshot(null)
                         }
                       }}
-                      disabled={!available || isPast}
+                      disabled={!isSelectable || isPast}
                       className={`aspect-square p-1 rounded text-sm transition-colors ${
                         isPast
                           ? 'bg-glass-100 text-glass-400 border-glass-200 opacity-60 cursor-not-allowed'
-                          : available
+                          : isSelectable
                           ? isSelected
                             ? 'bg-ocean-600 text-white border-ocean-600'
                             : 'bg-white text-glass-900 border-glass-200 hover:bg-ocean-50 hover:border-ocean-300 cursor-pointer'
@@ -717,6 +946,67 @@ export function ActivityBookingPanel({
           </div>
         )}
       </div>
+      )}
+
+      {/* Second date – Loro Parque (combinations only) */}
+      {isCombination && (
+        <div>
+          <label className="block text-sm font-medium text-glass-700 mb-2">
+            Loro Parque – Select date *
+          </label>
+          {loadingCalendar ? (
+            <div className="text-sm text-glass-600 text-center py-4">Loading...</div>
+          ) : (
+            <div className="border border-glass-200 rounded-lg p-2 bg-white">
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  <div key={day} className="text-center text-xs font-medium text-glass-600 py-1">{day}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {(() => {
+                  const [year, month] = currentMonth.split('-').map(Number)
+                  const firstDay = new Date(year, month - 1, 1)
+                  const lastDay = new Date(year, month, 0)
+                  const daysInMonth = lastDay.getDate()
+                  const startingDayOfWeek = (firstDay.getDay() + 6) % 7
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  const days: JSX.Element[] = []
+                  for (let i = 0; i < startingDayOfWeek; i++) {
+                    days.push(<div key={`e-${i}`} className="aspect-square" />)
+                  }
+                  for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                    const date = new Date(year, month - 1, day)
+                    const isPast = date < today
+                    const available = !isPast && availableDates.includes(dateStr)
+                    const blockedBySiam = dateStr === selectedDate
+                    const isSelectable = available && !blockedBySiam
+                    const isSelected = dateStr === selectedDate2
+                    days.push(
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => isSelectable && setSelectedDate2(dateStr)}
+                        disabled={!isSelectable || isPast}
+                        className={`aspect-square p-1 rounded text-sm border transition-colors ${
+                          isPast ? 'bg-glass-100 text-glass-400 cursor-not-allowed' :
+                          isSelectable ? (isSelected ? 'bg-ocean-600 text-white' : 'bg-white text-glass-900 hover:bg-ocean-50 cursor-pointer') :
+                          'bg-glass-100 text-glass-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    )
+                  }
+                  return days
+                })()}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Time Selection (if has sessions) */}
       {loadingSessions && (
@@ -743,44 +1033,96 @@ export function ActivityBookingPanel({
         </div>
       )}
 
-      {/* Participants */}
+      {/* Participants - hidden for date range (car rental): price = daily rate × days only */}
+      {!isDateRange && (
       <div>
-        <label className="block text-sm font-medium text-glass-700 mb-2">
+        <label className="block text-xs font-medium text-glass-700 mb-1">
           Number of participants *
         </label>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs text-glass-600 mb-1">Adults</label>
-            <input
-              type="number"
-              min="1"
-              value={adults}
-              onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 border border-glass-300 rounded-md"
-            />
+        <div className="flex flex-col gap-4 items-center">
+          <div className="flex flex-col items-center w-full max-w-[7rem]">
+            <label className="block text-[10px] text-glass-600 mb-0.5 text-center">{useQuantityLabel ? 'Quantity' : 'Adults'}</label>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setAdults((v) => Math.max(1, v - 1))}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Decrease adults"
+              >
+                −
+              </button>
+              <span className="text-sm font-bold text-glass-900 w-5 text-center">
+                {adults}
+              </span>
+              <button
+                type="button"
+                onClick={() => setAdults((v) => v + 1)}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Increase adults"
+              >
+                +
+              </button>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs text-glass-600 mb-1">Children</label>
-            <input
-              type="number"
-              min="0"
-              value={childs}
-              onChange={(e) => setChilds(parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-glass-300 rounded-md"
-            />
+          {showChildSelector && (
+          <div className="flex flex-col items-center w-full max-w-[7rem]">
+            <label className="block text-[10px] text-glass-600 mb-0.5 text-center">
+              Children {childAge ? `(${childAge})` : ''}
+            </label>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setChilds((v) => Math.max(0, v - 1))}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Decrease children"
+              >
+                −
+              </button>
+              <span className="text-sm font-bold text-glass-900 w-5 text-center">
+                {childs}
+              </span>
+              <button
+                type="button"
+                onClick={() => setChilds((v) => v + 1)}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Increase children"
+              >
+                +
+              </button>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs text-glass-600 mb-1">Infants</label>
-            <input
-              type="number"
-              min="0"
-              value={infants}
-              onChange={(e) => setInfants(parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-glass-300 rounded-md"
-            />
+          )}
+          {showInfantSelector && (
+          <div className="flex flex-col items-center w-full max-w-[7rem]">
+            <label className="block text-[10px] text-glass-600 mb-0.5 text-center">
+              Infants {infantAge ? `(${infantAge})` : ''}
+            </label>
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setInfants((v) => Math.max(0, v - 1))}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Decrease infants"
+              >
+                −
+              </button>
+              <span className="text-sm font-bold text-glass-900 w-5 text-center">
+                {infants}
+              </span>
+              <button
+                type="button"
+                onClick={() => setInfants((v) => v + 1)}
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-ocean-100 hover:bg-ocean-200 text-ocean-600 font-bold text-sm leading-none shadow-sm hover:shadow transition-shadow"
+                aria-label="Increase infants"
+              >
+                +
+              </button>
+            </div>
           </div>
+          )}
         </div>
       </div>
+      )}
 
       {/* Meeting Points / Pickup Points */}
       {(() => {
@@ -812,10 +1154,15 @@ export function ActivityBookingPanel({
       {/* Price Display */}
       {priceSnapshot && (
         <div className="border-t border-glass-200 pt-4">
+          {isDateRange && selectedDateEnd && (
+            <p className="text-xs text-glass-500 mb-1">
+              {priceSnapshot.total.toFixed(2)} €/day × {numberOfDays} day{numberOfDays > 1 ? 's' : ''} = {displayTotal.toFixed(2)} €
+            </p>
+          )}
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-glass-600">Total</span>
             <span className="text-xl font-bold text-glass-900">
-              {priceSnapshot.total.toFixed(2)} {currency}
+              {displayTotal.toFixed(2)} {currency}
             </span>
           </div>
         </div>
@@ -858,7 +1205,7 @@ export function ActivityBookingPanel({
           }}
           disabled={!readiness.readyForAddToCart || loadingPrices || loadingSessions}
           className="w-full px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg hover:bg-ocean-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ pointerEvents: 'auto' }}
+          style={{ pointerEvents: 'auto', touchAction: 'manipulation' }}
           onMouseEnter={(e) => {
             if (process.env.NODE_ENV === 'development') {
               const btn = e.currentTarget

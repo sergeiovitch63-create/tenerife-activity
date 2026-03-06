@@ -57,6 +57,49 @@ export default function BackofficePage() {
   const [priceData, setPriceData] = useState<unknown>(null)
   const [loadingCalendar, setLoadingCalendar] = useState(false)
   const [loadingPrice, setLoadingPrice] = useState(false)
+  const [visibility, setVisibility] = useState<{ hiddenGroupIds: string[]; hiddenEventIds: string[] }>({
+    hiddenGroupIds: [],
+    hiddenEventIds: [],
+  })
+
+  // Fetch visibility config
+  const fetchVisibility = async () => {
+    try {
+      const res = await fetch('/api/backoffice/visibility')
+      if (res.ok) {
+        const data = await res.json()
+        setVisibility({ hiddenGroupIds: data.hiddenGroupIds || [], hiddenEventIds: data.hiddenEventIds || [] })
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
+  const toggleGroupVisibility = async (groupId: string) => {
+    const id = String(groupId).trim()
+    const next = visibility.hiddenGroupIds.includes(id)
+      ? visibility.hiddenGroupIds.filter((x) => x !== id)
+      : [...visibility.hiddenGroupIds, id]
+    setVisibility((v) => ({ ...v, hiddenGroupIds: next }))
+    await fetch('/api/backoffice/visibility', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hiddenGroupIds: next }),
+    })
+  }
+
+  const toggleEventVisibility = async (eventId: string) => {
+    const id = String(eventId).trim()
+    const next = visibility.hiddenEventIds.includes(id)
+      ? visibility.hiddenEventIds.filter((x) => x !== id)
+      : [...visibility.hiddenEventIds, id]
+    setVisibility((v) => ({ ...v, hiddenEventIds: next }))
+    await fetch('/api/backoffice/visibility', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hiddenEventIds: next }),
+    })
+  }
 
   // Get lang from URL on mount
   useEffect(() => {
@@ -115,6 +158,10 @@ export default function BackofficePage() {
   useEffect(() => {
     fetchData()
   }, [currentLang])
+
+  useEffect(() => {
+    fetchVisibility()
+  }, [])
 
   const fetchCalendar = async () => {
     if (!selectedEvent) return
@@ -206,59 +253,47 @@ export default function BackofficePage() {
     triedKeys: string[]
   }
 
-  const resolveGroupDetails = (group: unknown): ResolvedGroupDetails => {
-    if (!group || !groupDetailsMap || typeof group !== 'object') {
+  const resolveGroupDetails = (group: unknown, selectedGroupStr?: string | null): ResolvedGroupDetails => {
+    if (!groupDetailsMap || typeof groupDetailsMap !== 'object') {
       return { details: null, triedKeys: [] }
     }
 
-    const groupObj = group as { id?: unknown; Code?: unknown; code?: unknown }
+    const groupObj = group && typeof group === 'object' ? (group as { id?: unknown; Id?: unknown; Code?: unknown; code?: unknown }) : null
     const triedKeys: string[] = []
-    
-    // Try 1: group.id
-    if (groupObj.id !== undefined) {
-      const key1 = String(groupObj.id)
-      triedKeys.push(key1)
-      if (groupDetailsMap[key1]) {
-        return { details: groupDetailsMap[key1], triedKeys }
-      }
+    const keysToTry: string[] = []
+
+    if (selectedGroupStr && selectedGroupStr.trim()) {
+      keysToTry.push(String(selectedGroupStr).trim())
     }
-    
-    // Try 2: group.Code
-    if (groupObj.Code) {
-      const key2 = String(groupObj.Code)
-      if (!triedKeys.includes(key2)) {
-        triedKeys.push(key2)
-        if (groupDetailsMap[key2]) {
-          return { details: groupDetailsMap[key2], triedKeys }
+    if (groupObj) {
+      if (groupObj.id !== undefined && groupObj.id !== null) keysToTry.push(String(groupObj.id))
+      if (groupObj.Id !== undefined && groupObj.Id !== null) keysToTry.push(String(groupObj.Id))
+      if (groupObj.Code) keysToTry.push(String(groupObj.Code))
+      if (groupObj.code) keysToTry.push(String(groupObj.code))
+    }
+
+    for (const key of keysToTry) {
+      const k = String(key).trim()
+      if (k && !triedKeys.includes(k)) {
+        triedKeys.push(k)
+        if (groupDetailsMap[k]) {
+          return { details: groupDetailsMap[k], triedKeys }
         }
       }
     }
-    
-    // Try 3: group.code
-    if (groupObj.code) {
-      const key3 = String(groupObj.code)
-      if (!triedKeys.includes(key3)) {
-        triedKeys.push(key3)
-        if (groupDetailsMap[key3]) {
-          return { details: groupDetailsMap[key3], triedKeys }
-        }
-      }
-    }
-    
-    // Try 4: Any groupDetails.Code we might have cached (if we already found one)
-    // This is a fallback - we check all groupDetails to see if any has a Code matching our group
+
+    // Fallback: check if any groupDetails has Code matching our keys
+    const matchKeys = [...keysToTry, ...triedKeys].map((k) => String(k).trim()).filter(Boolean)
     for (const [key, details] of Object.entries(groupDetailsMap)) {
       if (details && typeof details === 'object' && 'Code' in details) {
-        const detailsCode = String((details as { Code?: unknown }).Code)
-        if (detailsCode === String(groupObj.Code) || detailsCode === String(groupObj.code) || detailsCode === String(groupObj.id)) {
-          if (!triedKeys.includes(key)) {
-            triedKeys.push(key)
-            return { details: details, triedKeys }
-          }
+        const detailsCode = String((details as { Code?: unknown }).Code).trim()
+        if (detailsCode && matchKeys.includes(detailsCode)) {
+          if (!triedKeys.includes(key)) triedKeys.push(key)
+          return { details: details, triedKeys }
         }
       }
     }
-    
+
     return { details: null, triedKeys }
   }
 
@@ -301,7 +336,7 @@ export default function BackofficePage() {
   // Compute selectedGroupObj FIRST before any usage
   const selectedGroupObj = selectedGroup
     ? (selectedGroups.find((g) => {
-        const candidate = String(g.id ?? g.Code ?? g.code ?? '')
+        const candidate = String((g as { id?: unknown; Id?: unknown; Code?: unknown; code?: unknown }).id ?? (g as { Id?: unknown }).Id ?? (g as { Code?: unknown }).Code ?? (g as { code?: unknown }).code ?? '')
         return candidate === selectedGroup
       }) || null)
     : null
@@ -312,7 +347,7 @@ export default function BackofficePage() {
     ? String(selectedGroupObj.Code ?? selectedGroupObj.code ?? selectedGroupObj.id)
     : null
 
-  const { details: selectedGroupDetails, triedKeys: groupDetailsTriedKeys } = resolveGroupDetails(selectedGroupObj)
+  const { details: selectedGroupDetails, triedKeys: groupDetailsTriedKeys } = resolveGroupDetails(selectedGroupObj, selectedGroup)
   const hasSelectedGroupDetails = !!selectedGroupDetails
   const selectedGroupDetailsTyped = selectedGroupDetails as
     | {
@@ -390,8 +425,19 @@ export default function BackofficePage() {
       <div className="container mx-auto px-4 max-w-[1920px]">
         {/* Header */}
         <div className="mb-6 bg-white border border-glass-200 rounded-lg p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-glass-900">Atlántico Backoffice (API)</h1>
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div>
+              <h1 className="text-3xl font-bold text-glass-900">Atlántico Backoffice</h1>
+              <p className="text-sm text-glass-600 mt-1">
+                Cochez/décochez les groupes et événements pour les afficher ou masquer sur le frontend.
+              </p>
+            </div>
+            <a
+              href={`/${locale}/debug/classifications`}
+              className="px-4 py-2 bg-ocean-600 text-white text-sm font-medium rounded-lg hover:bg-ocean-700"
+            >
+              Voir les tour lists →
+            </a>
             <div className="flex items-center gap-4">
               <select
                 value={currentLang}
@@ -636,21 +682,37 @@ export default function BackofficePage() {
               ) : (
                 <>
                   <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                    {filteredGroups.map((group) => (
-                      <button
-                        key={String(group.id ?? group.Code ?? group.code ?? '')}
-                        onClick={() => {
-                          setSelectedGroup(String(group.id ?? group.Code ?? group.code ?? ''))
-                          setSelectedEvent(null)
-                        }}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                          selectedGroup === String(group.id ?? group.Code ?? group.code ?? '')
-                            ? 'bg-ocean-50 border-ocean-600'
-                            : 'bg-glass-50 border-glass-200 hover:border-ocean-300'
-                        }`}
-                      >
-                        <div className="font-medium text-glass-900">{group.name || '—'}</div>
-                        <div className="text-sm text-glass-600">Code: {group.Code ?? group.code ?? '—'}</div>
+                    {filteredGroups.map((group) => {
+                      const g = group as { id?: unknown; Id?: unknown; Code?: unknown; code?: unknown }
+                      const groupCode = String(g.Code ?? g.code ?? g.Id ?? g.id ?? '')
+                      const isVisible = !visibility.hiddenGroupIds.includes(groupCode)
+                      return (
+                        <div
+                          key={String(group.id ?? group.Code ?? group.code ?? '')}
+                          className={`flex items-start gap-2 p-3 rounded-lg border transition-colors ${
+                            selectedGroup === groupCode
+                              ? 'bg-ocean-50 border-ocean-600'
+                              : 'bg-glass-50 border-glass-200 hover:border-ocean-300'
+                          }`}
+                        >
+                          <label className="flex-shrink-0 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isVisible}
+                              onChange={() => toggleGroupVisibility(groupCode)}
+                              className="rounded border-glass-300"
+                            />
+                            <span className="ml-1 text-xs text-glass-600">Front</span>
+                          </label>
+                          <button
+                            onClick={() => {
+                              setSelectedGroup(groupCode)
+                              setSelectedEvent(null)
+                            }}
+                            className="flex-1 text-left"
+                          >
+                            <div className="font-medium text-glass-900">{group.name || '—'}</div>
+                            <div className="text-sm text-glass-600">Code: {groupCode}</div>
                         {group.id !== undefined && (
                           <div className="text-xs text-glass-500">ID: {String(group.id)}</div>
                         )}
@@ -663,8 +725,19 @@ export default function BackofficePage() {
                         {group.ids !== undefined && (
                           <div className="text-xs text-glass-500">Events: —</div>
                         )}
-                      </button>
-                    ))}
+                          </button>
+                          <a
+                            href={`/${locale}/debug/group-details?code=${encodeURIComponent(groupCode)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-shrink-0 text-xs text-ocean-600 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Détails →
+                          </a>
+                        </div>
+                      )
+                    })}
                   </div>
                   <button
                     onClick={() => toggleRawJson('groups')}
@@ -767,6 +840,7 @@ export default function BackofficePage() {
                         {eventIds.map((eventId) => {
                           const eventIdStr = String(eventId)
                           const event = data.eventDetailsByEventId[eventIdStr]
+                          const isEventVisible = !visibility.hiddenEventIds.includes(eventIdStr)
                           return (
                             <div
                               key={eventIdStr}
@@ -776,17 +850,37 @@ export default function BackofficePage() {
                                   : 'bg-glass-50 border-glass-200'
                               }`}
                             >
-                              <button
-                                onClick={() => setSelectedEvent(eventIdStr)}
-                                className="w-full text-left mb-2"
-                              >
+                              <div className="flex items-start gap-2 mb-2">
+                                <label className="flex-shrink-0 cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isEventVisible}
+                                    onChange={() => toggleEventVisibility(eventIdStr)}
+                                    className="rounded border-glass-300"
+                                  />
+                                  <span className="ml-1 text-xs text-glass-600">Front</span>
+                                </label>
+                                <button
+                                  onClick={() => setSelectedEvent(eventIdStr)}
+                                  className="flex-1 text-left"
+                                >
                                 <div className="text-sm font-medium text-glass-900">
                                   {String((event as { name?: unknown; title?: unknown } | null)?.name ?? (event as { title?: unknown } | null)?.title ?? eventIdStr)}
                                 </div>
                                 <div className="text-xs text-glass-600">
                                   Code: {String((event as { Code?: unknown } | null)?.Code ?? eventIdStr)}
                                 </div>
-                              </button>
+                                </button>
+                                <a
+                                  href={`/${locale}/debug/event-details?eventId=${encodeURIComponent(eventIdStr)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0 text-xs text-ocean-600 hover:underline"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  Détails →
+                                </a>
+                              </div>
                               <div className="flex gap-2 mt-2">
                                 <button
                                   onClick={async () => {

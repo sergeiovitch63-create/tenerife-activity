@@ -1,10 +1,10 @@
 import createMiddleware from 'next-intl/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { locales } from './src/i18n/request'
+import { routing } from './src/i18n/routing'
 
 // Locale codes for regex matching
-const localeCodes = ['en', 'es', 'de', 'fr', 'it', 'ru', 'pl']
+const localeCodes = routing.locales as readonly string[]
 const localePattern = `(${localeCodes.join('|')})`
 
 // Regex to match paths with two locale segments at the start: /<locale1>/<locale2>/(...)
@@ -43,11 +43,7 @@ function isAssetPath(pathname: string): boolean {
 }
 
 // Create next-intl middleware
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale: 'en',
-  localePrefix: 'always',
-})
+const intlMiddleware = createMiddleware(routing)
 
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl

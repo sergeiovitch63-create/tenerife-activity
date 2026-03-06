@@ -306,7 +306,7 @@ export async function GET(request: NextRequest) {
       triedUrls = discovery.tried
     } else {
       // Production: require env var, but return 404 instead of 500
-      if (process.env.NODE_ENV === 'development') {
+      if ((process.env.NODE_ENV as string) === 'development') {
         console.warn('[ATL_IMAGE_PROXY] No ATLANTICO_IMAGES_BASE_URL set, attempting discovery')
         // Will fall through to discovery logic above
       } else {

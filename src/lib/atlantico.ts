@@ -182,8 +182,10 @@ export function parseEventIds(ids: string | number | string[] | number[] | undef
 
 /**
  * Parse per-person pricing (pProd=0)
- * Format: "ADULT_PRICE|CHILD_PRICE|INFANT_PRICE|ADULT_COM|CHILD_COM|INFANT_COM"
- * 
+ * Supports:
+ * - Pipe format: "ADULT_PRICE|CHILD_PRICE|INFANT_PRICE|ADULT_COM|CHILD_COM|INFANT_COM"
+ * - JSON format: {"PVPA":"250.00", "PVPC": "0.00", "PVPOS": "0.00", ...}
+ *
  * @param raw - Raw price string
  * @returns Parsed prices or null if invalid
  */
@@ -192,7 +194,33 @@ export function parsePerPersonPrices(raw: string): {
   child: number
   infant: number
 } | null {
-  const parts = raw.split('|').map((p) => p.trim()).filter(Boolean)
+  if (!raw || typeof raw !== 'string') return null
+  const s = raw.trim()
+
+  // JSON format: PVPA=adult, PVPC=child, PVPOS=infant (Prix Vente Public)
+  if (s.startsWith('{')) {
+    try {
+      const obj = JSON.parse(s) as Record<string, unknown>
+      const adult = obj.PVPA ?? obj.pvpa ?? obj.VPVA ?? obj.vpva ?? null
+      const child = obj.PVPC ?? obj.pvpc ?? obj.VPVC ?? obj.vpvc ?? null
+      const infant = obj.PVPOS ?? obj.pvpos ?? obj.VPVOS ?? obj.vpvos ?? null
+      const adultNum = typeof adult === 'number' ? adult : typeof adult === 'string' ? parseFloat(adult) : NaN
+      const childNum = typeof child === 'number' ? child : typeof child === 'string' ? parseFloat(child) : 0
+      const infantNum = typeof infant === 'number' ? infant : typeof infant === 'string' ? parseFloat(infant) : 0
+      if (Number.isFinite(adultNum) && adultNum >= 0) {
+        return {
+          adult: adultNum,
+          child: Number.isFinite(childNum) ? childNum : 0,
+          infant: Number.isFinite(infantNum) ? infantNum : 0,
+        }
+      }
+    } catch {
+      // Not valid JSON, fall through to pipe format
+    }
+  }
+
+  // Pipe format
+  const parts = s.split('|').map((p) => p.trim()).filter(Boolean)
   if (parts.length < 3) return null
 
   const adult = parseFloat(parts[0])

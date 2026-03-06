@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from '@/navigation'
+import { useRouter, usePathname } from '@/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/ui/lib/cn'
 import { trackingProvider } from '@/config/tracking'
@@ -13,8 +13,16 @@ interface HeaderSearchProps {
 }
 
 export function HeaderSearch({ isOpen, onClose, placeholder }: HeaderSearchProps) {
+  const pathname = usePathname()
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const isHomePage = (() => {
+    const normalizedPath = (pathname || '/').replace(/\/$/, '') || '/'
+    return normalizedPath === '/'
+  })()
+
+  const isBackButtonVisible = !isHomePage
   const modalRef = useRef<HTMLDivElement>(null)
   const submitButtonRef = useRef<HTMLButtonElement>(null)
   const router = useRouter()
@@ -127,7 +135,10 @@ export function HeaderSearch({ isOpen, onClose, placeholder }: HeaderSearchProps
   return (
     <div
       data-search-modal
-      className="fixed inset-0 z-[100] flex items-start justify-center pt-20 md:pt-24 px-4"
+      className={cn(
+        'fixed inset-0 z-[99999] flex items-start justify-center px-4',
+        isBackButtonVisible ? 'pt-40 md:pt-44' : 'pt-20 md:pt-24'
+      )}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose()

@@ -65,7 +65,7 @@ export function FloatingBackButton() {
       // Fallback: if on activity page, go to VIP tours, otherwise go to home
       const isActivityPage = pathname?.startsWith('/activities/')
       if (isActivityPage) {
-        router.push('/vibe/vip-tours')
+        router.push('/activite/vip-tours')
       } else {
         router.push('/')
       }

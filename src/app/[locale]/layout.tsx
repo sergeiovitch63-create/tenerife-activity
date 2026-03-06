@@ -63,7 +63,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <Suspense fallback={null}>
         <AttributionCapture />
       </Suspense>

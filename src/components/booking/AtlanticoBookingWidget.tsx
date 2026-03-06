@@ -1257,12 +1257,13 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
     const year = displayMonth.getFullYear()
     const month = displayMonth.getMonth()
     const daysInMonth = getDaysInMonth(displayMonth)
-    const firstDay = new Date(year, month, 1).getDay()
+    // Monday=0, Sunday=6 (European week start)
+    const startingDayOfWeek = (new Date(year, month, 1).getDay() + 6) % 7
     
     const days: Array<{ date: Date | null; dateStr: string | null; isAvailable: boolean }> = []
     
     // Empty cells for days before month starts
-    for (let i = 0; i < firstDay; i++) {
+    for (let i = 0; i < startingDayOfWeek; i++) {
       days.push({ date: null, dateStr: null, isAvailable: false })
     }
     
@@ -1505,7 +1506,7 @@ export function AtlanticoBookingWidget({ tour, locale, slug }: AtlanticoBookingW
 
                         {/* Calendar Grid */}
                         <div className="grid grid-cols-7 gap-1 mb-2">
-                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                             <div key={day} className="text-xs text-center text-glass-500 font-medium py-1">
                               {day}
                             </div>

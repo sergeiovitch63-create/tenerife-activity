@@ -159,7 +159,7 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
       const [eventDetailsRes, limitsRes] = await Promise.all([
         fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}`).catch(() => null),
         (async () => {
-          const now = new Date()
+      const now = new Date()
           const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
           return fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}&month=${monthStart}`).catch(() => null)
         })(),
@@ -505,7 +505,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
         fetch(`/api/atlantico/group/${tour.code}/${atlLang}`).then(res => res.ok ? res.json() : null),
         (async () => {
           if (tour.ids) {
-            const eventIds = parseEventIds(tour.ids)
+            const eventIds = parseEventIds(tour.ids as string | number | string[] | number[] | undefined)
             if (eventIds.length > 0) {
               try {
                 const res = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eventIds[0])}&lang=${encodeURIComponent(atlLang)}`)
@@ -547,7 +547,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
               }
             }
             if (eventData.image && typeof eventData.image === 'string') {
-              const eventId = tour.ids ? parseEventIds(tour.ids)[0] : tour.code
+              const eventId = tour.ids ? parseEventIds(tour.ids as string | number | string[] | number[] | undefined)[0] : tour.code
               const url = await atlanticoAssetUrl(eventData.image, 'tour', { activityId: eventId, page: 'details' })
               if (url && !eventImages.includes(url)) {
                 eventImages.push(url)
@@ -711,7 +711,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
     return null
   }, [isActivity508, heroImage, isVipTour, vipTourImage, tour.image, apiImage])
 
-  return (
+    return (
     <Link
       href={`/activities/${tour.code}`}
       className="glass-panel p-6 hover:shadow-lg transition-all duration-200 block"
@@ -735,10 +735,10 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
             <div className="text-center">
               <div className="text-2xl mb-2">📷</div>
               <div>Image unavailable</div>
-            </div>
+              </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
       {/* Title */}
       <h3 className="text-xl font-semibold text-glass-900 mb-2 line-clamp-2">
@@ -788,7 +788,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
               )}
             </div>
           )}
-        </div>
+    </div>
       )}
     </Link>
   )

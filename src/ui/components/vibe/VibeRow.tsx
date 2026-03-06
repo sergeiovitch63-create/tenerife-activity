@@ -74,7 +74,8 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
 
   return (
     <Link
-      href={`/vibe/${vibe.slug}`}
+      href={`/activite/${vibe.slug}`}
+      prefetch={true}
       onClick={handleClick}
       className={cn(
         'block group',

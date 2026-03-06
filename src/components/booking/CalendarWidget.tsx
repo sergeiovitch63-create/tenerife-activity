@@ -205,7 +205,8 @@ export function CalendarWidget({
     const firstDay = new Date(year, month - 1, 1)
     const lastDay = new Date(year, month, 0)
     const daysInMonth = lastDay.getDate()
-    const startingDayOfWeek = firstDay.getDay() // 0 = Sunday, 1 = Monday, etc.
+    // Monday=0, Sunday=6 (European week start)
+    const startingDayOfWeek = (firstDay.getDay() + 6) % 7
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -321,7 +322,7 @@ export function CalendarWidget({
         <>
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
               <div key={day} className="text-center text-sm font-medium text-gray-700 py-2">
                 {day}
               </div>

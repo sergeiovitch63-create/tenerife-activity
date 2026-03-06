@@ -11,7 +11,7 @@ interface VibesListProps {
 
 export function VibesList({ vibes }: VibesListProps) {
   const { visibleCount } = useProgressiveRender({
-    initialCount: 10,
+    initialCount: Math.max(15, vibes.length),
     batchSize: 6,
     threshold: 500,
     totalCount: vibes.length,

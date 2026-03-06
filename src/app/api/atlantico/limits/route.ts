@@ -10,6 +10,33 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { normalizeLimits } from '@/lib/atlantico/normalizeLimits'
 
+/**
+ * Project wdays onto dates for a specific month (event 840 only).
+ * wdays format: [1=Monday, 2=Tuesday, ..., 7=Sunday]
+ */
+function projectWdaysForMonth(monthStart: string, wdays: number[]): string[] {
+  if (!Array.isArray(wdays) || wdays.length === 0) return []
+  const match = monthStart.match(/^(\d{4})-(\d{2})/)
+  if (!match) return []
+  const year = parseInt(match[1], 10)
+  const month = parseInt(match[2], 10) - 1
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const result: string[] = []
+  const lastDay = new Date(year, month + 1, 0).getDate()
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth()
+  const startDay = isCurrentMonth ? today.getDate() : 1
+  for (let day = startDay; day <= lastDay; day++) {
+    const d = new Date(year, month, day)
+    const jsDow = d.getDay()
+    const wday = jsDow === 0 ? 7 : jsDow
+    if (wdays.includes(wday) && d >= today) {
+      result.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`)
+    }
+  }
+  return result.sort()
+}
+
 // Mark route as dynamic (uses searchParams)
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -206,11 +233,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate availableDates from dates array where (limit - used) > 0
+    // When limit is 0, use top-level quote as effective limit (Atlantico format for events like 840)
+    const quoteVal = quote ?? 0
     const availableDatesFromLimits = dates
       .filter(d => {
         const limit = d.limit || 0
         const used = d.used || 0
-        return (limit - used) > 0
+        const effectiveLimit = limit > 0 ? limit : quoteVal
+        return (effectiveLimit - used) > 0
       })
       .map(d => d.date)
       .sort()
@@ -219,8 +249,41 @@ export async function GET(request: NextRequest) {
     const availableDatesFromSessions = Object.keys(filteredSessionsByDay)
     
     // Merge and deduplicate
-    const availableDatesSet = new Set([...availableDatesFromLimits, ...availableDatesFromSessions])
-    const availableDates = Array.from(availableDatesSet).sort()
+    let availableDates = Array.from(new Set([...availableDatesFromLimits, ...availableDatesFromSessions])).sort()
+
+    // When API returns wdays but sparse date array, project all matching weekdays in month
+    // Fallback when API ne renvoie pas wdays
+    const WDAYS_FALLBACK: Record<string, number[]> = {
+      '810': [5], '1066': [5],
+      '1676': [5], '1679': [5], '1677': [5],
+      '1819': [3, 6], '1820': [3, 6],
+      '1827': [2, 4], '1828': [2, 4], '1829': [2, 4], '1830': [2, 4],
+      '1831': [1, 2, 3, 4, 5, 6, 7], '1832': [1, 2, 3, 4, 5, 6, 7],
+    }
+    const wdaysFromApi = Array.isArray(raw?.dates?.wdays) ? raw.dates.wdays : []
+    const wdaysToUse =
+      wdaysFromApi.length > 0 ? wdaysFromApi : (WDAYS_FALLBACK[eventId] ?? [])
+    if (wdaysToUse.length > 0) {
+      const monthStart = monthParam || (() => {
+        const now = new Date()
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+      })()
+      const projected = projectWdaysForMonth(monthStart, wdaysToUse)
+      if (projected.length > 0) {
+        availableDates = Array.from(new Set([...availableDates, ...projected])).sort()
+      }
+    }
+    // Safety net: if availableDates still empty for known WDAYS_FALLBACK events, force projection
+    if (availableDates.length === 0 && WDAYS_FALLBACK[eventId]) {
+      const monthStart = monthParam || (() => {
+        const now = new Date()
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+      })()
+      const projected = projectWdaysForMonth(monthStart, WDAYS_FALLBACK[eventId])
+      if (projected.length > 0) {
+        availableDates = projected
+      }
+    }
 
     // Calculate debug info
     const hasDatesDate = Array.isArray(raw?.dates?.date) && raw.dates.date.length > 0
@@ -261,11 +324,14 @@ export async function GET(request: NextRequest) {
           
           if (validTimes.length > 0) {
             // Map each available date to these times
-            // Use available count from dates array if available
+            // Use available count from dates array; when limit is 0 or no dateData (projected), use quote
             for (const date of availableDates) {
               const dateData = dates.find(d => d.date === date)
-              const available = dateData ? (dateData.limit || 0) - (dateData.used || 0) : 0
-              
+              const limit = dateData?.limit ?? 0
+              const used = dateData?.used ?? 0
+              const effectiveLimit = limit > 0 ? limit : quoteVal
+              const available = effectiveLimit - used
+
               // Only add if available > 0
               if (available > 0) {
                 filteredSessionsByDay[date] = validTimes.map((time: string) => ({
@@ -387,20 +453,30 @@ export async function GET(request: NextRequest) {
     // CRITICAL: Even on error, return a valid response structure with calendarMode and requiresSessionTime
     // This prevents "Failed to fetch limits" from blocking the frontend
     const { searchParams } = request.nextUrl
+    const eventId = searchParams.get('eventId')
     const monthParam = searchParams.get('month')
     const fallbackMonthStart = monthParam || (() => {
       const now = new Date()
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
     })()
 
-    // Return a valid response with safe defaults (prevents frontend blocking)
+    // On error: still project dates for events with WDAYS_FALLBACK (e.g. 810, 1066)
+    const WDAYS_FALLBACK_ON_ERROR: Record<string, number[]> = {
+      '810': [5], '1066': [5],
+      '1827': [2, 4], '1828': [2, 4], '1829': [2, 4], '1830': [2, 4],
+    }
+    const wdays = eventId ? (WDAYS_FALLBACK_ON_ERROR[eventId] ?? []) : []
+    const errorAvailableDates = wdays.length > 0
+      ? projectWdaysForMonth(fallbackMonthStart, wdays)
+      : []
+
     return NextResponse.json<LimitsResponse>(
       {
         ok: true,
         quote: null,
         monthStart: fallbackMonthStart,
         sessionsByDay: {},
-        availableDates: [],
+        availableDates: errorAvailableDates,
         calendarMode: 'none', // Safe default - ALWAYS present, never null
         requiresSessionTime: false, // 'none' mode never requires session time - ALWAYS present
         availabilityMode: 'NO_SCHEDULE_PUBLISHED',

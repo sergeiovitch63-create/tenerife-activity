@@ -119,7 +119,8 @@ export function VibeCard({ vibe }: VibeCardProps) {
 
   return (
     <Link
-      href={`/vibe/${vibe.slug}`}
+      href={`/activite/${vibe.slug}`}
+      prefetch={true}
       onClick={handleClick}
       className={cn(
         'group block p-8 bg-white transition-all duration-300 ease-out relative overflow-hidden',
