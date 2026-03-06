@@ -227,3 +227,6 @@ function RecommendationsCarouselComponent() {
     </div>
   )
 }
+
+// Memoize component to prevent unnecessary re-renders
+export const RecommendationsCarousel = memo(RecommendationsCarouselComponent)
