@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo, useState, memo } from 'react'
+import { useRef, useMemo, useState, memo, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { cn } from '@/ui/lib/cn'
@@ -271,5 +271,10 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
 }
 
 // Memoize to prevent unnecessary re-renders
-export const VibeRow = memo(VibeRowComponent)
+// Only re-render if vibe or index changes
+export const VibeRow = memo(VibeRowComponent, (prevProps, nextProps) => {
+  return prevProps.vibe.id === nextProps.vibe.id && 
+         prevProps.index === nextProps.index &&
+         prevProps.vibe.slug === nextProps.vibe.slug
+})
 
