@@ -92,46 +92,78 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
         const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
         const origin = envBase ? envBase : `${protocol}://${host}`
 
-        // Fetch classifications
-        const classificationsResponse = await fetch(
-          `${origin}/api/atlantico/classifications?lang=${atlLang}`,
-          { cache: 'no-store' } // Use no-store for dynamic pages
-        )
-
-        if (classificationsResponse.ok) {
-          const classificationsData = await classificationsResponse.json()
+        // Fetch classifications with error handling for build time
+        try {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
           
-          if (classificationsData.ok && Array.isArray(classificationsData.classifications)) {
-            // Find classification by name (case-insensitive, trim)
-            const normalizedSearchName = classificationName.trim().toLowerCase()
-            const found = classificationsData.classifications.find((c: any) => {
-              const normalizedName = String(c.name || '').trim().toLowerCase()
-              return normalizedName === normalizedSearchName
-            })
+          const classificationsResponse = await fetch(
+            `${origin}/api/atlantico/classifications?lang=${atlLang}`,
+            { 
+              cache: 'no-store', // Use no-store for dynamic pages
+              signal: controller.signal,
+            }
+          )
+          
+          clearTimeout(timeoutId)
 
-            if (found) {
-              classificationId = found.id
+          if (classificationsResponse.ok) {
+            const classificationsData = await classificationsResponse.json()
+            
+            if (classificationsData.ok && Array.isArray(classificationsData.classifications)) {
+              // Find classification by name (case-insensitive, trim)
+              const normalizedSearchName = classificationName.trim().toLowerCase()
+              const found = classificationsData.classifications.find((c: any) => {
+                const normalizedName = String(c.name || '').trim().toLowerCase()
+                return normalizedName === normalizedSearchName
+              })
 
-              // Fetch groups for this classification
-              const groupsResponse = await fetch(
-                `${origin}/api/atlantico/groups?lang=${atlLang}&page=-1&classificationId=${encodeURIComponent(String(classificationId))}`,
-                { cache: 'no-store' } // Use no-store for dynamic pages
-              )
+              if (found) {
+                classificationId = found.id
 
-              if (groupsResponse.ok) {
-                const groupsData = await groupsResponse.json()
+                // Fetch groups for this classification
+                const groupsController = new AbortController()
+                const groupsTimeoutId = setTimeout(() => groupsController.abort(), 5000)
                 
-                if (groupsData.ok && Array.isArray(groupsData.groups)) {
-                  groups = groupsData.groups
+                try {
+                  const groupsResponse = await fetch(
+                    `${origin}/api/atlantico/groups?lang=${atlLang}&page=-1&classificationId=${encodeURIComponent(String(classificationId))}`,
+                    { 
+                      cache: 'no-store', // Use no-store for dynamic pages
+                      signal: groupsController.signal,
+                    }
+                  )
+                  
+                  clearTimeout(groupsTimeoutId)
+
+                  if (groupsResponse.ok) {
+                    const groupsData = await groupsResponse.json()
+                    
+                    if (groupsData.ok && Array.isArray(groupsData.groups)) {
+                      groups = groupsData.groups
+                    }
+                  }
+                } catch (groupsError) {
+                  clearTimeout(groupsTimeoutId)
+                  // Silently fail during build
+                  if (process.env.NODE_ENV !== 'production') {
+                    console.warn('[VIBE] Error fetching groups:', groupsError)
+                  }
                 }
               }
             }
           }
+        } catch (error) {
+          // Silently fail during build - these are expected during static generation
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('[VIBE] Error fetching Atlantico data (non-blocking):', error)
+          }
         }
       }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[VIBE] Error fetching Atlantico data:', error)
+    } catch (outerError) {
+      // Outer catch for any other errors
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[VIBE] Outer error (non-blocking):', outerError)
       }
     }
   }

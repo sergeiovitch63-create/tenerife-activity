@@ -21,6 +21,7 @@ const nextConfig = {
   // Exclude debug routes and heavy dependencies from production build
   // This prevents Next.js from trying to collect page data for debug routes during build
   // and reduces bundle size for API routes
+  // Target: reduce Serverless Functions below 250MB limit
   ...(process.env.NODE_ENV === 'production' && {
     experimental: {
       outputFileTracingExcludes: {
@@ -28,19 +29,19 @@ const nextConfig = {
           '**/api/debug/**',
           '**/api/atlantico/debug/**',
         ],
-        // Exclude heavy dependencies from API routes that don't need them
-        // This significantly reduces bundle size for Vercel Functions (300mb limit)
-        // Target: reduce from 396mb to under 300mb (need to save ~100mb)
-        '**/api/atlantico/sync/**': [
-          // Exclude Supabase (not used in sync) - saves ~100mb
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          // Exclude React/React-DOM (not needed in API routes) - saves ~50mb
+        // Exclude heavy dependencies from ALL API routes by default
+        // This significantly reduces bundle size for Vercel Functions (250mb limit)
+        // Target: reduce from ~250mb+ to under 250mb
+        '**/api/**': [
+          // Exclude React/React-DOM from ALL API routes (not needed) - saves ~50mb
           '**/node_modules/react/**',
           '**/node_modules/react-dom/**',
           '**/node_modules/.pnpm/**/react/**',
           '**/node_modules/.pnpm/**/react-dom/**',
-          // Exclude dev dependencies
+          // Exclude Zustand (client-side state management, not needed in API) - saves ~5mb
+          '**/node_modules/zustand/**',
+          '**/node_modules/.pnpm/**/zustand/**',
+          // Exclude dev dependencies from ALL API routes - saves ~100mb+
           '**/node_modules/playwright/**',
           '**/node_modules/@playwright/**',
           '**/node_modules/tsx/**',
@@ -59,20 +60,35 @@ const nextConfig = {
           // Exclude next-intl client-side code (API routes don't need it)
           '**/node_modules/next-intl/dist/client/**',
           '**/node_modules/.pnpm/**/next-intl/**/dist/client/**',
+          // Exclude Tailwind CSS (not needed in API routes)
+          '**/node_modules/tailwindcss/**',
+          '**/node_modules/.pnpm/**/tailwindcss/**',
+          '**/node_modules/autoprefixer/**',
+          '**/node_modules/.pnpm/**/autoprefixer/**',
+          '**/node_modules/postcss/**',
+          '**/node_modules/.pnpm/**/postcss/**',
         ],
-        // Also exclude from other API routes that don't need these
+        // Exclude Supabase from routes that don't use it (most routes)
+        // Only keep Supabase for routes that explicitly need it
         '**/api/atlantico/**': [
           '**/node_modules/@supabase/**',
-          '**/node_modules/playwright/**',
-          '**/node_modules/tsx/**',
-          '**/node_modules/@playwright/**',
           '**/node_modules/.pnpm/**/@supabase/**',
-          '**/node_modules/.pnpm/**/@playwright/**',
-          '**/node_modules/.pnpm/**/playwright/**',
-          '**/node_modules/.pnpm/**/tsx/**',
-          '**/node_modules/typescript/**',
-          '**/node_modules/.pnpm/**/typescript/**',
         ],
+        '**/api/catalog/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+        ],
+        '**/api/backoffice/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+        ],
+        '**/api/debug/**': [
+          '**/node_modules/@supabase/**',
+          '**/node_modules/.pnpm/**/@supabase/**',
+        ],
+        // Routes that NEED Supabase - don't exclude it
+        // (admin/curation/*, debug/supabase, debug/env)
+        // These routes will include Supabase but still exclude React/dev deps
       },
     },
   }),
