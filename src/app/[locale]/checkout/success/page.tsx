@@ -7,7 +7,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from '@/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/ui/components/shared/Button'
 import { Section, Container } from '@/ui/components/layout'
