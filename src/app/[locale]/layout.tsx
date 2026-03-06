@@ -7,10 +7,12 @@ import { Footer } from '@/ui/components/navigation'
 import { AttributionCapture } from '../AttributionCapture'
 import { FloatingBackButton } from '@/components/navigation/FloatingBackButton'
 import { PrefetchLinks } from './PrefetchLinks'
+import { PerformanceInit } from '@/lib/performance/PerformanceInit.client'
 import { locales, type Locale } from '@/i18n/request'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo'
+import '@/ui/styles/view-transitions.css'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -74,6 +76,9 @@ export default async function LocaleLayout({
       <Footer locale={locale} />
       <Suspense fallback={null}>
         <PrefetchLinks />
+      </Suspense>
+      <Suspense fallback={null}>
+        <PerformanceInit />
       </Suspense>
     </NextIntlClientProvider>
   )
