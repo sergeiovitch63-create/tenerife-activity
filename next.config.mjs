@@ -265,6 +265,15 @@ const nextConfig = {
       ],
     },
   }),
+  
+  // Compression and optimization
+  compress: true, // Enable gzip compression (Vercel handles this automatically)
+  
+  // Power optimization: reduce JavaScript bundle size
+  ...(process.env.NODE_ENV === 'production' && {
+    // Reduce JavaScript bundle size
+    output: 'standalone', // Optimize for production deployment
+  }),
 }
 
 export default withNextIntl(nextConfig)
