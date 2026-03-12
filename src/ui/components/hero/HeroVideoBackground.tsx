@@ -34,39 +34,13 @@ export function HeroVideoBackground({
     setShouldRenderVideo(true)
   }, [])
 
-  // Optimise le chargement de la vidéo : uniquement quand visible
+  // Configure la vidéo côté client (playsinline, etc.)
   useEffect(() => {
     const video = videoRef.current
     if (!video || !shouldRenderVideo) return
-    
+
     // Set webkit-playsinline for older iOS versions
     video.setAttribute('webkit-playsinline', 'true')
-    
-    // Load video only when it enters viewport (IntersectionObserver)
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Video is visible, load it
-            video.load()
-            // Ensure muted and force play
-            video.muted = true
-            video.play().catch(() => {
-              // Silently handle autoplay failures
-            })
-            // Disconnect observer after first load
-            observer.disconnect()
-          }
-        })
-      },
-      { threshold: 0.1 }
-    )
-    
-    observer.observe(video)
-    
-    return () => {
-      observer.disconnect()
-    }
   }, [shouldRenderVideo])
 
   return (
@@ -96,7 +70,7 @@ export function HeroVideoBackground({
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             controls={false}
             disablePictureInPicture
             poster={poster}
@@ -114,6 +88,14 @@ export function HeroVideoBackground({
               opacity: 1,
               display: 'block',
               pointerEvents: 'none',
+            }}
+            onCanPlay={() => {
+              const video = videoRef.current
+              if (!video) return
+              video.muted = true
+              video.play().catch(() => {
+                // Silencieusement ignorer les erreurs d'autoplay
+              })
             }}
           >
             <source src={src} type="video/mp4" />
