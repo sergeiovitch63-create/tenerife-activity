@@ -66,13 +66,13 @@ export function Footer({ locale }: FooterProps) {
           {/* Footer image + reference (clickable → PDF) */}
           <div className="mt-8 flex flex-col items-center gap-2">
             <a
-              href="/images/INTERMEDIADOR-2.pdf"
+              href="/images/INTERMEDIADOR 2.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded"
             >
               <img
-                src="/images/hero-poster.jpg"
+                src="/images/footer.jpg"
                 alt="Voir le document INTERMEDIADOR 2"
                 width={360}
                 height={180}
