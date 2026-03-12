@@ -61,7 +61,7 @@ export async function GET(
 
     try {
       const classRes = await fetch(
-        `${origin}/api/atlantico/classifications?lang=${encodeURIComponent(validatedLang)}`,
+        `${origin}/api/atlantico/classifications?lang=ENG`,
         { next: { revalidate: REVALIDATE } as const }
       )
       if (classRes.ok) {
