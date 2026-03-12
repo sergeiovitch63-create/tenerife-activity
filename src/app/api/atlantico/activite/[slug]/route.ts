@@ -67,12 +67,23 @@ export async function GET(
       if (classRes.ok) {
         const classData = await classRes.json()
         if (classData.ok && Array.isArray(classData.classifications)) {
-          const normalizedSearch = classificationName.trim().toLowerCase()
-          const found = classData.classifications.find(
-            (c: { name?: string }) =>
-              String(c.name || '').trim().toLowerCase() === normalizedSearch
-          )
-          if (found) classificationId = found.id
+          const normalizedSearch = classificationName
+            .trim()
+            .toLowerCase()
+            .replace(/\s+&\s+/g, ' and ')
+            .replace(/\s+/g, ' ')
+          const found = classData.classifications.find((c: { name?: string; id?: string | number; code?: string }) => {
+            const name = String(c.name || '')
+              .trim()
+              .toLowerCase()
+              .replace(/\s+&\s+/g, ' and ')
+              .replace(/\s+/g, ' ')
+            return name === normalizedSearch
+          })
+          if (found) {
+            // groupsList expects id (per backoffice: "classification code = Id de la Classification")
+            classificationId = found.id ?? found.code ?? null
+          }
         }
       }
     } catch {
@@ -105,6 +116,19 @@ export async function GET(
       const groupsData = await groupsRes.json()
       if (groupsData.ok && Array.isArray(groupsData.groups)) {
         tours = groupsData.groups
+      }
+      // Fallback: Atlantico may return empty for some locales (ESP/FRA); retry with ENG
+      if (tours.length === 0 && validatedLang !== 'ENG') {
+        const fallbackRes = await fetch(
+          `${origin}/api/atlantico/groups?lang=ENG&page=-1&classificationId=${encodeURIComponent(String(classificationId))}`,
+          fetchOpts
+        )
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json()
+          if (fallbackData.ok && Array.isArray(fallbackData.groups)) {
+            tours = fallbackData.groups
+          }
+        }
       }
     }
 
