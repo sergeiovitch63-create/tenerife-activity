@@ -50,7 +50,7 @@ export function HomePageContent({
       {/* Hero Section with Video Background */}
       <div id="hero">
         <HeroVideoBackground
-          src="/videos/hero.mp4"
+          src="https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Hero.mp4"
           poster="/images/hero-poster.jpg"
           overlayClassName="bg-black/35"
         >
