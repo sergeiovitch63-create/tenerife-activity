@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { Link } from '@/navigation'
 import { Container } from '@/ui/components/layout'
 import { useTranslations } from 'next-intl'
@@ -72,7 +71,7 @@ export function Footer({ locale }: FooterProps) {
               rel="noopener noreferrer"
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded"
             >
-              <Image
+              <img
                 src="/images/hero-poster.jpg"
                 alt="Voir le document INTERMEDIADOR 2"
                 width={360}
