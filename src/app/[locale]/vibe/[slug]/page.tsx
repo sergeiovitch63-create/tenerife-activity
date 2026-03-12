@@ -98,7 +98,7 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
           const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
           
           const classificationsResponse = await fetch(
-            `${origin}/api/atlantico/classifications?lang=${atlLang}`,
+            `${origin}/api/atlantico/classifications?lang=ENG`,
             { 
               cache: 'no-store', // Use no-store for dynamic pages
               signal: controller.signal,
