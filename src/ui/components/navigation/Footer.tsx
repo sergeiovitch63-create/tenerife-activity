@@ -72,7 +72,7 @@ export function Footer({ locale }: FooterProps) {
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded"
             >
               <img
-                src="/images/footer.jpg"
+                src="/images/partners/affiliate.png"
                 alt="Voir le document INTERMEDIADOR 2"
                 width={360}
                 height={180}

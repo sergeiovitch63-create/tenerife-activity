@@ -11,7 +11,7 @@ export function PartnersSection() {
   const router = useRouter()
   const t = useTranslations('partners.section')
   
-  const PARTNER_FLYER_SRC = "/flyers/FLYERS_A5.png"
+  const PARTNER_FLYER_SRC = "/images/partners/affiliate.png"
 
   const handleWorkWithUs = () => {
     router.push('/partners')
@@ -59,7 +59,7 @@ export function PartnersSection() {
                 <div className="relative w-full aspect-[148/210] rounded-lg overflow-hidden border border-white/20 shadow-lg">
                   <Image
                     src={PARTNER_FLYER_SRC}
-                    alt="Tenerife Activity flyer (A5)"
+                    alt="Tenerife Activity affiliate flyer"
                     fill
                     className="object-contain"
                     sizes="(max-width: 768px) 90vw, 400px"
