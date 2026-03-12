@@ -10,7 +10,7 @@ export const activitiesMock: Activity[] = [
     location: 'Mount Teide National Park',
     media: {
       type: 'video',
-      src: '/videos/cable-car-observatory.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4',
     },
     tags: [
       'solo',
@@ -33,7 +33,7 @@ export const activitiesMock: Activity[] = [
     location: 'Costa Adeje',
     media: {
       type: 'video',
-      src: '/videos/vibe-theme-parks.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4',
     },
     tags: [
       'family',
@@ -54,7 +54,7 @@ export const activitiesMock: Activity[] = [
     location: 'Tenerife',
     media: {
       type: 'video',
-      src: '/videos/VIP-Tours.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4',
     },
     tags: [
       'couple',
@@ -76,7 +76,7 @@ export const activitiesMock: Activity[] = [
     location: 'Los Cristianos',
     media: {
       type: 'video',
-      src: '/videos/boat-trips-cruises.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4',
     },
     tags: [
       'solo',
@@ -99,7 +99,7 @@ export const activitiesMock: Activity[] = [
     location: 'Tenerife',
     media: {
       type: 'video',
-      src: '/videos/bus-excursions.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bus-Excursions.mp4',
     },
     tags: [
       'solo',
@@ -124,7 +124,7 @@ export const activitiesMock: Activity[] = [
     location: 'Puerto de la Cruz',
     media: {
       type: 'video',
-      src: '/videos/tickets-attractions.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Tickets-Attractions.mp4',
     },
     tags: [
       'family',
@@ -147,7 +147,7 @@ export const activitiesMock: Activity[] = [
     location: 'Playa de las Américas',
     media: {
       type: 'video',
-      src: '/videos/water-sports.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4',
     },
     tags: [
       'couple',
@@ -168,7 +168,7 @@ export const activitiesMock: Activity[] = [
     location: 'Los Gigantes',
     media: {
       type: 'video',
-      src: '/videos/diving-fishing.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Diving-Fishing.mp4',
     },
     tags: [
       'couple',
@@ -190,7 +190,7 @@ export const activitiesMock: Activity[] = [
     location: 'Masca Valley',
     media: {
       type: 'video',
-      src: '/videos/adventure-nature.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4',
     },
     tags: [
       'solo',
@@ -212,7 +212,7 @@ export const activitiesMock: Activity[] = [
     location: 'Playa de las Américas',
     media: {
       type: 'video',
-      src: '/videos/shows-entertainment.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Shows-Entertainment.mp4',
     },
     tags: [
       'couple',
@@ -235,7 +235,7 @@ export const activitiesMock: Activity[] = [
     location: 'La Laguna',
     media: {
       type: 'video',
-      src: '/videos/gastronomy-tastings.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4',
     },
     tags: [
       'solo',
@@ -285,7 +285,7 @@ export const activitiesMock: Activity[] = [
     location: 'Costa Adeje',
     media: {
       type: 'video',
-      src: '/videos/bike-rental.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bike-Rental.mp4',
     },
     tags: [
       'solo',
@@ -307,7 +307,7 @@ export const activitiesMock: Activity[] = [
     location: 'Tenerife Airport',
     media: {
       type: 'video',
-      src: '/videos/transfers-transport.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Transfers-Transport.mp4',
     },
     tags: [
       'solo',
@@ -330,7 +330,7 @@ export const activitiesMock: Activity[] = [
     location: 'Los Gigantes',
     media: {
       type: 'video',
-      src: '/videos/water-sports.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4',
     },
     tags: [
       'couple',
@@ -352,7 +352,7 @@ export const activitiesMock: Activity[] = [
     location: 'Mount Teide',
     media: {
       type: 'video',
-      src: '/videos/cable-car-observatory.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4',
     },
     tags: [
       'solo',
@@ -377,7 +377,7 @@ export const activitiesMock: Activity[] = [
     location: 'Adeje',
     media: {
       type: 'video',
-      src: '/videos/adventure-nature.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4',
     },
     tags: [
       'couple',
@@ -397,7 +397,7 @@ export const activitiesMock: Activity[] = [
     location: 'Tacoronte',
     media: {
       type: 'video',
-      src: '/videos/gastronomy-tastings.mp4',
+      src: 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4',
     },
     tags: [
       'couple',

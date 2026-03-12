@@ -18,7 +18,7 @@
     },
     "order": 1,
     "thumbnail": "/videos/thumbnails/VIP-Tours.png",
-    "video": "/videos/VIP-Tours.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4",
     "translationKey": "vipTours"
   },
   {
@@ -40,7 +40,7 @@
     },
     "order": 2,
     "thumbnail": "/videos/thumbnails/vibe-theme-parks.png",
-    "video": "/videos/vibe-theme-parks.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4",
     "translationKey": "themeParks"
   },
   {
@@ -62,7 +62,7 @@
     },
     "order": 3,
     "thumbnail": "/videos/thumbnails/tickets-attractions.png",
-    "video": "/videos/tickets-attractions.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Tickets-Attractions.mp4",
     "translationKey": "ticketsAttractions"
   },
   {
@@ -84,7 +84,7 @@
     },
     "order": 4,
     "thumbnail": "/videos/thumbnails/bus-excursions.png",
-    "video": "/videos/bus-excursions.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bus-Excursions.mp4",
     "translationKey": "busExcursions"
   },
   {
@@ -106,7 +106,7 @@
     },
     "order": 5,
     "thumbnail": "/videos/thumbnails/boat-trips-cruises.png",
-    "video": "/videos/boat-trips-cruises.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4",
     "translationKey": "boatTripsCruises"
   },
   {
@@ -128,7 +128,7 @@
     },
     "order": 6,
     "thumbnail": "/videos/thumbnails/shows-entertainment.png",
-    "video": "/videos/shows-entertainment.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Shows-Entertainment.mp4",
     "translationKey": "showsEntertainment"
   },
   {
@@ -150,7 +150,7 @@
     },
     "order": 7,
     "thumbnail": "/videos/thumbnails/water-sports.png",
-    "video": "/videos/water-sports.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4",
     "translationKey": "waterSports"
   },
   {
@@ -172,7 +172,7 @@
     },
     "order": 8,
     "thumbnail": "/videos/thumbnails/cable-car-observatory.png",
-    "video": "/videos/cable-car-observatory.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4",
     "translationKey": "cableCarObservatory"
   },
   {
@@ -194,7 +194,7 @@
     },
     "order": 9,
     "thumbnail": "/videos/thumbnails/diving-fishing.png",
-    "video": "/videos/diving-fishing.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Diving-Fishing.mp4",
     "translationKey": "divingFishing"
   },
   {
@@ -216,7 +216,7 @@
     },
     "order": 10,
     "thumbnail": "/videos/thumbnails/adventure-nature.png",
-    "video": "/videos/adventure-nature.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4",
     "translationKey": "adventureNature"
   },
   {
@@ -238,7 +238,7 @@
     },
     "order": 11,
     "thumbnail": "/videos/thumbnails/gastronomy-tastings.png",
-    "video": "/videos/gastronomy-tastings.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4",
     "translationKey": "gastronomyTastings"
   },
   {
@@ -282,7 +282,7 @@
     },
     "order": 13,
     "thumbnail": "/videos/thumbnails/bike-rental.png",
-    "video": "/videos/bike-rental.mp4",
+    "video": "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bike-Rental.mp4",
     "translationKey": "bikeRental"
   }
 ]

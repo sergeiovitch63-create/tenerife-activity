@@ -3,20 +3,20 @@
 import { useRef, useState, useEffect } from 'react'
 
 const VIBE_VIDEO_MAP: Record<string, string> = {
-  'vip-tours': '/videos/VIP-Tours.mp4',
-  'theme-parks': '/videos/vibe-theme-parks.mp4',
-  'tickets-attractions': '/videos/tickets-attractions.mp4',
-  'bus-excursions': '/videos/bus-excursions.mp4',
-  'boat-trips-cruises': '/videos/boat-trips-cruises.mp4',
-  'shows-entertainment': '/videos/shows-entertainment.mp4',
-  'water-sports': '/videos/water-sports.mp4',
-  'cable-car-observatory': '/videos/cable-car-observatory.mp4',
-  'diving-fishing': '/videos/diving-fishing.mp4',
-  'adventure-nature': '/videos/adventure-nature.mp4',
-  'gastronomy-tastings': '/videos/gastronomy-tastings.mp4',
+  'vip-tours': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4',
+  'theme-parks': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4',
+  'tickets-attractions': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Tickets-Attractions.mp4',
+  'bus-excursions': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bus-Excursions.mp4',
+  'boat-trips-cruises': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4',
+  'shows-entertainment': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Shows-Entertainment.mp4',
+  'water-sports': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4',
+  'cable-car-observatory': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4',
+  'diving-fishing': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Diving-Fishing.mp4',
+  'adventure-nature': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4',
+  'gastronomy-tastings': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4',
   'car-rental': '/videos/car-rental.mp4',
-  'bike-rental': '/videos/bike-rental.mp4',
-  'transfers-transport': '/videos/transfers-transport.mp4',
+  'bike-rental': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bike-Rental.mp4',
+  'transfers-transport': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Transfers-Transport.mp4',
 }
 
 interface VibeVideoProps {

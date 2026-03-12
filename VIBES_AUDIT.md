@@ -4,20 +4,20 @@
 
 | # | ID | Slug | Title EN | Title ES | Title FR | Description EN | Tagline EN | Thumbnail | Video |
 |---|----|------|----------|----------|----------|-----------------|------------|-----------|-------|
-| 1 | `1` | `vip-tours` | VIP Tours | Tours VIP | Tours VIP | Exclusive premium tours | Exclusive access to Tenerife's most coveted experiences | `/videos/thumbnails/VIP-Tours.png` | `/videos/VIP-Tours.mp4` |
-| 2 | `2` | `theme-parks` | Theme Parks | Parques temáticos | Parcs à thème | Family fun and entertainment | Unforgettable family adventures await | `/videos/thumbnails/vibe-theme-parks.png` | `/videos/vibe-theme-parks.mp4` |
-| 3 | `3` | `tickets-attractions` | Tickets & Attractions | Entradas y atracciones | Billets et attractions | Skip-the-line tickets and attractions | Skip the queues, maximize your time | `/videos/thumbnails/tickets-attractions.png` | `/videos/tickets-attractions.mp4` |
-| 4 | `4` | `bus-excursions` | Bus Excursions | Excursiones en autobús | Excursions en bus | Guided bus tours around the island | Discover the island in comfort and style | `/videos/thumbnails/bus-excursions.png` | `/videos/bus-excursions.mp4` |
-| 5 | `5` | `boat-trips-cruises` | Boat Trips & Cruises | Viajes en barco y cruceros | Voyages en bateau et croisières | Ocean adventures and cruises | Set sail for unforgettable ocean moments | `/videos/thumbnails/boat-trips-cruises.png` | `/videos/boat-trips-cruises.mp4` |
-| 6 | `6` | `shows-entertainment` | Shows & Entertainment | Espectáculos y entretenimiento | Spectacles et divertissements | Live shows and evening entertainment | Evenings filled with world-class performances | `/videos/thumbnails/shows-entertainment.png` | `/videos/shows-entertainment.mp4` |
-| 7 | `7` | `water-sports` | Water Sports | Deportes acuáticos | Sports nautiques | Aquatic activities and water fun | Dive into thrilling aquatic adventures | `/videos/thumbnails/water-sports.png` | `/videos/water-sports.mp4` |
-| 8 | `8` | `cable-car-observatory` | Cable Car & Observatory | Teleférico y observatorio | Téléphérique et observatoire | Mountain views and stargazing | Reach new heights and gaze at the stars | `/videos/thumbnails/cable-car-observatory.png` | `/videos/cable-car-observatory.mp4` |
-| 9 | `9` | `diving-fishing` | Diving & Fishing | Buceo y pesca | Plongée et pêche | Underwater adventures and fishing trips | Explore the depths or cast your line | `/videos/thumbnails/diving-fishing.png` | `/videos/diving-fishing.mp4` |
-| 10 | `10` | `adventure-nature` | Adventure & Nature | Aventura y naturaleza | Aventure et nature | Outdoor adventures and nature experiences | Connect with Tenerife's wild side | `/videos/thumbnails/adventure-nature.png` | `/videos/adventure-nature.mp4` |
-| 11 | `11` | `gastronomy-tastings` | Gastronomy & Tastings | Gastronomía y degustaciones | Gastronomie et dégustations | Culinary experiences and tastings | Savor the authentic flavors of the Canaries | `/videos/thumbnails/gastronomy-tastings.png` | `/videos/gastronomy-tastings.mp4` |
+| 1 | `1` | `vip-tours` | VIP Tours | Tours VIP | Tours VIP | Exclusive premium tours | Exclusive access to Tenerife's most coveted experiences | `/videos/thumbnails/VIP-Tours.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4` |
+| 2 | `2` | `theme-parks` | Theme Parks | Parques temáticos | Parcs à thème | Family fun and entertainment | Unforgettable family adventures await | `/videos/thumbnails/vibe-theme-parks.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4` |
+| 3 | `3` | `tickets-attractions` | Tickets & Attractions | Entradas y atracciones | Billets et attractions | Skip-the-line tickets and attractions | Skip the queues, maximize your time | `/videos/thumbnails/tickets-attractions.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Tickets-Attractions.mp4` |
+| 4 | `4` | `bus-excursions` | Bus Excursions | Excursiones en autobús | Excursions en bus | Guided bus tours around the island | Discover the island in comfort and style | `/videos/thumbnails/bus-excursions.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bus-Excursions.mp4` |
+| 5 | `5` | `boat-trips-cruises` | Boat Trips & Cruises | Viajes en barco y cruceros | Voyages en bateau et croisières | Ocean adventures and cruises | Set sail for unforgettable ocean moments | `/videos/thumbnails/boat-trips-cruises.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4` |
+| 6 | `6` | `shows-entertainment` | Shows & Entertainment | Espectáculos y entretenimiento | Spectacles et divertissements | Live shows and evening entertainment | Evenings filled with world-class performances | `/videos/thumbnails/shows-entertainment.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Shows-Entertainment.mp4` |
+| 7 | `7` | `water-sports` | Water Sports | Deportes acuáticos | Sports nautiques | Aquatic activities and water fun | Dive into thrilling aquatic adventures | `/videos/thumbnails/water-sports.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4` |
+| 8 | `8` | `cable-car-observatory` | Cable Car & Observatory | Teleférico y observatorio | Téléphérique et observatoire | Mountain views and stargazing | Reach new heights and gaze at the stars | `/videos/thumbnails/cable-car-observatory.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4` |
+| 9 | `9` | `diving-fishing` | Diving & Fishing | Buceo y pesca | Plongée et pêche | Underwater adventures and fishing trips | Explore the depths or cast your line | `/videos/thumbnails/diving-fishing.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Diving-Fishing.mp4` |
+| 10 | `10` | `adventure-nature` | Adventure & Nature | Aventura y naturaleza | Aventure et nature | Outdoor adventures and nature experiences | Connect with Tenerife's wild side | `/videos/thumbnails/adventure-nature.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4` |
+| 11 | `11` | `gastronomy-tastings` | Gastronomy & Tastings | Gastronomía y degustaciones | Gastronomie et dégustations | Culinary experiences and tastings | Savor the authentic flavors of the Canaries | `/videos/thumbnails/gastronomy-tastings.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4` |
 | 12 | `12` | `car-rental` | Car Rental | Alquiler de coche | Location de voiture | Vehicle rental services | Freedom to explore at your own pace | `/videos/thumbnails/car-rental.png` | `/videos/car-rental.mp4` |
-| 13 | `13` | `bike-rental` | Bike Rental | Alquiler de bicicleta | Location de vélo | Bicycle rental services | Pedal through scenic routes | `/videos/thumbnails/bike-rental.png` | `/videos/bike-rental.mp4` |
-| 14 | `14` | `transfers-transport` | Transfers & Transport | Traslados y transporte privado | Transferts et transport privé | Airport transfers and transport services | Seamless journeys from start to finish | `/videos/thumbnails/transfers-transport.png` | `/videos/transfers-transport.mp4` |
+| 13 | `13` | `bike-rental` | Bike Rental | Alquiler de bicicleta | Location de vélo | Bicycle rental services | Pedal through scenic routes | `/videos/thumbnails/bike-rental.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bike-Rental.mp4` |
+| 14 | `14` | `transfers-transport` | Transfers & Transport | Traslados y transporte privado | Transferts et transport privé | Airport transfers and transport services | Seamless journeys from start to finish | `/videos/thumbnails/transfers-transport.png` | `https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Transfers-Transport.mp4` |
 
 ---
 
@@ -135,8 +135,8 @@ export const vibeThumbnails: Record<string, string> = {
 **Lignes 17-32** : Mapping des slugs vers les fichiers vidéo
 ```typescript
 const VIBE_VIDEO_MAP: Record<string, string> = {
-  'vip-tours': '/videos/VIP-Tours.mp4',
-  'theme-parks': '/videos/vibe-theme-parks.mp4',
+  'vip-tours': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4',
+  'theme-parks': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4',
   // ... tous les 14 vibes ont une vidéo
 }
 ```

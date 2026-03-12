@@ -6,7 +6,7 @@
  * Get thumbnail paths from video source path
  * Returns both webp and jpg paths for fallback support
  * 
- * @param videoSrc - Video source path (e.g., "/videos/boat-trips-cruises.mp4")
+ * @param videoSrc - Video source path (e.g., "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4")
  * @returns Object with webp and jpg paths
  */
 export function getThumbnailPaths(videoSrc: string | null): {
@@ -33,7 +33,7 @@ export function getThumbnailPaths(videoSrc: string | null): {
 /**
  * Get primary thumbnail path (webp preferred)
  * 
- * @param videoSrc - Video source path (e.g., "/videos/boat-trips-cruises.mp4")
+ * @param videoSrc - Video source path (e.g., "https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4")
  * @returns Thumbnail path (e.g., "/videos/thumbnails/boat-trips-cruises.webp")
  * @deprecated Use getThumbnailPaths for better fallback support
  */
