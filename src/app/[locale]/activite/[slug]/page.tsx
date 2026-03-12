@@ -16,7 +16,8 @@ import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCar
 import { getTranslations } from 'next-intl/server'
 import { getTranslatedVibeTitle } from '@/ui/components/vibe/vibe-translations'
 import { vibeRepository } from '@/config/repositories'
-import { locales } from '@/i18n/request'
+import { locales, type Locale } from '@/i18n/request'
+import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
 
 interface PageParams {
   params: Promise<{ locale: string; slug: string }>
@@ -165,7 +166,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
                         {codeStr ? (
                           <ToursListCardImage
                             code={codeStr}
-                            alt={t.name}
+                            alt={translateContent(t.name, locale as Locale)}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -176,11 +177,11 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
                       </div>
                       <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">
                         <h2 className="text-lg font-semibold text-glass-900 line-clamp-2">
-                          {t.name}
+                          {translateContent(t.name, locale as Locale)}
                         </h2>
                         {t.desc && (
                           <p className="text-sm text-glass-700 leading-relaxed line-clamp-4">
-                            {decodeTextFromApi(t.desc)}
+                            {translateDescriptionByCode(codeStr, decodeTextFromApi(t.desc), locale as Locale)}
                           </p>
                         )}
                         {!t.desc && (

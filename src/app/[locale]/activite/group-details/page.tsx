@@ -14,6 +14,8 @@ import { GROUP_DETAILS_IMAGES } from '@/data/group-details-images.generated'
 import { getLocalGroupImages } from '@/lib/atlantico/get-local-group-images.server'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
+import type { Locale } from '@/i18n/request'
 import { GroupDetails508LuxLayout } from '@/app/[locale]/debug/group-details/GroupDetails508LuxLayout.client'
 import { getTranslations } from 'next-intl/server'
 
@@ -190,19 +192,27 @@ export default async function ActiviteGroupDetailsPage({ params, searchParams }:
         ? tGroupDetails('overview.itinerary508')
         : (details.route as string) || (details.itinerary as string) || undefined
 
+    const rawName = decodeTextFromApi(details.name) || `Tour ${code}`
+    const rawDesc = decodeTextFromApi(details.desc)
+    const rawItinerary = itinerary
+    const rawWillDo = codeStr !== '340' ? details.willDo : undefined
+    const rawFaq = decodeTextFromApi(details.faq)
+    const rawCancel = cancellationPolicy
+    const loc = locale as Locale
+
     return (
       <GroupDetails508LuxLayout
         heroUrl={heroUrl}
         galleryUrls={galleryUrls}
-        name={decodeTextFromApi(details.name) || `Tour ${code}`}
+        name={translateContent(rawName, loc)}
         code={codeStr}
         duration={details.duration}
         price={details.price}
-        desc={decodeTextFromApi(details.desc)}
-        itinerary={itinerary}
-        willDo={codeStr !== '340' ? details.willDo : undefined}
-        faq={decodeTextFromApi(details.faq)}
-        cancellationPolicy={cancellationPolicy}
+        desc={rawDesc ? translateDescriptionByCode(codeStr, rawDesc, loc) : undefined}
+        itinerary={rawItinerary ? translateContent(rawItinerary, loc) : undefined}
+        willDo={rawWillDo ? translateContent(String(rawWillDo), loc) : undefined}
+        faq={rawFaq ? translateContent(rawFaq, loc) : undefined}
+        cancellationPolicy={rawCancel ? translateContent(String(rawCancel), loc) : undefined}
         childAge={decodeTextFromApi(details.childAge)}
         infantAge={decodeTextFromApi(details.infantAge)}
         eventIds={eventIds}
