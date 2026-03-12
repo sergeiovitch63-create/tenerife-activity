@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/ui/lib/cn'
+import { shouldAutoplayVideo, shouldDisableVideos } from '@/lib/mediaPolicy'
 
 interface HeroVideoBackgroundProps {
   src: string
@@ -19,11 +20,24 @@ export function HeroVideoBackground({
   children,
 }: HeroVideoBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [shouldRenderVideo, setShouldRenderVideo] = useState(false)
 
-  // Optimize video loading: load only when visible
+  // Décide si la vidéo peut être chargée / lue en fonction de la connexion et des préférences utilisateur
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    if (shouldDisableVideos() || !shouldAutoplayVideo()) {
+      setShouldRenderVideo(false)
+      return
+    }
+
+    setShouldRenderVideo(true)
+  }, [])
+
+  // Optimise le chargement de la vidéo : uniquement quand visible
   useEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    if (!video || !shouldRenderVideo) return
     
     // Set webkit-playsinline for older iOS versions
     video.setAttribute('webkit-playsinline', 'true')
@@ -53,7 +67,7 @@ export function HeroVideoBackground({
     return () => {
       observer.disconnect()
     }
-  }, [])
+  }, [shouldRenderVideo])
 
   return (
     <div 
@@ -67,7 +81,7 @@ export function HeroVideoBackground({
         position: 'relative',
       }}
     >
-      {/* Video Background */}
+      {/* Video ou poster en arrière-plan */}
       <div 
         className="absolute inset-0 w-full h-full"
         style={{ 
@@ -75,35 +89,46 @@ export function HeroVideoBackground({
           overflow: 'hidden',
         }}
       >
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          controls={false}
-          disablePictureInPicture
-          poster={poster}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: -1,
-            opacity: 1,
-            display: 'block',
-            pointerEvents: 'none',
-          }}
-        >
-          <source src={src} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        {shouldRenderVideo ? (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            controls={false}
+            disablePictureInPicture
+            poster={poster}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              zIndex: -1,
+              opacity: 1,
+              display: 'block',
+              pointerEvents: 'none',
+            }}
+          >
+            <source src={src} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          poster && (
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-center"
+              style={{
+                backgroundImage: `url(${poster})`,
+              }}
+            />
+          )
+        )}
       </div>
       
       {/* Premium Gradient Overlay */}
