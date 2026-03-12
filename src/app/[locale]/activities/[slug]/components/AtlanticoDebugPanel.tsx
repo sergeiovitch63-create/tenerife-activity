@@ -36,19 +36,8 @@ export function AtlanticoDebugPanel({ tourId, events, locale }: { tourId: string
   const [isLoading, setIsLoading] = useState(false)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
 
-  // Map locale to Atlantico lang
-  const mapLocaleToLang = (loc: string): string => {
-    const map: Record<string, string> = {
-      en: 'ENG',
-      es: 'ESP',
-      fr: 'FRA',
-      de: 'GER',
-      it: 'ITA',
-    }
-    return map[loc] || 'ENG'
-  }
-
-  const lang = mapLocaleToLang(locale)
+  // Always ENG for Atlantico data (same logic for all locales)
+  const lang = 'ENG'
 
   // Extract all image URLs from a response
   const extractImagesFromResponse = (response: any, source: string): ImageInfo[] => {
