@@ -10,7 +10,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { CartItem, PriceSnapshot } from './types'
 import { generateCartItemKey, isCartItemExpired, createCartItem } from './types'
-import { setCartCookie } from './cookie'
+import { setCartCookie, type CartCookieFullItem } from './cookie'
 
 interface CartState {
   items: CartItem[]
@@ -110,7 +110,7 @@ export const useCartStore = create<CartState>()(
             const parsed = JSON.parse(value) as { state?: { items?: CartItem[] } }
             const items = parsed?.state?.items ?? []
             const valid = items.filter((i) => !isCartItemExpired(i))
-            setCartCookie(valid)
+            setCartCookie(valid as unknown as CartCookieFullItem[])
           } catch {
             // ignore
           }

@@ -1059,6 +1059,11 @@ export function ActivityDetailClient({
     }
   }, [eventImageUrl, selectedOption?.image, groupImageUrl, heroImageUrl, item.image, heroImage, selectedEventId, selectedOption, groupDetails])
 
+  // Reset mobile gallery index when images/event change (must be before any conditional return)
+  useEffect(() => {
+    setMobileGalleryIndex(0)
+  }, [allImages.length, selectedEventId])
+
   // Premium layout for activity 508
   if (isActivity508) {
     console.log('[ACTIVITY_508] Rendering premium layout for activity 508', { groupCode: item.groupCode, slug: item.slug })
@@ -1742,10 +1747,6 @@ export function ActivityDetailClient({
       else goToPrevGallery()
     }
   }
-
-  useEffect(() => {
-    setMobileGalleryIndex(0)
-  }, [allImages.length, selectedEventId])
 
   return (
     <div className="min-h-screen bg-white">

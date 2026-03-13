@@ -54,9 +54,10 @@ async function fetchMeetingPoints(
         )
         if (!res.ok) return
         const data = (await res.json()) as { meetingPoints?: unknown[] }
-        if (data.meetingPoints && Array.isArray(data.meetingPoints)) {
+        const points = data.meetingPoints
+        if (points && Array.isArray(points)) {
           items.forEach((item) => {
-            if (item.t_id === eventId) map[item.itemKey] = data.meetingPoints
+            if (item.t_id === eventId) map[item.itemKey] = points
           })
         }
       } catch {

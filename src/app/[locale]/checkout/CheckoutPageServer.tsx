@@ -30,7 +30,7 @@ export async function CheckoutPageServer({ locale }: CheckoutPageServerProps) {
     <CheckoutClient
       locale={locale}
       initialRevalidationResult={revalidationResult}
-      initialMeetingPoints={meetingPoints}
+      initialMeetingPoints={meetingPoints as Record<string, import('@/app/api/atlantico/event-details/route').MeetingPoint[]>}
     />
   )
 }

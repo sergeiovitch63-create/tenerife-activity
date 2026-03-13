@@ -11,7 +11,7 @@ import { isCartItemExpired } from '@/lib/cart/types'
 import { CartItemImage } from '@/components/cart/CartItemImage.client'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
-import { setCartCookie } from '@/lib/cart/cookie'
+import { setCartCookie, type CartCookieFullItem } from '@/lib/cart/cookie'
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—'
@@ -216,7 +216,7 @@ export function CartPageClient({ groupNames }: CartPageClientProps) {
     if (!mounted) return
     const valid = items.filter((i) => !isCartItemExpired(i))
     if (valid.length > 0) {
-      setCartCookie(valid)
+      setCartCookie(valid as unknown as CartCookieFullItem[])
     }
   }, [mounted, items])
 

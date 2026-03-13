@@ -16,16 +16,24 @@ import { cn } from '@/ui/lib/cn'
 import type { MeetingPoint } from '@/app/api/atlantico/event-details/route'
 import { getMeetingPointName } from '@/components/booking/MeetingPointsDisplay'
 
+/** Revalidation result from API (server returns looser type than client CartItem) */
+type RevalidationResultProp = {
+  items: Array<Record<string, unknown> & { itemKey: string; priceChanged?: boolean; priceDiff?: number; available?: boolean; newPriceSnapshot?: unknown }>
+  errors: Array<{ itemKey: string; error: string; field?: string }>
+  hasPriceChanges: boolean
+  hasAvailabilityIssues: boolean
+}
+
 interface CheckoutClientProps {
   locale: string
   /** Server-fetched revalidation result. When provided, skips client revalidate. */
-  initialRevalidationResult?: RevalidationResult | null
+  initialRevalidationResult?: RevalidationResultProp | null
   /** Server-fetched meeting points. When provided, skips client loadMeetingPoints. */
   initialMeetingPoints?: Record<string, MeetingPoint[]>
 }
 
 interface RevalidationResult {
-  items: Array<CartItem & { revalidated: true; priceChanged: boolean; priceDiff?: number; available: boolean; newPriceSnapshot?: any }>
+  items: Array<CartItem & { revalidated: true; priceChanged: boolean; priceDiff?: number; available: boolean; newPriceSnapshot?: unknown }>
   errors: Array<{ itemKey: string; error: string; field?: string }>
   hasPriceChanges: boolean
   hasAvailabilityIssues: boolean
@@ -55,7 +63,7 @@ export function CheckoutClient({
   const hasInitialRevalidation = initialRevalidationResult != null
   const hasInitialMeetingPoints = Object.keys(initialMeetingPoints ?? {}).length > 0
   const [revalidating, setRevalidating] = useState(!hasInitialRevalidation)
-  const [revalidationResult, setRevalidationResult] = useState<RevalidationResult | null>(
+  const [revalidationResult, setRevalidationResult] = useState<RevalidationResult | RevalidationResultProp | null>(
     initialRevalidationResult ?? null
   )
   const [submitting, setSubmitting] = useState(false)
@@ -284,7 +292,7 @@ export function CheckoutClient({
 
   const item = validItems[0]
   const revalidatedItem = revalidationResult?.items[0]
-  const priceSnapshot = revalidatedItem?.newPriceSnapshot || item.priceSnapshot
+  const priceSnapshot = ((revalidatedItem?.newPriceSnapshot as { total: number } | undefined) || item.priceSnapshot) as { total: number }
   const priceChanged = revalidatedItem?.priceChanged || false
 
   return (
