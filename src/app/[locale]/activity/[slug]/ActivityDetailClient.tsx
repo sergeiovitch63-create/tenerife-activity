@@ -15,7 +15,7 @@
  */
 
 import { SafeImage } from '@/components/SafeImage'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
@@ -142,6 +142,7 @@ export function ActivityDetailClient({
   heroImageUrl,
 }: ActivityDetailClientProps) {
   const tGroup = useTranslations('groupDetails')
+  const tDetail = useTranslations('activityDetail')
   const [selectedTab, setSelectedTab] = useState<'overview' | 'whats-included' | 'description' | 'what-you-do' | 'details' | 'prices' | 'cancellation' | 'reviews'>('overview')
   
   // Check if this is activity 508 for custom tab layout
@@ -181,11 +182,19 @@ export function ActivityDetailClient({
   const [groupDetails, setGroupDetails] = useState<any>(null)
   const [limitsInfo, setLimitsInfo] = useState<any>(null)
   
+  // API error states (user-visible)
+  const [groupDetailsError, setGroupDetailsError] = useState(false)
+  const [eventDetailsError, setEventDetailsError] = useState(false)
+  const [limitsError, setLimitsError] = useState(false)
+  
   // Image states
   const [eventImageUrl, setEventImageUrl] = useState<string | null>(null)
   const [groupImageUrl, setGroupImageUrl] = useState<string | null>(null)
   // Carousel state for event 303
   const [heroCarouselIndex, setHeroCarouselIndex] = useState<number>(0)
+  // Carousel state for mobile gallery (default layout)
+  const [mobileGalleryIndex, setMobileGalleryIndex] = useState<number>(0)
+  const mobileGalleryTouchStart = useRef<number>(0)
   // All images from API (for gallery)
   const [allImages, setAllImages] = useState<string[]>([])
   
@@ -359,6 +368,7 @@ export function ActivityDetailClient({
 
   // Fetch groupDetails immediately (always available)
   useEffect(() => {
+    setGroupDetailsError(false)
     // SPECIAL CASE: Event 303 - Use local images
     if (item.groupCode === '303') {
       setGroupImageUrl('/images/events/303/A.webp')
@@ -382,7 +392,7 @@ export function ActivityDetailClient({
             })
           }
         })
-        .catch(() => {})
+        .catch(() => setGroupDetailsError(true))
       return
     }
 
@@ -485,7 +495,7 @@ export function ActivityDetailClient({
           }
         }
       })
-      .catch(() => {})
+      .catch(() => setGroupDetailsError(true))
   }, [item.groupCode, lang])
 
   // Fetch complete Atlantico info when eventId is selected
@@ -494,6 +504,8 @@ export function ActivityDetailClient({
       setEventDetails(null)
       setLimitsInfo(null)
       setEventImageUrl(null)
+      setEventDetailsError(false)
+      setLimitsError(false)
       // Reset allImages to only group images when no event is selected
       if (groupDetails) {
         const groupImages = extractImageUrls(groupDetails)
@@ -505,6 +517,7 @@ export function ActivityDetailClient({
     }
 
     // Fetch eventDetails
+    setEventDetailsError(false)
     fetch(`/api/atlantico/event/${selectedEventId}/${lang}`)
       .then(res => res.ok ? res.json() : null)
       .then(async (data) => {
@@ -687,7 +700,7 @@ export function ActivityDetailClient({
           }
         }
       })
-      .catch(() => {})
+      .catch(() => setEventDetailsError(true))
 
     // Store limits info when fetched
     const normalizedMonth = (() => {
@@ -699,12 +712,13 @@ export function ActivityDetailClient({
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
     })()
 
+    setLimitsError(false)
     fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}&month=${encodeURIComponent(normalizedMonth)}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data) setLimitsInfo(data)
       })
-      .catch(() => {})
+      .catch(() => setLimitsError(true))
   }, [selectedEventId, lang, currentMonth])
 
   // Check if there are valid times for selected date
@@ -1171,6 +1185,11 @@ export function ActivityDetailClient({
 
               {/* Tab Content - Premium Styling */}
               <div className="pt-8">
+                {groupDetailsError && !groupDetails && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm font-medium">{tDetail('errors.groupDetails')}</p>
+                  </div>
+                )}
                 {selectedTab === 'overview' && (
                   <div className="space-y-8">
                     {/* What you do - above Overview */}
@@ -1392,7 +1411,7 @@ export function ActivityDetailClient({
                 <div className="bg-white rounded-2xl shadow-2xl border border-glass-200 overflow-hidden">
                   {/* Booking Header */}
                   <div className="bg-gradient-to-r from-ocean-600 to-ocean-700 p-6 text-white">
-                    <h3 className="text-2xl font-bold mb-2">Book Your Experience</h3>
+                    <h3 className="text-2xl font-bold mb-2">{tDetail('bookYourExperience')}</h3>
                     {groupBasePrice && (
                       <p className="text-ocean-100 text-lg">From {formatEUR(groupBasePrice)}</p>
                     )}
@@ -1403,7 +1422,7 @@ export function ActivityDetailClient({
                     {/* Option selector */}
                     {eventOptions.length > 0 && (
                       <div>
-                        <label className="block text-sm font-semibold text-glass-900 mb-2">Select Option</label>
+                        <label className="block text-sm font-semibold text-glass-900 mb-2">{tDetail('selectOption')}</label>
                         <select
                           value={selectedEventId}
                           onChange={(e) => {
@@ -1412,7 +1431,7 @@ export function ActivityDetailClient({
                           }}
                           className="w-full px-4 py-3 border-2 border-glass-300 rounded-xl focus:ring-2 focus:ring-ocean-500 focus:border-ocean-500 transition-all bg-white"
                         >
-                          <option value="">Choose an option...</option>
+                          <option value="">{tDetail('chooseOption')}</option>
                           {eventOptions.map((opt) => (
                             <option key={opt.eventId} value={opt.eventId}>
                               {opt.label}
@@ -1425,9 +1444,9 @@ export function ActivityDetailClient({
                     {/* Calendar - Premium Styling */}
                     {selectedEventId && calendarMode !== 'none' && (
                       <div>
-                        <label className="block text-sm font-semibold text-glass-900 mb-3">Select Date</label>
+                        <label className="block text-sm font-semibold text-glass-900 mb-3">{tDetail('selectDate')}</label>
                         {loadingCalendar ? (
-                          <div className="text-center py-8 text-glass-500">Loading calendar...</div>
+                          <div className="text-center py-8 text-glass-500">{tDetail('loadingCalendar')}</div>
                         ) : (
                           <>
                             {/* Month Navigation */}
@@ -1706,6 +1725,28 @@ export function ActivityDetailClient({
   const mainGalleryImage = galleryImages[0] ?? heroImage
   const sideGalleryImages = galleryImages.slice(1, 5) // up to 4 small images on the right
 
+  const goToPrevGallery = () => {
+    setMobileGalleryIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)
+  }
+  const goToNextGallery = () => {
+    setMobileGalleryIndex((prev) => (prev + 1) % galleryImages.length)
+  }
+  const handleMobileGalleryTouchStart = (e: React.TouchEvent) => {
+    mobileGalleryTouchStart.current = e.touches[0].clientX
+  }
+  const handleMobileGalleryTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX
+    const delta = mobileGalleryTouchStart.current - touchEndX
+    if (Math.abs(delta) > 50 && galleryImages.length > 1) {
+      if (delta > 0) goToNextGallery()
+      else goToPrevGallery()
+    }
+  }
+
+  useEffect(() => {
+    setMobileGalleryIndex(0)
+  }, [allImages.length, selectedEventId])
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero / Gallery section */}
@@ -1781,15 +1822,81 @@ export function ActivityDetailClient({
             {/* Overlay gradient for better text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" style={{ zIndex: 1 }} />
           </>
-        ) : (
-          /* Standard Hero Image */
+        ) : galleryImages.length > 1 ? (
+          /* Mobile gallery carousel - swipeable between multiple images */
           <>
-            {heroImage ? (
+            <div
+              className="absolute inset-0"
+              style={{ zIndex: 0 }}
+              onTouchStart={handleMobileGalleryTouchStart}
+              onTouchEnd={handleMobileGalleryTouchEnd}
+            >
+              {galleryImages.map((img, index) => (
+                <div
+                  key={img}
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    index === mobileGalleryIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  <SafeImage
+                    src={img}
+                    alt={`${item.title} - Photo ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={goToPrevGallery}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all"
+              aria-label="Previous image"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={goToNextGallery}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all"
+              aria-label="Next image"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+              {galleryImages.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setMobileGalleryIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === mobileGalleryIndex
+                      ? 'bg-white w-8'
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" style={{ zIndex: 1 }} />
+          </>
+        ) : (
+          /* Single image fallback */
+          <>
+            {(() => {
+              const singleImage = galleryImages[0] ?? heroImage
+              return singleImage ? (
               <>
                 <div className="absolute inset-0" style={{ zIndex: 0 }}>
                   <SafeImage
-                    key={heroImage} // Force re-render when image changes
-                    src={heroImage}
+                    key={singleImage}
+                    src={singleImage}
                     alt={selectedOption?.label || item.title}
                     fill
                     priority
@@ -1797,31 +1904,34 @@ export function ActivityDetailClient({
                     className="object-cover"
                     onError={(e) => {
                       if (process.env.NODE_ENV === 'development') {
-                        console.error('[HERO_IMAGE_ERROR] Failed to load image:', heroImage, e)
+                        console.error('[HERO_IMAGE_ERROR] Failed to load image:', singleImage, e)
                       }
                     }}
                     onLoad={() => {
                       if (process.env.NODE_ENV === 'development') {
-                        console.log('[HERO_IMAGE_SUCCESS] Image loaded:', heroImage)
+                        console.log('[HERO_IMAGE_SUCCESS] Image loaded:', singleImage)
                       }
                     }}
                   />
                 </div>
-                {/* Overlay gradient for better text readability */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" style={{ zIndex: 1 }} />
               </>
             ) : (
               <div className="w-full h-full bg-ocean-600" />
-            )}
+            )
+            })()}
           </>
         )}
         
         {/* Title overlay on hero - mobile only */}
         <div className="absolute bottom-0 left-0 right-0 p-8 lg:hidden" style={{ zIndex: 2 }}>
           <h1 className="text-4xl font-bold text-white mb-2">{item.title}</h1>
-          {eventDetails?.times && eventDetails.times.length > 0 && (
-            <p className="text-white/90">Duration: {eventDetails.times.length}</p>
-          )}
+          {(() => {
+            const durationHours = groupDetails?.duration ?? eventDetails?.duration ?? (eventDetails?.times?.length ? eventDetails.times.length : null)
+            return durationHours != null ? (
+              <p className="text-white/90">Duration: {durationHours} hrs</p>
+            ) : null
+          })()}
         </div>
       </div>
 
@@ -2030,6 +2140,11 @@ export function ActivityDetailClient({
 
             {/* Tab Content */}
             <div className="prose max-w-none">
+              {groupDetailsError && !groupDetails && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-800 text-sm font-medium">{tDetail('errors.groupDetails')}</p>
+                </div>
+              )}
               {selectedTab === 'overview' && (
                 <div>
                   {isActivity508 ? (
@@ -2215,8 +2330,10 @@ export function ActivityDetailClient({
 
                   {/* Event Details */}
                   {selectedEventId && !eventDetails && (
-                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-blue-800 text-sm">Loading event details...</p>
+                    <div className={`mb-6 p-4 rounded-lg border ${eventDetailsError ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
+                      <p className={`text-sm font-medium ${eventDetailsError ? 'text-red-800' : 'text-blue-800'}`}>
+                        {eventDetailsError ? tDetail('errors.eventDetails') : 'Loading event details...'}
+                      </p>
                     </div>
                   )}
                   {eventDetails && (
@@ -2389,8 +2506,10 @@ export function ActivityDetailClient({
 
                   {/* Limits Info */}
                   {selectedEventId && !limitsInfo && (
-                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-blue-800 text-sm">Loading availability information...</p>
+                    <div className={`mb-6 p-4 rounded-lg border ${limitsError ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
+                      <p className={`text-sm font-medium ${limitsError ? 'text-red-800' : 'text-blue-800'}`}>
+                        {limitsError ? tDetail('errors.limits') : 'Loading availability information...'}
+                      </p>
                     </div>
                   )}
                   {limitsInfo && (
@@ -2508,7 +2627,7 @@ export function ActivityDetailClient({
                 <div>
                   <h2>Prices</h2>
                   {!selectedEventId || !selectedDate ? (
-                    <p className="text-glass-500">Select an option and date to see prices.</p>
+                    <p className="text-glass-500">{tDetail('selectOptionAndDate')}</p>
                   ) : priceStatus === 'loading' ? (
                     <p className="text-glass-500">Loading prices...</p>
                   ) : priceStatus === 'error' || !pricesData ? (
@@ -2517,17 +2636,17 @@ export function ActivityDetailClient({
                     <p className="text-glass-500">Pricing unavailable for selected date.</p>
                   ) : pricesData.type === 'per_person' ? (
                     <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-                      <dt className="text-glass-600">Adult</dt>
+                      <dt className="text-glass-600">{tDetail('adult')}</dt>
                       <dd className="text-glass-900">{formatEUR(pricesData.adultPrice)}</dd>
                       {typeof pricesData.childPrice === 'number' && Number.isFinite(pricesData.childPrice) && (
                         <>
-                          <dt className="text-glass-600">Child</dt>
+                          <dt className="text-glass-600">{tDetail('child')}</dt>
                           <dd className="text-glass-900">{formatEUR(pricesData.childPrice)}</dd>
                         </>
                       )}
                       {typeof pricesData.infantPrice === 'number' && Number.isFinite(pricesData.infantPrice) && (
                         <>
-                          <dt className="text-glass-600">Infant</dt>
+                          <dt className="text-glass-600">{tDetail('infant')}</dt>
                           <dd className="text-glass-900">{formatEUR(pricesData.infantPrice)}</dd>
                         </>
                       )}
@@ -2621,7 +2740,7 @@ export function ActivityDetailClient({
 
               {selectedTab === 'description' && (
                 <div>
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">Description</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">{tDetail('description')}</h2>
                   {isActivity508 ? (
                     // Premium layout for activity 508
                     groupDetails?.desc ? (
@@ -2633,7 +2752,7 @@ export function ActivityDetailClient({
                           return rest ? (
                             <p className="text-gray-500 leading-relaxed prose prose-lg max-w-none">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
                           ) : (
-                            <p className="text-glass-500">No additional description.</p>
+                            <p className="text-glass-500">{tDetail('noAdditionalDescription')}</p>
                           )
                         })()}
                         
@@ -2646,8 +2765,8 @@ export function ActivityDetailClient({
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <div>
-                                  <p className="text-sm text-glass-600">Duration</p>
-                                  <p className="text-lg font-semibold text-glass-900">{groupDetails.duration} hours</p>
+                                  <p className="text-sm text-glass-600">{tDetail('duration')}</p>
+                                  <p className="text-lg font-semibold text-glass-900">{groupDetails.duration} {tDetail('hours')}</p>
                                 </div>
                               </div>
                             </div>
@@ -2660,7 +2779,7 @@ export function ActivityDetailClient({
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-4a3 3 0 00-5.356-1.857M17 20H7m10 0v-4c0-.656-.126-1.283-.356-1.857M7 20H2v-4a3 3 0 015.356-1.857M7 20v-4c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                                 <div>
-                                  <p className="text-sm text-glass-600">Child Age</p>
+                                  <p className="text-sm text-glass-600">{tDetail('childAge')}</p>
                                   <p className="text-lg font-semibold text-glass-900">{groupDetails.childAge}</p>
                                 </div>
                               </div>
@@ -2669,7 +2788,7 @@ export function ActivityDetailClient({
                         </div>
                       </div>
                     ) : (
-                      <p className="text-glass-500">No description available.</p>
+                      <p className="text-glass-500">{tDetail('noDescriptionAvailable')}</p>
                     )
                   ) : (
                     // For other activities, use item.description
@@ -2679,7 +2798,7 @@ export function ActivityDetailClient({
                         dangerouslySetInnerHTML={sanitizeAtlanticoHtml(item.description)}
                       />
                     ) : (
-                      <p className="text-glass-500">No description available.</p>
+                      <p className="text-glass-500">{tDetail('noDescriptionAvailable')}</p>
                     )
                   )}
                 </div>
@@ -2687,8 +2806,8 @@ export function ActivityDetailClient({
 
               {selectedTab === 'reviews' && (
                 <div>
-                  <h2>Reviews</h2>
-                  <p className="text-glass-500">No reviews available.</p>
+                  <h2>{tDetail('reviews')}</h2>
+                  <p className="text-glass-500">{tDetail('noReviewsAvailable')}</p>
                 </div>
               )}
             </div>
@@ -2755,7 +2874,7 @@ export function ActivityDetailClient({
               <div className="mt-8">
                 <h2 className="text-2xl font-bold mb-4">Select a Date</h2>
                 {loadingCalendar ? (
-                  <p className="text-glass-500">Loading calendar...</p>
+                  <p className="text-glass-500">{tDetail('loadingCalendar')}</p>
                 ) : noAvailabilityFound ? (
                   <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
                     <div className="font-medium mb-2">⚠️ No availability found</div>
@@ -2937,7 +3056,7 @@ export function ActivityDetailClient({
                     }}
                     className="w-full px-3 py-2 border border-glass-300 rounded"
                   >
-                    <option value="">Choose an option...</option>
+                    <option value="">{tDetail('chooseOption')}</option>
                     {eventOptions.map((opt) => (
                       <option key={opt.eventId} value={opt.eventId}>
                         {opt.label}

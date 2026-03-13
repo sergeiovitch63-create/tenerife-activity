@@ -54,6 +54,8 @@ interface AtlanticoStylePageProps {
 
 export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode, mockData }: AtlanticoStylePageProps) {
   const t = useTranslations('activities.gomeraVipTour.includes')
+  const tPage = useTranslations('atlanticoStylePage')
+  const tTabs = useTranslations('atlanticoStylePage.tabs')
   const [activeTab, setActiveTab] = useState('what-youll-do')
   const [showFullDescription, setShowFullDescription] = useState(false)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
@@ -458,11 +460,11 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
   }, [selectedDate])
 
   const tabs = [
-    { id: 'what-youll-do', label: "What you'll do", sectionId: 'section-what-youll-do' },
-    { id: 'description', label: 'Description', sectionId: 'section-description' },
-    { id: 'details', label: 'Details', sectionId: 'section-details' },
-    { id: 'prices', label: 'Prices', sectionId: 'section-prices' },
-    { id: 'reviews', label: 'Reviews', sectionId: 'section-reviews' },
+    { id: 'what-youll-do', label: tTabs('whatYoullDo'), sectionId: 'section-what-youll-do' },
+    { id: 'description', label: tTabs('description'), sectionId: 'section-description' },
+    { id: 'details', label: tTabs('details'), sectionId: 'section-details' },
+    { id: 'prices', label: tTabs('prices'), sectionId: 'section-prices' },
+    { id: 'reviews', label: tTabs('reviews'), sectionId: 'section-reviews' },
   ]
 
   // Extract "What you'll do" - first sentence or short description
@@ -471,7 +473,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
     tour.shortDescriptionOverride || 
     tour.shortDescription ||
     (tour.description ? tour.description.split(/[.!?]/)[0] + '.' : '') ||
-    'Discover this amazing experience in Tenerife.'
+    tPage('fallbackDescription')
 
   // Description text
   const description = mockData?.fullDescription || tour.description || ''
@@ -626,7 +628,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
             {tour.raw?.groupSize && (
               <div className="flex items-center gap-2">
                 <span>👥</span>
-                <span>Small group</span>
+                <span>{tPage('smallGroup')}</span>
               </div>
             )}
             
@@ -634,7 +636,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
             {tour.raw?.pickup && (
               <div className="flex items-center gap-2">
                 <span>🚐</span>
-                <span>Pickup service</span>
+                <span>{tPage('pickupService')}</span>
               </div>
             )}
             
@@ -704,7 +706,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                           onClick={() => setShowFullDescription(!showFullDescription)}
                           className="mt-4 text-ocean-600 hover:text-ocean-700 font-medium"
                         >
-                          {showFullDescription ? 'Show less' : 'Show more'}
+                          {showFullDescription ? tPage('showLess') : tPage('showMore')}
                         </button>
                       )}
                     </div>
@@ -720,7 +722,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                           onClick={() => setShowFullDescription(!showFullDescription)}
                           className="mt-4 text-ocean-600 hover:text-ocean-700 font-medium"
                         >
-                          {showFullDescription ? 'Show less' : 'Show more'}
+                          {showFullDescription ? tPage('showLess') : tPage('showMore')}
                         </button>
                       )}
                     </div>
@@ -833,12 +835,12 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
               {(slug === 'gomera-vip-tour' || (mockData && mockData.freeCancellationText)) && (
                 <Accordion
                   id="section-free-cancellation"
-                  title="Free Cancellation"
+                  title={tPage('cancellation.title')}
                   isOpen={isSectionOpen('free-cancellation')}
                   onToggle={() => toggleSection('free-cancellation')}
                 >
                   <p className="text-glass-700">
-                    {mockData?.freeCancellationText || 'Free cancellation up to 24 hours before the excursion. If you cancel within 24 hours of the excursion, there will not be a refund.'}
+                    {mockData?.freeCancellationText || tPage('cancellation.free')}
                   </p>
                 </Accordion>
               )}
@@ -855,7 +857,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                   return (
                     <Accordion
                       id="section-cancellation"
-                      title="Cancellation"
+                      title={tPage('cancellation.policy')}
                       isOpen={isSectionOpen('cancellation')}
                       onToggle={() => toggleSection('cancellation')}
                     >
@@ -907,7 +909,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                 // Determine title: "Free cancellation" if policy mentions free cancellation, otherwise "Cancellation"
                 const policyText = String(cancellationPolicy).toLowerCase()
                 const hasFreeCancellation = policyText.includes('free cancellation') || policyText.includes('free cancel')
-                const cancellationTitle = hasFreeCancellation ? 'Free cancellation' : 'Cancellation'
+                const cancellationTitle = hasFreeCancellation ? tPage('cancellation.title') : tPage('cancellation.policy')
                 
                 return (
                   <Accordion
@@ -942,10 +944,10 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b border-glass-200">
-                          <th className="text-left py-3 px-4 font-semibold text-glass-900">Option</th>
-                          <th className="text-right py-3 px-4 font-semibold text-glass-900">Adults</th>
-                          <th className="text-right py-3 px-4 font-semibold text-glass-900">Children</th>
-                          <th className="text-right py-3 px-4 font-semibold text-glass-900">Infants</th>
+                          <th className="text-left py-3 px-4 font-semibold text-glass-900">{tPage('option')}</th>
+                          <th className="text-right py-3 px-4 font-semibold text-glass-900">{tPage('adults')}</th>
+                          <th className="text-right py-3 px-4 font-semibold text-glass-900">{tPage('children')}</th>
+                          <th className="text-right py-3 px-4 font-semibold text-glass-900">{tPage('infants')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1006,7 +1008,7 @@ export function AtlanticoStylePage({ tour, locale, slug, eventOptions, groupCode
                 isOpen={isSectionOpen('reviews')}
                 onToggle={() => toggleSection('reviews')}
               >
-                <p className="text-glass-500 italic">Reviews section coming soon.</p>
+                <p className="text-glass-500 italic">{tPage('reviewsComingSoon')}</p>
               </Accordion>
             </div>
           </div>

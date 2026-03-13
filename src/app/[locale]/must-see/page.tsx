@@ -47,6 +47,7 @@ export default async function MustSeePage({
 }) {
   const { locale } = await params
   const t = await getTranslations('mustSee')
+  const tCommon = await getTranslations('common')
   const lang = mapLocaleToLang(locale)
 
   let tours: Tour[] = []
@@ -129,7 +130,7 @@ export default async function MustSeePage({
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-                            No image
+                            {tCommon('noImage')}
                           </div>
                         )}
                       </div>

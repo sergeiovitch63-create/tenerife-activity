@@ -13,6 +13,7 @@ import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { Section, Container, Stack } from '@/ui/components/layout'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { getTranslations } from 'next-intl/server'
 import { ToursListCardImage } from './ToursListCardImage.client'
 
 interface PageParams {
@@ -50,6 +51,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 export default async function ToursListDebugPage({ params, searchParams }: PageParams) {
   const { locale } = await params
   const query = (await searchParams) || {}
+  const tCommon = await getTranslations('common')
 
   const lang = mapLocaleToLang(locale)
   const classificationId = query.classificationId || ''
@@ -216,7 +218,7 @@ export default async function ToursListDebugPage({ params, searchParams }: PageP
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-                            No image
+                            {tCommon('noImage')}
                           </div>
                         )}
                       </div>

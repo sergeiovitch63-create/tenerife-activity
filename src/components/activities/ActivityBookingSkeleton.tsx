@@ -7,6 +7,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { Tabs } from '@/app/[locale]/activities/[slug]/components/Tabs'
 import { ActivityBookingPanel } from './ActivityBookingPanel'
 import type { ActivityResolved } from '@/lib/atlantico/resolve'
@@ -64,6 +65,7 @@ function EventIcon({ filename }: { filename: string }) {
 }
 
 export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: ActivityBookingSkeletonProps) {
+  const t = useTranslations('bookingSkeleton')
   // Use premium version for all VIP Tours (classification 308) - 100% sales-oriented
   const isVipTour = isVipTourGroup(resolved?.t_group) || isVipTourGroup(slug)
   
@@ -296,18 +298,18 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
   }
 
   const tabs = [
-    { id: 'what-youll-do', label: "What you'll do", sectionId: 'section-what-youll-do' },
-    { id: 'description', label: 'Description', sectionId: 'section-description' },
-    { id: 'details', label: 'Details', sectionId: 'section-details' },
-    { id: 'cancellation', label: 'Cancellation', sectionId: 'section-cancellation' },
-    { id: 'prices', label: 'Prices', sectionId: 'section-prices' },
-    { id: 'reviews', label: 'Reviews', sectionId: 'section-reviews' },
+    { id: 'what-youll-do', label: t('tabWhatYoullDo'), sectionId: 'section-what-youll-do' },
+    { id: 'description', label: t('tabDescription'), sectionId: 'section-description' },
+    { id: 'details', label: t('tabDetails'), sectionId: 'section-details' },
+    { id: 'cancellation', label: t('tabCancellation'), sectionId: 'section-cancellation' },
+    { id: 'prices', label: t('tabPrices'), sectionId: 'section-prices' },
+    { id: 'reviews', label: t('tabReviews'), sectionId: 'section-reviews' },
   ]
 
   const selectedEvent = resolved?.events?.find(e => e.t_id === selectedEventId)
 
   // Get activity title and duration
-  const activityTitle = groupDetails?.name || eventDetails?.name || eventDetails?.title || 'Activity'
+  const activityTitle = groupDetails?.name || eventDetails?.name || eventDetails?.title || t('activity')
   const activityDuration = groupDetails?.duration || eventDetails?.duration
 
   // Early return for premium version - AFTER all hooks
@@ -365,7 +367,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
               <div id="section-what-youll-do" className={activeTab === 'what-youll-do' ? '' : 'hidden'}>
                 {loadingInfo ? (
                   <div className="min-h-[200px] flex items-center justify-center">
-                    <p className="text-glass-500">Loading...</p>
+                    <p className="text-glass-500">{t('loading')}</p>
                   </div>
                 ) : eventDetails?.desc || groupDetails?.desc ? (
                   <div className="prose prose-lg max-w-none">
@@ -382,7 +384,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
               <div id="section-description" className={activeTab === 'description' ? '' : 'hidden'}>
                 {loadingInfo ? (
                   <div className="min-h-[200px] flex items-center justify-center">
-                    <p className="text-glass-500">Loading...</p>
+                    <p className="text-glass-500">{t('loading')}</p>
                   </div>
                 ) : eventDetails?.description || groupDetails?.description ? (
                   <div className="prose prose-lg max-w-none">
@@ -572,7 +574,7 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                         {limitsInfo.requiresSessionTime !== undefined && (
                           <div>
                             <dt className="font-medium text-glass-600">Requires Session Time:</dt>
-                            <dd className="text-glass-900">{limitsInfo.requiresSessionTime ? 'Yes' : 'No'}</dd>
+                            <dd className="text-glass-900">{limitsInfo.requiresSessionTime ? t('yes') : t('no')}</dd>
                           </div>
                         )}
                         {limitsInfo.quote !== null && limitsInfo.quote !== undefined && (
@@ -678,12 +680,12 @@ export function ActivityBookingSkeleton({ locale = 'en', resolved, slug }: Activ
                         )}
                       </dl>
                     ) : (
-                      <p className="text-glass-600">Select a date to see prices.</p>
+                      <p className="text-glass-600">{t('selectDateToSeePrices')}</p>
                     )}
                   </div>
                 ) : (
                   <div className="bg-glass-50 rounded-lg p-6">
-                    <p className="text-glass-600">Select a date to see prices.</p>
+                    <p className="text-glass-600">{t('selectDateToSeePrices')}</p>
                   </div>
                 )}
               </div>

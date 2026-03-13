@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { getGroupDetails } from '@/lib/atlantico'
 import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 
 /**
  * Activity Packs Section - 4 featured group details (168, 169, 102, 41)
@@ -23,31 +24,48 @@ function stripHtml(html: string): string {
 
 export async function ActivityPacksSection({ locale }: { locale: string }) {
   const t = await getTranslations('activityPacks')
+  const tCommon = await getTranslations('common')
   const lang = mapLocaleToAtlanticoLang(locale)
 
-  // Fetch group details for each code
+  const staticImageFallback = (code: string) => `/images/tours-list/${code}/cover.png`
+
+  // Fetch group details for each code (including images)
   const activityPacks = await Promise.all(
     GROUP_CODES.map(async (code) => {
-      let title = `Activity ${code}`
+      let title = tCommon('activityFallback', { code })
       let description = ''
+      let image: string = staticImageFallback(code)
 
       try {
         const details = await getGroupDetails(code, lang)
         title = (details.name ?? details.Name ?? title) as string
         const rawDesc = (details.desc ?? details.description ?? '') as string
         description = stripHtml(rawDesc)
-      } catch {
-        // Fallback if API unavailable (e.g. during build)
-      }
 
-      const imagePath = `/images/tours-list/${code}/cover.png`
+        // Extract image from groupDetails (image or images[0])
+        let imageFilename: string | null = null
+        if (details.image && typeof details.image === 'string' && details.image.trim()) {
+          imageFilename = (details.image as string).trim()
+        } else if (Array.isArray(details.images) && details.images.length > 0) {
+          const first = details.images[0]
+          if (typeof first === 'string' && first.trim()) {
+            imageFilename = first.trim()
+          }
+        }
+        if (imageFilename) {
+          const url = buildAtlanticoImageUrl(imageFilename)
+          if (url) image = url
+        }
+      } catch {
+        // Fallback if API unavailable (e.g. during build) – keep static image
+      }
 
       return {
         id: code,
         slug: code,
         title,
         description: description || t('subtitle'),
-        image: imagePath,
+        image,
         href: `/activities/${code}`,
       }
     })

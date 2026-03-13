@@ -18,6 +18,10 @@ import { getMeetingPointName } from '@/components/booking/MeetingPointsDisplay'
 
 interface CheckoutClientProps {
   locale: string
+  /** Server-fetched revalidation result. When provided, skips client revalidate. */
+  initialRevalidationResult?: RevalidationResult | null
+  /** Server-fetched meeting points. When provided, skips client loadMeetingPoints. */
+  initialMeetingPoints?: Record<string, MeetingPoint[]>
 }
 
 interface RevalidationResult {
@@ -39,13 +43,21 @@ interface CustomerData {
   acceptTerms: boolean
 }
 
-export function CheckoutClient({ locale }: CheckoutClientProps) {
+export function CheckoutClient({
+  locale,
+  initialRevalidationResult = null,
+  initialMeetingPoints = {},
+}: CheckoutClientProps) {
   const t = useTranslations('checkout')
   const router = useRouter()
-  const { items, removeExpired, clearCart } = useCartStore()
+  const { items, removeExpired } = useCartStore()
   const [mounted, setMounted] = useState(false)
-  const [revalidating, setRevalidating] = useState(false)
-  const [revalidationResult, setRevalidationResult] = useState<RevalidationResult | null>(null)
+  const hasInitialRevalidation = initialRevalidationResult != null
+  const hasInitialMeetingPoints = Object.keys(initialMeetingPoints ?? {}).length > 0
+  const [revalidating, setRevalidating] = useState(!hasInitialRevalidation)
+  const [revalidationResult, setRevalidationResult] = useState<RevalidationResult | null>(
+    initialRevalidationResult ?? null
+  )
   const [submitting, setSubmitting] = useState(false)
   const [customerData, setCustomerData] = useState<CustomerData>({
     name: '',
@@ -59,59 +71,11 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
     acceptTerms: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [meetingPoints, setMeetingPoints] = useState<Record<string, MeetingPoint[]>>({}) // itemKey -> meetingPoints
-  const [loadingMeetingPoints, setLoadingMeetingPoints] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    removeExpired()
-    // Auto-revalidate on mount
-    handleRevalidate()
-    // Load meeting points for cart items
-    loadMeetingPoints()
-  }, [])
-
-  /**
-   * Load meeting points for all cart items
-   */
-  const loadMeetingPoints = async () => {
-    if (validItems.length === 0) return
-
-    setLoadingMeetingPoints(true)
-    const pointsMap: Record<string, MeetingPoint[]> = {}
-
-    try {
-      // Fetch meeting points for each unique event ID
-      const eventIds = Array.from(new Set(validItems.map(item => item.t_id)))
-      
-      await Promise.all(
-        eventIds.map(async (eventId) => {
-          try {
-            const response = await fetch(`/api/atlantico/event-details?eventId=${eventId}&lang=${validItems[0]?.language || 'ENG'}`)
-            if (response.ok) {
-              const data = await response.json()
-              if (data.meetingPoints && Array.isArray(data.meetingPoints)) {
-                // Store for all items with this eventId
-                validItems.forEach(item => {
-                  if (item.t_id === eventId) {
-                    pointsMap[item.itemKey] = data.meetingPoints
-                  }
-                })
-              }
-            }
-          } catch (error) {
-            console.error(`[CHECKOUT] Failed to load meeting points for event ${eventId}:`, error)
-          }
-        })
-      )
-
-      setMeetingPoints(pointsMap)
-    } catch (error) {
-      console.error('[CHECKOUT] Error loading meeting points:', error)
-    } finally {
-      setLoadingMeetingPoints(false)
-    }
-  }
+  const [meetingPoints, setMeetingPoints] = useState<Record<string, MeetingPoint[]>>(
+    initialMeetingPoints ?? {}
+  )
+  const [loadingMeetingPoints, setLoadingMeetingPoints] = useState(!hasInitialMeetingPoints)
+  const [meetingPointsError, setMeetingPointsError] = useState(false)
 
   const validItems = mounted ? items.filter((item) => !isCartItemExpired(item)) : []
 
@@ -147,6 +111,66 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
       setRevalidating(false)
     }
   }
+
+  const loadMeetingPoints = async () => {
+    if (validItems.length === 0) return
+
+    setLoadingMeetingPoints(true)
+    setMeetingPointsError(false)
+    const pointsMap: Record<string, MeetingPoint[]> = {}
+
+    try {
+      const eventIds = Array.from(new Set(validItems.map((item) => item.t_id)))
+      await Promise.all(
+        eventIds.map(async (eventId) => {
+          try {
+            const response = await fetch(
+              `/api/atlantico/event-details?eventId=${eventId}&lang=${validItems[0]?.language || 'ENG'}`
+            )
+            if (response.ok) {
+              const data = await response.json()
+              if (data.meetingPoints && Array.isArray(data.meetingPoints)) {
+                validItems.forEach((item) => {
+                  if (item.t_id === eventId) {
+                    pointsMap[item.itemKey] = data.meetingPoints
+                  }
+                })
+              }
+            } else {
+              setMeetingPointsError(true)
+            }
+          } catch (error) {
+            console.error(`[CHECKOUT] Failed to load meeting points for event ${eventId}:`, error)
+            setMeetingPointsError(true)
+          }
+        })
+      )
+      setMeetingPoints(pointsMap)
+    } catch (error) {
+      console.error('[CHECKOUT] Error loading meeting points:', error)
+      setMeetingPointsError(true)
+    } finally {
+      setLoadingMeetingPoints(false)
+    }
+  }
+
+  useEffect(() => {
+    setMounted(true)
+    removeExpired()
+  }, [removeExpired])
+
+  useEffect(() => {
+    if (!mounted) return
+    const valid = items.filter((item) => !isCartItemExpired(item))
+    if (valid.length === 0) return
+
+    if (!hasInitialRevalidation) {
+      handleRevalidate()
+    }
+    if (!hasInitialMeetingPoints) {
+      loadMeetingPoints()
+    }
+  }, [mounted, hasInitialRevalidation, hasInitialMeetingPoints])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -422,6 +446,20 @@ export function CheckoutClient({ locale }: CheckoutClientProps) {
                   <div className="w-full px-4 py-2 border border-glass-300 rounded-lg bg-glass-50 text-glass-500">
                     Loading meeting points...
                   </div>
+                ) : meetingPointsError ? (
+                  <>
+                    <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
+                      {t('errors.meetingPointsLoadFailed')}
+                    </p>
+                    <input
+                      type="text"
+                      id="mpoint"
+                      value={customerData.mpoint}
+                      onChange={(e) => setCustomerData({ ...customerData, mpoint: e.target.value })}
+                      placeholder={t('meetingPointPlaceholder') || 'Enter meeting point'}
+                      className="w-full px-4 py-2 border border-glass-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-500"
+                    />
+                  </>
                 ) : (() => {
                   // Get meeting points from first cart item (or combine all unique)
                   const firstItem = validItems[0]

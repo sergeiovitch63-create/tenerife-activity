@@ -13,6 +13,7 @@ import { Section, Container, Stack } from '@/ui/components/layout'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { getTranslations } from 'next-intl/server'
 
 interface PageParams {
   params: Promise<{ locale: string }>
@@ -37,6 +38,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 export default async function ClassificationsDebugPage({ params }: PageParams) {
   const { locale } = await params
+  const tCommon = await getTranslations('common')
   const lang = mapLocaleToLang(locale)
 
   // Disable in production for safety
@@ -170,7 +172,7 @@ export default async function ClassificationsDebugPage({ params }: PageParams) {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-                            No image
+                            {tCommon('noImage')}
                           </div>
                         )}
                       </div>

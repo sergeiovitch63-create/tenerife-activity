@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
@@ -116,6 +117,7 @@ function resolveGroupDetails(
 }
 
 export default function CatalogTreePage() {
+  const t = useTranslations('catalogPage')
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   const lang = mapLocaleToLang(locale)
@@ -258,7 +260,7 @@ export default function CatalogTreePage() {
           {error && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-800 text-sm">
-                <strong>Error:</strong> {error}
+                <strong>{t('errorLabel')}</strong> {error}
               </p>
             </div>
           )}
@@ -266,11 +268,11 @@ export default function CatalogTreePage() {
 
         {loading && !data ? (
           <div className="text-center py-12">
-            <p className="text-glass-600">Loading catalog...</p>
+            <p className="text-glass-600">{t('loadingCatalog')}</p>
           </div>
         ) : classifications.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-glass-500 text-lg">No classifications available.</p>
+            <p className="text-glass-500 text-lg">{t('noClassificationsAvailable')}</p>
           </div>
         ) : (
           <div className="space-y-3">

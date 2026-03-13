@@ -8,6 +8,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { ActivityBookingPanel } from './ActivityBookingPanel'
 import type { ActivityResolved } from '@/lib/atlantico/resolve'
 import { SafeImage } from '@/components/SafeImage'
@@ -203,6 +204,8 @@ function EventIcon({ filename }: { filename: string }) {
 }
 
 export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity508 = false }: PremiumActivityPageProps) {
+  const tPage = useTranslations('premiumActivity')
+  const tTabs = useTranslations('premiumActivity.tabs')
   const [selectedEventId, setSelectedEventId] = useState<string | null>(resolved?.t_id || null)
   const [activeTab, setActiveTab] = useState<'overview' | 'included' | 'cancellation' | 'description' | 'what-you-do'>(
     isActivity508 ? 'what-you-do' : 'overview'
@@ -443,16 +446,16 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
   // For activity 508: What you do, Overview, What's Included, Description (Cancellation Policy moved to booking panel)
   const tabs = isActivity508
     ? [
-        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: 'What you do' }] : []),
-        { id: 'overview' as const, label: 'Overview' },
-        { id: 'included' as const, label: "What's Included" },
-        { id: 'description' as const, label: 'Description' },
+        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: tTabs('whatYouDo') }] : []),
+        { id: 'overview' as const, label: tTabs('overview') },
+        { id: 'included' as const, label: tTabs('whatsIncluded') },
+        { id: 'description' as const, label: tTabs('description') },
       ]
     : [
-        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: 'What you do' }] : []),
-        { id: 'overview' as const, label: 'Overview' },
-        { id: 'included' as const, label: "What's Included" },
-        { id: 'cancellation' as const, label: 'Cancellation Policy' },
+        ...(activityWillDo ? [{ id: 'what-you-do' as const, label: tTabs('whatYouDo') }] : []),
+        { id: 'overview' as const, label: tTabs('overview') },
+        { id: 'included' as const, label: tTabs('whatsIncluded') },
+        { id: 'cancellation' as const, label: tTabs('cancellationPolicy') },
       ]
 
   return (
@@ -475,7 +478,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
             {/* Event Options - Only if multiple */}
             {resolved?.events && resolved.events.length > 1 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-glass-900 mb-4">Choose Your Experience</h2>
+                <h2 className="text-2xl font-bold text-glass-900 mb-4">{tPage('chooseYourExperience')}</h2>
                 <div className="flex flex-wrap gap-3">
                   {resolved.events.map((event) => (
                     <button
@@ -539,7 +542,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                       </div>
                     ) : (
                       <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
-                        <p className="text-lg">Information not available.</p>
+                        <p className="text-lg">{tPage('informationNotAvailable')}</p>
                       </div>
                     )}
                   </div>
@@ -590,7 +593,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                     <FaqSections faq={activityFAQ} fallbackRaw />
                   ) : (
                     <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
-                      <p className="text-lg">Information about what&apos;s included will be displayed here.</p>
+                      <p className="text-lg">{tPage('whatsIncludedPlaceholder')}</p>
                     </div>
                   )}
                 </div>
@@ -609,12 +612,12 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
                         return rest ? (
                           <p className="text-gray-500 leading-relaxed">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
                         ) : (
-                          <p className="text-glass-500">No additional description.</p>
+                          <p className="text-glass-500">{tPage('noAdditionalDescription')}</p>
                         )
                       })()
                     ) : (
                       <div className="bg-glass-50 rounded-xl p-8 text-center text-glass-600">
-                        <p className="text-lg">No description available.</p>
+                        <p className="text-lg">{tPage('noDescriptionAvailable')}</p>
                       </div>
                     )}
                   </div>

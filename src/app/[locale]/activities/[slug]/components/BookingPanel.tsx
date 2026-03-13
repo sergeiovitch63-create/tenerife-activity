@@ -6,6 +6,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface Event {
   id: string
@@ -23,6 +24,7 @@ interface BookingPanelProps {
 }
 
 export function BookingPanel({ events, defaultPrice }: BookingPanelProps) {
+  const t = useTranslations('common')
   const [selectedEventId, setSelectedEventId] = useState<string | null>(
     events.length > 0 ? events[0].id : null
   )
@@ -105,7 +107,7 @@ export function BookingPanel({ events, defaultPrice }: BookingPanelProps) {
               {adultPrice !== null ? (
                 <div className="text-3xl font-bold text-ocean-600">€{adultPrice}</div>
               ) : (
-                <div className="text-lg text-glass-500">Price on request</div>
+                <div className="text-lg text-glass-500">{t('priceOnRequest')}</div>
               )}
               <div className="text-xs text-glass-500 mt-1">per adult</div>
             </div>

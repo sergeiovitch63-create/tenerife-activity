@@ -1,5 +1,190 @@
 {
+  "catalogPage": {
+    "errorLabel": "Errore:",
+    "loadingCatalog": "Caricamento catalogo...",
+    "noClassificationsAvailable": "Nessuna classificazione disponibile."
+  },
+  "badges": {
+    "topRated": "Miglior valutato",
+    "bestseller": "Bestseller",
+    "family": "Famiglia",
+    "new": "Novità"
+  },
+  "vibeFilters": {
+    "price": "Prezzo",
+    "priceRange": "Prezzo: {min} € - {max} €"
+  },
+  "overviewInfoBar": {
+    "reducedGroup": "Gruppo ridotto",
+    "pickupService": "Servizio di prelievo",
+    "wheelchairAccessible": "Accessibile in sedia a rotelle",
+    "duration": "Durata",
+    "yes": "Sì",
+    "no": "No",
+    "dash": "—"
+  },
+  "teideVip": {
+    "loadingAvailability": "Caricamento disponibilità...",
+    "errorLoadingAvailability": "Errore nel caricamento della disponibilità",
+    "noAvailabilityThisMonth": "Nessuna disponibilità per questo mese",
+    "checkBackLater": "Riprova più tardi o scegli un altro mese",
+    "selectedDate": "Data selezionata",
+    "availableOnThisDate": "Disponibile in questa data"
+  },
+  "calendar": {
+    "failedToFetchLimits": "Impossibile recuperare i limiti",
+    "failedToFetchAvailability": "Impossibile recuperare la disponibilità",
+    "noAvailabilityThisMonthShowing": "Nessuna disponibilità questo mese → visualizzazione di {month}",
+    "noAvailabilityFound": "Nessuna disponibilità trovata",
+    "noAvailabilityFound12Months": "Nessuna disponibilità trovata per i prossimi 12 mesi per questa opzione. Prova un'altra opzione.",
+    "previousMonth": "Mese precedente",
+    "nextMonth": "Mese successivo",
+    "prevButton": "← Prec.",
+    "nextButton": "Succ. →"
+  },
+  "bookingSkeleton": {
+    "tabWhatYoullDo": "Cosa farai",
+    "tabDescription": "Descrizione",
+    "tabDetails": "Dettagli",
+    "tabCancellation": "Cancellazione",
+    "tabPrices": "Prezzi",
+    "tabReviews": "Recensioni",
+    "loading": "Caricamento...",
+    "activity": "Attività",
+    "yes": "Sì",
+    "no": "No",
+    "selectDateToSeePrices": "Seleziona una data per vedere i prezzi."
+  },
+  "activitiesPage": {
+    "title": "Attività",
+    "unableToLoad": "Impossibile caricare le attività al momento.",
+    "noActivitiesAvailable": "Nessuna attività disponibile.",
+    "noActivitiesFound": "Nessuna attività trovata.",
+    "showingCount": "Mostra {count} {count, plural, one {attività} other {attività}}",
+    "showingCountWithStats": "Mostra {count} {count, plural, one {attività} other {attività}} ({classifications} classificazioni, {groups} gruppi, {events} eventi)",
+    "apiUnavailableTitle": "API temporaneamente non disponibile.",
+    "apiUnavailableDesc": "Visualizzazione dei dati in cache. Se è la tua prima visita, il catalogo viene sincronizzato in background.",
+    "manualSync": "Sincronizzazione manuale",
+    "errorLabel": "Errore:"
+  },
+  "youMightAlsoLike": {
+    "title": "Potrebbe piacerti anche",
+    "errors": {
+      "loadFailed": "Impossibile caricare i tour correlati. Riprova più tardi."
+    }
+  },
+  "atlanticoStylePage": {
+    "fallbackDescription": "Scopri questa straordinaria esperienza a Tenerife.",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra di meno",
+    "smallGroup": "Piccolo gruppo",
+    "pickupService": "Servizio di prelievo",
+    "option": "Opzione",
+    "adults": "Adulti",
+    "reviewsComingSoon": "Sezione recensioni in arrivo.",
+    "children": "Bambini",
+    "infants": "Neonati",
+    "cancellation": {
+      "free": "Cancellazione gratuita fino a 24 ore prima dell'escursione. Se annulli entro 24 ore dall'escursione, non sarà previsto alcun rimborso.",
+      "title": "Cancellazione gratuita",
+      "policy": "Politica di cancellazione"
+    },
+    "tabs": {
+      "whatYoullDo": "Cosa farai",
+      "description": "Descrizione",
+      "details": "Dettagli",
+      "prices": "Prezzi",
+      "reviews": "Recensioni"
+    }
+  },
+  "premiumActivity": {
+    "chooseYourExperience": "Scegli la tua esperienza",
+    "informationNotAvailable": "Informazioni non disponibili.",
+    "whatsIncludedPlaceholder": "Le informazioni su ciò che è incluso saranno visualizzate qui.",
+    "noAdditionalDescription": "Nessuna descrizione aggiuntiva.",
+    "noDescriptionAvailable": "Nessuna descrizione disponibile.",
+    "tabs": {
+      "whatYouDo": "Cosa farai",
+      "overview": "Panoramica",
+      "whatsIncluded": "Cosa è incluso",
+      "description": "Descrizione",
+      "cancellationPolicy": "Politica di cancellazione"
+    }
+  },
+  "vibeListing": {
+    "availability": "Disponibilità",
+    "today": "Oggi",
+    "tomorrow": "Domani",
+    "selectDates": "Seleziona date",
+    "all": "Tutti",
+    "duration": "Durata",
+    "duration0to3h": "0-3 ore",
+    "duration3to5h": "3-5 ore",
+    "duration5to7h": "5-7 ore",
+    "durationAllDay": "Giornata intera (7h+)",
+    "noToursMatchFilters": "Nessun tour corrisponde ai tuoi filtri.",
+    "loadingImage": "Caricamento immagine...",
+    "loadingAvailability": "Caricamento disponibilità...",
+    "imageUnavailable": "Immagine non disponibile",
+    "availabilityNotAvailable": "Disponibilità non disponibile",
+    "availableToday": "Disponibile oggi",
+    "availableTomorrow": "Disponibile domani",
+    "checkAvailability": "Verifica disponibilità",
+    "errors": {
+      "unavailable": "Disponibilità non disponibile"
+    }
+  },
+  "bookingPanel": {
+    "quantity": "Quantità",
+    "adults": "Adulti",
+    "meetingPickupPoints": "Punti di incontro e ritiro",
+    "loading": "Caricamento...",
+    "itemAddedToCart": "Articolo aggiunto al carrello",
+    "selectTime": "Seleziona un orario *",
+    "errors": {
+      "tourGroupRequired": "Il gruppo del tour è obbligatorio",
+      "pleaseSelectOption": "Seleziona un'opzione",
+      "pleaseSelectDate": "Seleziona una data",
+      "pleaseSelectDateLoroParque": "Seleziona la data per Loro Parque",
+      "siamLoroDifferentDays": "Siam Park e Loro Parque devono essere in giorni diversi",
+      "pleaseSelectEndDate": "Seleziona la data di fine",
+      "endDateAfterStart": "La data di fine deve essere uguale o successiva alla data di inizio",
+      "atLeastOneParticipant": "È richiesto almeno 1 partecipante",
+      "atLeastOneAdult": "È richiesto almeno 1 adulto",
+      "pleaseSelectTime": "Seleziona un orario",
+      "pricesBeingCalculated": "I prezzi sono in fase di calcolo"
+    }
+  },
+  "activityDetail": {
+    "errors": {
+      "groupDetails": "Impossibile caricare i dettagli dell'attività. Riprova più tardi.",
+      "eventDetails": "Impossibile caricare i dettagli dell'evento. Riprova più tardi.",
+      "limits": "Impossibile caricare le informazioni di disponibilità. Riprova più tardi."
+    },
+    "bookYourExperience": "Prenota la tua esperienza",
+    "selectOption": "Seleziona opzione",
+    "chooseOption": "Scegli un'opzione...",
+    "selectOptionAndDate": "Seleziona un'opzione e una data per vedere i prezzi.",
+    "description": "Descrizione",
+    "noAdditionalDescription": "Nessuna descrizione aggiuntiva.",
+    "noDescriptionAvailable": "Nessuna descrizione disponibile.",
+    "duration": "Durata",
+    "hours": "ore",
+    "childAge": "Età bambini",
+    "reviews": "Recensioni",
+    "noReviewsAvailable": "Nessuna recensione disponibile.",
+    "selectDate": "Seleziona data",
+    "loadingCalendar": "Caricamento calendario...",
+    "adult": "Adulto",
+    "child": "Bambino",
+    "infant": "Neonato"
+  },
   "common": {
+    "activityFallback": "Attività {code}",
+    "noImage": "Nessuna immagine",
+    "priceOnRequest": "Prezzo su richiesta",
+    "smallGroup": "Piccolo gruppo",
+    "pickupService": "Servizio di prelievo",
     "siteName": "Tenerife Activity",
     "search": "Cerca",
     "searchInput": "Campo di ricerca",
@@ -153,6 +338,11 @@
       "secure": "Prenotazione partner sicura",
       "secureDesc": "Sicuro e protetto"
     }
+  },
+  "vibePage": {
+    "noToursAvailable": "Nessun tour disponibile",
+    "noToursFound": "Nessun tour trovato per la classificazione «{classification}».",
+    "notMappedToClassification": "Questa atmosfera non è associata a nessuna classificazione Atlantico."
   },
   "vibe": {
     "notFound": "Atmosfera non trovata",
@@ -699,7 +889,8 @@
       "termsRequired": "Devi accettare i termini e le condizioni",
       "cartEmpty": "Il tuo carrello è vuoto",
       "multiItemNotSupported": "Solo un'attività può essere prenotata alla volta. Rimuovi altri articoli dal carrello.",
-      "paymentFailed": "Inizializzazione del pagamento fallita. Riprova."
+      "paymentFailed": "Inizializzazione del pagamento fallita. Riprova.",
+      "meetingPointsLoadFailed": "Impossibile caricare i punti di incontro. Puoi inserirne uno manualmente qui sotto."
     },
     "success": {
       "title": "Pagamento riuscito",

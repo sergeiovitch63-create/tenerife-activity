@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface Session {
   time: string
@@ -47,6 +48,8 @@ export function CalendarWidget({
   selectedDate,
   selectedSession,
 }: CalendarWidgetProps) {
+  const t = useTranslations('calendar')
+  const locale = useLocale()
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
@@ -91,7 +94,7 @@ export function CalendarWidget({
       .then((res) => res.json())
       .then(async (data: { ok: boolean; sessionsByDay?: Record<string, Session[]>; availableDates?: string[]; error?: string }) => {
         if (!data.ok) {
-          setError(data.error || 'Failed to fetch limits')
+          setError(data.error || t('failedToFetchLimits'))
           setSessionsByDay({})
           setAvailableDates([])
           return
@@ -159,14 +162,14 @@ export function CalendarWidget({
         }
       })
       .catch((err) => {
-        setError(err instanceof Error ? err.message : 'Failed to fetch availability')
+        setError(err instanceof Error ? err.message : t('failedToFetchAvailability'))
         setSessionsByDay({})
         setAvailableDates([])
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [currentMonth, eventId, lang, onDateSelect])
+  }, [currentMonth, eventId, lang, onDateSelect, t])
 
   // Update selected day sessions when limits change
   useEffect(() => {
@@ -271,9 +274,9 @@ export function CalendarWidget({
         <button
           onClick={goToPreviousMonth}
           className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Previous month"
+          aria-label={t('previousMonth')}
         >
-          ← Prev
+          {t('prevButton')}
         </button>
         <h3 className="text-lg font-semibold text-gray-900">
           {getMonthName(currentMonth)}
@@ -281,25 +284,27 @@ export function CalendarWidget({
         <button
           onClick={goToNextMonth}
           className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Next month"
+          aria-label={t('nextMonth')}
         >
-          Next →
+          {t('nextButton')}
         </button>
       </div>
 
       {/* Auto-switched month notice */}
       {autoSwitchedMonth && (
         <div className="mb-4 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-          <span className="font-medium">ℹ️</span> No availability this month → showing{' '}
-          <strong>{new Date(autoSwitchedMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</strong>
+          <span className="font-medium">ℹ️</span>{' '}
+          {t('noAvailabilityThisMonthShowing', {
+            month: new Date(autoSwitchedMonth + 'T12:00:00').toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
+          })}
         </div>
       )}
 
       {/* No availability found notice */}
       {noAvailabilityFound && (
         <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-          <div className="font-medium mb-1">⚠️ No availability found</div>
-          <div>No availability found for the next 12 months for this option. Please try a different option.</div>
+          <div className="font-medium mb-1">⚠️ {t('noAvailabilityFound')}</div>
+          <div>{t('noAvailabilityFound12Months')}</div>
         </div>
       )}
 

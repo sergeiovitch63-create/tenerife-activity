@@ -1,5 +1,190 @@
 {
+  "catalogPage": {
+    "errorLabel": "Error:",
+    "loadingCatalog": "Loading catalog...",
+    "noClassificationsAvailable": "No classifications available."
+  },
+  "badges": {
+    "topRated": "Top Rated",
+    "bestseller": "Bestseller",
+    "family": "Family",
+    "new": "New"
+  },
+  "vibeFilters": {
+    "price": "Price",
+    "priceRange": "Price: €{min} - €{max}"
+  },
+  "overviewInfoBar": {
+    "reducedGroup": "Reduced group",
+    "pickupService": "Pickup service",
+    "wheelchairAccessible": "Wheelchair accessible",
+    "duration": "Duration",
+    "yes": "Yes",
+    "no": "No",
+    "dash": "—"
+  },
+  "teideVip": {
+    "loadingAvailability": "Loading availability...",
+    "errorLoadingAvailability": "Error loading availability",
+    "noAvailabilityThisMonth": "No availability returned for this month",
+    "checkBackLater": "Please check back later or try a different month",
+    "selectedDate": "Selected date",
+    "availableOnThisDate": "Available on this date"
+  },
+  "calendar": {
+    "failedToFetchLimits": "Failed to fetch limits",
+    "failedToFetchAvailability": "Failed to fetch availability",
+    "noAvailabilityThisMonthShowing": "No availability this month → showing {month}",
+    "noAvailabilityFound": "No availability found",
+    "noAvailabilityFound12Months": "No availability found for the next 12 months for this option. Please try a different option.",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "prevButton": "← Prev",
+    "nextButton": "Next →"
+  },
+  "bookingSkeleton": {
+    "tabWhatYoullDo": "What you'll do",
+    "tabDescription": "Description",
+    "tabDetails": "Details",
+    "tabCancellation": "Cancellation",
+    "tabPrices": "Prices",
+    "tabReviews": "Reviews",
+    "loading": "Loading...",
+    "activity": "Activity",
+    "yes": "Yes",
+    "no": "No",
+    "selectDateToSeePrices": "Select a date to see prices."
+  },
+  "activitiesPage": {
+    "title": "Activities",
+    "unableToLoad": "Unable to load activities at this time.",
+    "noActivitiesAvailable": "No activities available.",
+    "noActivitiesFound": "No activities found.",
+    "showingCount": "Showing {count} {count, plural, one {activity} other {activities}}",
+    "showingCountWithStats": "Showing {count} {count, plural, one {activity} other {activities}} ({classifications} classifications, {groups} groups, {events} events)",
+    "apiUnavailableTitle": "API temporarily unavailable.",
+    "apiUnavailableDesc": "Showing cached data. If this is your first visit, the catalog is being synced in the background.",
+    "manualSync": "Manual Sync",
+    "errorLabel": "Error:"
+  },
+  "youMightAlsoLike": {
+    "title": "You might also like",
+    "errors": {
+      "loadFailed": "Unable to load related tours. Please try again later."
+    }
+  },
+  "atlanticoStylePage": {
+    "fallbackDescription": "Discover this amazing experience in Tenerife.",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "smallGroup": "Small group",
+    "pickupService": "Pickup service",
+    "option": "Option",
+    "adults": "Adults",
+    "reviewsComingSoon": "Reviews section coming soon.",
+    "children": "Children",
+    "infants": "Infants",
+    "cancellation": {
+      "free": "Free cancellation up to 24 hours before the excursion. If you cancel within 24 hours of the excursion, there will not be a refund.",
+      "title": "Free cancellation",
+      "policy": "Cancellation"
+    },
+    "tabs": {
+      "whatYoullDo": "What you'll do",
+      "description": "Description",
+      "details": "Details",
+      "prices": "Prices",
+      "reviews": "Reviews"
+    }
+  },
+  "premiumActivity": {
+    "chooseYourExperience": "Choose Your Experience",
+    "informationNotAvailable": "Information not available.",
+    "whatsIncludedPlaceholder": "Information about what's included will be displayed here.",
+    "noAdditionalDescription": "No additional description.",
+    "noDescriptionAvailable": "No description available.",
+    "tabs": {
+      "whatYouDo": "What you do",
+      "overview": "Overview",
+      "whatsIncluded": "What's Included",
+      "description": "Description",
+      "cancellationPolicy": "Cancellation Policy"
+    }
+  },
+  "vibeListing": {
+    "availability": "Availability",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "selectDates": "Select Dates",
+    "all": "All",
+    "duration": "Duration",
+    "duration0to3h": "0-3 hours",
+    "duration3to5h": "3-5 hours",
+    "duration5to7h": "5-7 hours",
+    "durationAllDay": "All day (7h+)",
+    "noToursMatchFilters": "No tours match your filters.",
+    "loadingImage": "Loading image...",
+    "loadingAvailability": "Loading availability...",
+    "imageUnavailable": "Image unavailable",
+    "availabilityNotAvailable": "Availability not available",
+    "availableToday": "Available today",
+    "availableTomorrow": "Available tomorrow",
+    "checkAvailability": "Check availability",
+    "errors": {
+      "unavailable": "Availability unavailable"
+    }
+  },
+  "bookingPanel": {
+    "quantity": "Quantity",
+    "adults": "Adults",
+    "meetingPickupPoints": "Meeting & Pickup Points",
+    "loading": "Loading...",
+    "itemAddedToCart": "Item added to cart",
+    "selectTime": "Select a time *",
+    "errors": {
+      "tourGroupRequired": "Tour group is required",
+      "pleaseSelectOption": "Please select an option",
+      "pleaseSelectDate": "Please select a date",
+      "pleaseSelectDateLoroParque": "Please select date for Loro Parque",
+      "siamLoroDifferentDays": "Siam Park and Loro Parque must be on different days",
+      "pleaseSelectEndDate": "Please select end date",
+      "endDateAfterStart": "End date must be on or after start date",
+      "atLeastOneParticipant": "At least 1 participant is required",
+      "atLeastOneAdult": "At least 1 adult is required",
+      "pleaseSelectTime": "Please select a time",
+      "pricesBeingCalculated": "Prices are being calculated"
+    }
+  },
+  "activityDetail": {
+    "errors": {
+      "groupDetails": "Unable to load activity details. Please try again later.",
+      "eventDetails": "Unable to load event details. Please try again later.",
+      "limits": "Unable to load availability information. Please try again later."
+    },
+    "bookYourExperience": "Book Your Experience",
+    "selectOption": "Select Option",
+    "chooseOption": "Choose an option...",
+    "selectOptionAndDate": "Select an option and date to see prices.",
+    "description": "Description",
+    "noAdditionalDescription": "No additional description.",
+    "noDescriptionAvailable": "No description available.",
+    "duration": "Duration",
+    "hours": "hours",
+    "childAge": "Child Age",
+    "reviews": "Reviews",
+    "noReviewsAvailable": "No reviews available.",
+    "selectDate": "Select Date",
+    "loadingCalendar": "Loading calendar...",
+    "adult": "Adult",
+    "child": "Child",
+    "infant": "Infant"
+  },
   "common": {
+    "activityFallback": "Activity {code}",
+    "noImage": "No image",
+    "priceOnRequest": "Price on request",
+    "smallGroup": "Small group",
+    "pickupService": "Pickup service",
     "siteName": "Tenerife Activity",
     "search": "Search",
     "searchInput": "Search input",
@@ -153,6 +338,11 @@
       "secure": "Secure partner booking",
       "secureDesc": "Safe and protected"
     }
+  },
+  "vibePage": {
+    "noToursAvailable": "No tours available",
+    "noToursFound": "No tours found for \"{classification}\" classification.",
+    "notMappedToClassification": "This vibe is not mapped to an Atlantico classification."
   },
   "vibe": {
     "notFound": "Vibe not found",
@@ -655,7 +845,8 @@
       "termsRequired": "You must accept the terms and conditions",
       "cartEmpty": "Your cart is empty",
       "multiItemNotSupported": "Only one activity can be booked at a time. Please remove other items from your cart.",
-      "paymentFailed": "Payment initiation failed. Please try again."
+      "paymentFailed": "Payment initiation failed. Please try again.",
+      "meetingPointsLoadFailed": "Unable to load meeting points. You can enter one manually below."
     },
     "success": {
       "title": "Payment Successful",

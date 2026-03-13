@@ -6,6 +6,7 @@
  */
 
 import { Link } from '@/navigation'
+import { getTranslations } from 'next-intl/server'
 import { ClientImage } from '../catalog/ClientImage'
 import type { DesiredVipTour } from '@/content/vibes/vip-tours.desired'
 import type { VipTourMapping } from '@/content/vibes/vip-tours.mapping'
@@ -15,7 +16,8 @@ interface VipTourPlaceholderCardProps {
   mapping?: VipTourMapping // Optional: use if available (preferred)
 }
 
-export function VipTourPlaceholderCard({ desiredTour, mapping }: VipTourPlaceholderCardProps) {
+export async function VipTourPlaceholderCard({ desiredTour, mapping }: VipTourPlaceholderCardProps) {
+  const t = await getTranslations('common')
   // Use mapping if available, otherwise fallback to desiredTour
   const slug = mapping?.internalSlug || desiredTour?.slug || ''
   const title = mapping?.fallbackTitle || desiredTour?.title || ''
@@ -64,7 +66,7 @@ export function VipTourPlaceholderCard({ desiredTour, mapping }: VipTourPlacehol
               </div>
               <div className="flex items-center gap-2 text-sm text-glass-700">
                 <span className="text-ocean-600">🚌</span>
-                <span>Pickup service: —</span>
+                <span>{t('pickupService')}: —</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-glass-700">
                 <span className="text-ocean-600">⏱</span>

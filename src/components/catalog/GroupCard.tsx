@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -59,6 +60,7 @@ function formatDuration(duration: string | number | undefined): string {
 }
 
 export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: GroupCardProps) {
+  const t = useTranslations('common')
   const imageUrl = group.image || details?.image || null
   const title = group.name || details?.name || details?.Name || '—'
   const price = group.price ?? details?.price
@@ -87,7 +89,7 @@ export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: G
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <div className="text-ocean-300 text-sm font-medium">No image</div>
+            <div className="text-ocean-300 text-sm font-medium">{t('noImage')}</div>
           </div>
         )}
       </div>
@@ -126,7 +128,7 @@ export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: G
                   From {formatPrice(price)}
                 </span>
               ) : (
-                <span className="text-sm text-glass-500">Price on request</span>
+                <span className="text-sm text-glass-500">{t('priceOnRequest')}</span>
               )}
             </div>
             <span className="px-4 py-2 bg-ocean-600 text-white text-sm font-medium rounded-lg group-hover:bg-ocean-700 transition-colors">

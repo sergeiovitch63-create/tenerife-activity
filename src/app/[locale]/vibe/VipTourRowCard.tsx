@@ -11,6 +11,7 @@
  */
 
 import { Link } from '@/navigation'
+import { getTranslations } from 'next-intl/server'
 import { ClientImage } from '../catalog/ClientImage'
 import type { FullTour } from '@/lib/atlantico/catalog-types'
 import { astronomicTourVipMedia } from '@/content/activities/astronomic-tour-vip.media'
@@ -298,7 +299,8 @@ function getNextAvailableDate(tour: FullTour): string | null {
 /**
  * VIP Tour Row Card Component
  */
-export function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; internalSlug?: string }) {
+export async function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; internalSlug?: string }) {
+  const t = await getTranslations('common')
   // Check if this is Astronomic Tour VIP or Gomera VIP Tour for card overrides
   const isAstronomicTourVip = tour.slug === 'astronomic-tour-vip'
   const isGomeraVipTour = tour.slug === 'gomera-vip-tour'
@@ -519,7 +521,7 @@ export function VipTourRowCard({ tour, internalSlug }: { tour: FullTour; interna
                 </div>
               </>
             ) : (
-              <div className="text-sm text-glass-500 font-medium">Price on request</div>
+              <div className="text-sm text-glass-500 font-medium">{t('priceOnRequest')}</div>
             )}
           </div>
         </div>

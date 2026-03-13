@@ -15,11 +15,18 @@ const PartnersSection = lazy(() =>
   import('@/ui/sections/PartnersSection').then(m => ({ default: m.PartnersSection }))
 )
 
+interface MustSeeItem {
+  title: string
+  subtitleKey: string
+  image: string
+}
+
 interface HomePageContentProps {
   locale: string
   vibes: Vibe[]
   allExperiences: Experience[]
   curatedRows: Record<string, any>
+  mustSeeItems: { row1: MustSeeItem[]; row2: MustSeeItem[] } | null
   t: any
 }
 
@@ -28,6 +35,7 @@ export function HomePageContent({
   vibes,
   allExperiences,
   curatedRows,
+  mustSeeItems,
   t,
 }: HomePageContentProps) {
   // Apply curation to experiences
@@ -96,7 +104,7 @@ export function HomePageContent({
       <Section variant="default" background="default" className="pb-4 md:pb-6">
         <Container size="lg">
           <div className="flex flex-col items-center gap-6 md:gap-8 pt-6 md:pt-10 pb-2 md:pb-3">
-            <RecommendationsCarousel />
+            <RecommendationsCarousel row1={mustSeeItems?.row1} row2={mustSeeItems?.row2} />
           </div>
         </Container>
       </Section>

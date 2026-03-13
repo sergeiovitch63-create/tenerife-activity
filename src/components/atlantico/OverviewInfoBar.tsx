@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 /**
  * Horizontal info bar shown at top of Overview section.
  * Displays: Reduced Group, Pickup Service, Wheelchair Accessible, Duration
@@ -73,19 +75,8 @@ export interface OverviewInfoBarProps {
   lang?: string
 }
 
-const LABELS = {
-  reducedGroup: { en: 'Reduced group', es: 'Grupo reducido' },
-  pickup: { en: 'Pickup service', es: 'Servicio de recogida' },
-  wheelchair: { en: 'Wheelchair accessible', es: 'Accesible en silla de ruedas' },
-  duration: { en: 'Duration', es: 'Duration' },
-}
-
-function getLabel(key: keyof typeof LABELS, lang?: string): string {
-  const isEs = lang?.toLowerCase().startsWith('es')
-  return isEs ? LABELS[key].es : LABELS[key].en
-}
-
-export function OverviewInfoBar({ icons = [], faq = '', desc = '', duration, lang }: OverviewInfoBarProps) {
+export function OverviewInfoBar({ icons = [], faq = '', desc = '', duration }: OverviewInfoBarProps) {
+  const t = useTranslations('overviewInfoBar')
   const { pickup, wheelchair } = deriveFromIcons(icons)
   const reducedGroup = deriveReducedGroup(faq, desc)
   const durationStr = formatDuration(duration)
@@ -94,23 +85,23 @@ export function OverviewInfoBar({ icons = [], faq = '', desc = '', duration, lan
 
   items.push({
     icon: ICONS.group,
-    label: getLabel('reducedGroup', lang),
-    value: reducedGroup ? 'Sí' : 'No',
+    label: t('reducedGroup'),
+    value: reducedGroup ? t('yes') : t('no'),
   })
   items.push({
     icon: ICONS.bus,
-    label: getLabel('pickup', lang),
-    value: pickup === true ? 'Sí' : pickup === false ? 'No' : '—',
+    label: t('pickupService'),
+    value: pickup === true ? t('yes') : pickup === false ? t('no') : t('dash'),
   })
   items.push({
     icon: ICONS.wheelchair,
-    label: getLabel('wheelchair', lang),
-    value: wheelchair === true ? 'Sí' : wheelchair === false ? 'No' : '—',
+    label: t('wheelchairAccessible'),
+    value: wheelchair === true ? t('yes') : wheelchair === false ? t('no') : t('dash'),
   })
   if (durationStr) {
     items.push({
       icon: ICONS.clock,
-      label: getLabel('duration', lang),
+      label: t('duration'),
       value: durationStr,
     })
   }

@@ -8,6 +8,7 @@
  */
 
 import { Link } from '@/navigation'
+import { getTranslations } from 'next-intl/server'
 import { ClientImage } from '../catalog/ClientImage'
 import type { NormalizedCatalogItem } from '@/lib/atlantico/sync-catalog'
 
@@ -88,6 +89,7 @@ export default async function ActivitiesPage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'activitiesPage' })
   
   // Map locale to Atlántico language code (ENG, ESP, etc.)
   // Default mapping (can be extended)
@@ -241,14 +243,16 @@ export default async function ActivitiesPage({
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-glass-900 mb-2">
-            Activities
+            {t('title')}
           </h1>
           <p className="text-glass-600">
             {error
-              ? 'Unable to load activities at this time.'
+              ? t('unableToLoad')
               : items.length > 0
-                ? `Showing ${items.length} ${items.length === 1 ? 'activity' : 'activities'}${stats ? ` (${stats.classifications} classifications, ${stats.groups} groups, ${stats.events} events)` : ''}`
-                : 'No activities available.'}
+                ? stats
+                  ? t('showingCountWithStats', { count: items.length, classifications: stats.classifications, groups: stats.groups, events: stats.events })
+                  : t('showingCount', { count: items.length })
+                : t('noActivitiesAvailable')}
           </p>
         </div>
 
@@ -256,7 +260,7 @@ export default async function ActivitiesPage({
         {isApiUnavailable && (
           <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-yellow-800 text-sm mb-3">
-              <strong>API temporarily unavailable.</strong> Showing cached data. If this is your first visit, the catalog is being synced in the background.
+              <strong>{t('apiUnavailableTitle')}</strong> {t('apiUnavailableDesc')}
             </p>
             <a
               href={`/api/atlantico/sync?lang=${lang}&full=1`}
@@ -264,7 +268,7 @@ export default async function ActivitiesPage({
               rel="noopener noreferrer"
               className="inline-block px-4 py-2 bg-ocean-600 text-white text-sm font-medium rounded-lg hover:bg-ocean-700 transition-colors"
             >
-              Manual Sync
+              {t('manualSync')}
             </a>
           </div>
         )}
@@ -287,7 +291,7 @@ export default async function ActivitiesPage({
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-glass-500 text-lg">No activities found.</p>
+            <p className="text-glass-500 text-lg">{t('noActivitiesFound')}</p>
           </div>
         )}
       </div>

@@ -8,6 +8,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/navigation'
 import { useCartStore } from '@/lib/cart/store'
 import { createCartItem, type PriceSnapshot } from '@/lib/cart/types'
@@ -78,50 +79,50 @@ function getBookingReadinessState(
 
   // Required: t_group
   if (!t_group) {
-    missing.push('Tour group is required')
+    missing.push('tourGroupRequired')
   }
 
   // Required: selectedEventId (t_id)
   if (!selectedEventId) {
-    missing.push('Please select an option')
+    missing.push('pleaseSelectOption')
   }
 
   // Required: tourDate
   if (!tourDate) {
-    missing.push('Please select a date')
+    missing.push('pleaseSelectDate')
   }
 
   // Combination: require second date (Loro Parque)
   if (isCombination && !tourDate2) {
-    missing.push('Please select date for Loro Parque')
+    missing.push('pleaseSelectDateLoroParque')
   }
   // Combination: Siam Park and Loro Parque must be different days
   if (isCombination && tourDate && tourDate2 && tourDate === tourDate2) {
-    missing.push('Siam Park and Loro Parque must be on different days')
+    missing.push('siamLoroDifferentDays')
   }
 
   // Date range (car rental): require end date and end >= start
   if (isDateRange && !tourDateEnd) {
-    missing.push('Please select end date')
+    missing.push('pleaseSelectEndDate')
   }
   if (isDateRange && tourDate && tourDateEnd && tourDateEnd < tourDate) {
-    missing.push('End date must be on or after start date')
+    missing.push('endDateAfterStart')
   }
 
   // Pax total must be >= 1 (skip for date range: no participant selectors, use 1 by default)
   if (!isDateRange) {
     const paxTotal = adults + childs + infants
     if (paxTotal < 1) {
-      missing.push('At least 1 participant is required')
+      missing.push('atLeastOneParticipant')
     } else if (adults < 1) {
-      missing.push('At least 1 adult is required')
+      missing.push('atLeastOneAdult')
     }
   }
 
   // If sessions exist -> require sesTime
   // If no sessions -> sesTime = "00:00" automatically
   if (hasSessions && !sesTime) {
-    missing.push('Please select a time')
+    missing.push('pleaseSelectTime')
   }
 
   // Prices: allow clicking even if not loaded (will show spinner during final recalculation)
@@ -129,7 +130,7 @@ function getBookingReadinessState(
   const hasPrice = priceSnapshot !== null
   if (!hasPrice && !loadingPrices) {
     // Only warn if not loading (user should see prices before booking)
-    missing.push('Prices are being calculated')
+    missing.push('pricesBeingCalculated')
   }
 
   // Customer fields (name/email/phone) are NOT required here
@@ -166,6 +167,8 @@ export function ActivityBookingPanel({
   isCombination = false,
   tourName,
 }: ActivityBookingPanelProps) {
+  const t = useTranslations('bookingPanel')
+  const tErrors = useTranslations('bookingPanel.errors')
   const router = useRouter()
   const { addItem } = useCartStore()
   const [selectedEventId, setSelectedEventId] = useState(initialEventId)
@@ -955,7 +958,7 @@ export function ActivityBookingPanel({
             Loro Parque – Select date *
           </label>
           {loadingCalendar ? (
-            <div className="text-sm text-glass-600 text-center py-4">Loading...</div>
+            <div className="text-sm text-glass-600 text-center py-4">{t('loading')}</div>
           ) : (
             <div className="border border-glass-200 rounded-lg p-2 bg-white">
               <div className="grid grid-cols-7 gap-1 mb-1">
@@ -1015,7 +1018,7 @@ export function ActivityBookingPanel({
       {!loadingSessions && hasSessions && (
         <div>
           <label className="block text-sm font-medium text-glass-700 mb-2">
-            Select a time *
+            {t('selectTime')}
           </label>
           <select
             value={selectedTime}
@@ -1041,7 +1044,7 @@ export function ActivityBookingPanel({
         </label>
         <div className="flex flex-col gap-4 items-center">
           <div className="flex flex-col items-center w-full max-w-[7rem]">
-            <label className="block text-[10px] text-glass-600 mb-0.5 text-center">{useQuantityLabel ? 'Quantity' : 'Adults'}</label>
+            <label className="block text-[10px] text-glass-600 mb-0.5 text-center">{useQuantityLabel ? t('quantity') : t('adults')}</label>
             <div className="flex items-center justify-center gap-2">
               <button
                 type="button"
@@ -1142,7 +1145,7 @@ export function ActivityBookingPanel({
               <MeetingPointsDisplay
                 meetingPoints={meetingPoints}
                 showTitle={true}
-                title="Meeting & Pickup Points"
+                title={t('meetingPickupPoints')}
                 className="text-sm"
               />
             </div>
@@ -1185,10 +1188,10 @@ export function ActivityBookingPanel({
       {/* Missing Requirements (shown inline) */}
       {!readiness.ready && readiness.missing.length > 0 && (
         <div className="text-sm text-glass-600 space-y-1">
-          {readiness.missing.map((msg, idx) => (
+          {readiness.missing.map((key, idx) => (
             <div key={idx} className="flex items-start">
               <span className="text-red-500 mr-2">•</span>
-              <span>{msg}</span>
+              <span>{tErrors(key)}</span>
             </div>
           ))}
         </div>
@@ -1256,7 +1259,7 @@ export function ActivityBookingPanel({
       {/* Toast Notification */}
       {showToast && (
         <CartToast
-          message="Item added to cart"
+          message={t('itemAddedToCart')}
           onClose={() => setShowToast(false)}
           locale={locale}
         />

@@ -9,17 +9,18 @@ export type BadgeVariant = 'top' | 'bestseller' | 'family' | 'new'
 
 export interface BadgeConfig {
   variant: BadgeVariant
-  label: string
+  /** i18n key under namespace 'badges' */
+  labelKey: string
 }
 
 /**
- * Badge labels - centralized for easy translation/API mapping
+ * Badge i18n keys (namespace: badges)
  */
-export const BADGE_LABELS = {
-  TOP_RATED: 'Top Rated',
-  BESTSELLER: 'Bestseller',
-  FAMILY: 'Family',
-  NEW: 'New',
+export const BADGE_LABEL_KEYS = {
+  TOP_RATED: 'topRated',
+  BESTSELLER: 'bestseller',
+  FAMILY: 'family',
+  NEW: 'new',
 } as const
 
 /**
@@ -43,14 +44,14 @@ export const BADGE_RULES: BadgeRule[] = [
     condition: (exp) => exp.rating !== undefined && exp.rating >= 4.5,
     config: {
       variant: 'top',
-      label: BADGE_LABELS.TOP_RATED,
+      labelKey: BADGE_LABEL_KEYS.TOP_RATED,
     },
   },
   {
     condition: (exp) => exp.reviewCount !== undefined && exp.reviewCount > 200,
     config: {
       variant: 'bestseller',
-      label: BADGE_LABELS.BESTSELLER,
+      labelKey: BADGE_LABEL_KEYS.BESTSELLER,
     },
   },
 ]

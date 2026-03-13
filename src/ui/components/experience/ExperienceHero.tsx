@@ -27,6 +27,7 @@ interface ExperienceHeroProps {
 
 export function ExperienceHero({ experience }: ExperienceHeroProps) {
   const t = useTranslations('experience')
+  const tBadges = useTranslations('badges')
   const badges = getExperienceBadges(experience)
 
   return (
@@ -34,7 +35,7 @@ export function ExperienceHero({ experience }: ExperienceHeroProps) {
       <div className="flex flex-wrap items-center gap-3">
         {badges.map((badge, idx) => (
           <Badge key={idx} variant={badge.variant}>
-            {badge.label}
+            {tBadges(badge.labelKey)}
           </Badge>
         ))}
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 import { isVipTourGroup, getVipTourCoverImageSync, getVipTourLocalImages } from '@/lib/atlantico/vip-tours-images'
@@ -93,6 +94,7 @@ function getWeekdayNames(days: number[]): string[] {
 }
 
 export function VibeListingClient({ initialTours, locale, classificationName }: VibeListingClientProps) {
+  const t = useTranslations('vibeListing')
   const [tours] = useState<Tour[]>(initialTours)
   const [sort] = useState<SortOption>('popularity') // Keep state for compatibility but unused
   const viewMode: ViewMode = 'grid' // Force grid view only
@@ -157,11 +159,11 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
     try {
       // Fetch event details and limits in parallel
       const [eventDetailsRes, limitsRes] = await Promise.all([
-        fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}`).catch(() => null),
+        fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}`),
         (async () => {
-      const now = new Date()
+          const now = new Date()
           const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
-          return fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}&month=${monthStart}`).catch(() => null)
+          return fetch(`/api/atlantico/limits?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}&month=${monthStart}`)
         })(),
       ])
 
@@ -376,13 +378,13 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
       <div className="flex items-center gap-2 flex-wrap">
           {/* Availability Filter */}
           <InlineFilterDropdown
-            label="Availability"
-            value={filters.availability === 'all' ? 'Availability' : filters.availability === 'today' ? 'Today' : filters.availability === 'tomorrow' ? 'Tomorrow' : 'Select Dates'}
+            label={t('availability')}
+            value={filters.availability === 'all' ? t('availability') : filters.availability === 'today' ? t('today') : filters.availability === 'tomorrow' ? t('tomorrow') : t('selectDates')}
             options={[
-              { value: 'all', label: 'All' },
-              { value: 'today', label: 'Today' },
-              { value: 'tomorrow', label: 'Tomorrow' },
-              { value: 'dates', label: 'Select Dates' },
+              { value: 'all', label: t('all') },
+              { value: 'today', label: t('today') },
+              { value: 'tomorrow', label: t('tomorrow') },
+              { value: 'dates', label: t('selectDates') },
             ]}
             selectedValue={filters.availability}
             onChange={(value) => setFilters(prev => ({ ...prev, availability: value as AvailabilityFilter }))}
@@ -390,14 +392,14 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
 
           {/* Duration Filter */}
           <InlineFilterDropdown
-            label="Duration"
-            value={filters.duration === 'all' ? 'Duration' : filters.duration === '0-3h' ? '0-3 hours' : filters.duration === '3-5h' ? '3-5 hours' : filters.duration === '5-7h' ? '5-7 hours' : 'All day (7h+)'}
+            label={t('duration')}
+            value={filters.duration === 'all' ? t('duration') : filters.duration === '0-3h' ? t('duration0to3h') : filters.duration === '3-5h' ? t('duration3to5h') : filters.duration === '5-7h' ? t('duration5to7h') : t('durationAllDay')}
             options={[
-              { value: 'all', label: 'All' },
-              { value: '0-3h', label: '0-3 hours' },
-              { value: '3-5h', label: '3-5 hours' },
-              { value: '5-7h', label: '5-7 hours' },
-              { value: '7h+', label: 'All day (7h+)' },
+              { value: 'all', label: t('all') },
+              { value: '0-3h', label: t('duration0to3h') },
+              { value: '3-5h', label: t('duration3to5h') },
+              { value: '5-7h', label: t('duration5to7h') },
+              { value: '7h+', label: t('durationAllDay') },
             ]}
             selectedValue={filters.duration}
             onChange={(value) => setFilters(prev => ({ ...prev, duration: value as DurationFilter }))}
@@ -461,7 +463,7 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
       {/* Tour Cards */}
       {filteredAndSortedTours.length === 0 ? (
         <div className="glass-panel p-12 text-center">
-          <p className="text-glass-600 text-lg">No tours match your filters.</p>
+          <p className="text-glass-600 text-lg">{t('noToursMatchFilters')}</p>
         </div>
       ) : (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -487,6 +489,7 @@ interface TourCardProps {
 }
 
 function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
+  const t = useTranslations('vibeListing')
   const [heroImage, setHeroImage] = useState<string | null>(null) // For activity 508: exact hero image
   const [vipTourImage, setVipTourImage] = useState<string | null>(null)
   const [apiImage, setApiImage] = useState<string | null>(null)
@@ -720,7 +723,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
       <div className="mb-4 aspect-video overflow-hidden rounded-lg relative bg-glass-100">
         {loadingImage && !cardImage ? (
           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-            <div className="animate-pulse text-glass-300">Loading image...</div>
+            <div className="animate-pulse text-glass-300">{t('loadingImage')}</div>
           </div>
         ) : cardImage ? (
           <SafeImage
@@ -734,7 +737,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm bg-glass-50">
             <div className="text-center">
               <div className="text-2xl mb-2">📷</div>
-              <div>Image unavailable</div>
+              <div>{t('imageUnavailable')}</div>
               </div>
               </div>
             )}
@@ -770,21 +773,23 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
       {availabilityPreview && (
         <div className="mt-3 pt-3 border-t border-glass-200">
           {availabilityPreview.loading ? (
-            <div className="text-xs text-glass-500">Loading availability...</div>
+            <div className="text-xs text-glass-500">{t('loadingAvailability')}</div>
           ) : availabilityPreview.error ? (
-            <div className="text-xs text-glass-400">Availability not available</div>
+            <span className="inline-flex items-center text-xs text-amber-600 dark:text-amber-400">
+              {t('errors.unavailable')}
+            </span>
           ) : (
             <div className="text-xs text-glass-600">
               {availabilityPreview.hasToday ? (
-                <span className="text-ocean-600 font-medium">Available today</span>
+                <span className="text-ocean-600 font-medium">{t('availableToday')}</span>
               ) : availabilityPreview.hasTomorrow ? (
-                <span className="text-ocean-600 font-medium">Available tomorrow</span>
+                <span className="text-ocean-600 font-medium">{t('availableTomorrow')}</span>
               ) : availabilityPreview.nextAvailableDate ? (
                 <span>Next: {formatShortDate(availabilityPreview.nextAvailableDate)}</span>
               ) : availabilityPreview.availableWeekdays.length > 0 ? (
                 <span>{availabilityPreview.availableWeekdays.join(', ')}</span>
               ) : (
-                <span className="text-glass-400">Check availability</span>
+                <span className="text-glass-400">{t('checkAvailability')}</span>
               )}
             </div>
           )}

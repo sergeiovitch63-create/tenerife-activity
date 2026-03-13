@@ -60,25 +60,36 @@ const mustSeeRow2: MustSeeItem[] = [
 
 // Removed dev logging - use React DevTools for debugging
 
-function RecommendationsCarouselComponent() {
+interface RecommendationsCarouselProps {
+  /** Server-enriched row 1 items (with images from groupDetails). Fallback to static if not provided. */
+  row1?: MustSeeItem[]
+  /** Server-enriched row 2 items (with images from groupDetails). Fallback to static if not provided. */
+  row2?: MustSeeItem[]
+}
+
+function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: RecommendationsCarouselProps = {}) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
 
+  // Use server-enriched data when provided, else fallback to static
+  const row1 = row1Prop ?? mustSeeRow1
+  const row2 = row2Prop ?? mustSeeRow2
+
   // Memoize duplicated arrays to prevent recreation on every render
   const row1Duplicated = useMemo(() => [
-    ...mustSeeRow1,
-    ...mustSeeRow1,
-    ...mustSeeRow1,
-    ...mustSeeRow1,
-  ], [])
+    ...row1,
+    ...row1,
+    ...row1,
+    ...row1,
+  ], [row1])
   
   const row2Duplicated = useMemo(() => [
-    ...mustSeeRow2,
-    ...mustSeeRow2,
-    ...mustSeeRow2,
-    ...mustSeeRow2,
-  ], [])
+    ...row2,
+    ...row2,
+    ...row2,
+    ...row2,
+  ], [row2])
 
   // Memoize handlers to prevent recreation
   const handleMediaChange = useCallback((e: MediaQueryListEvent) => {

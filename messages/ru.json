@@ -1,5 +1,190 @@
 {
+  "catalogPage": {
+    "errorLabel": "Ошибка:",
+    "loadingCatalog": "Загрузка каталога...",
+    "noClassificationsAvailable": "Нет доступных классификаций."
+  },
+  "badges": {
+    "topRated": "Лучшая оценка",
+    "bestseller": "Бестселлер",
+    "family": "Семья",
+    "new": "Новинка"
+  },
+  "vibeFilters": {
+    "price": "Цена",
+    "priceRange": "Цена: {min} € - {max} €"
+  },
+  "overviewInfoBar": {
+    "reducedGroup": "Небольшая группа",
+    "pickupService": "Услуга трансфера",
+    "wheelchairAccessible": "Доступно для инвалидных колясок",
+    "duration": "Продолжительность",
+    "yes": "Да",
+    "no": "Нет",
+    "dash": "—"
+  },
+  "teideVip": {
+    "loadingAvailability": "Загрузка доступности...",
+    "errorLoadingAvailability": "Ошибка загрузки доступности",
+    "noAvailabilityThisMonth": "Нет доступности на этот месяц",
+    "checkBackLater": "Пожалуйста, проверьте позже или выберите другой месяц",
+    "selectedDate": "Выбранная дата",
+    "availableOnThisDate": "Доступно на эту дату"
+  },
+  "calendar": {
+    "failedToFetchLimits": "Не удалось загрузить лимиты",
+    "failedToFetchAvailability": "Не удалось загрузить доступность",
+    "noAvailabilityThisMonthShowing": "Нет доступности в этом месяце → показываем {month}",
+    "noAvailabilityFound": "Доступность не найдена",
+    "noAvailabilityFound12Months": "Доступность не найдена в течение следующих 12 месяцев для этой опции. Попробуйте другую опцию.",
+    "previousMonth": "Предыдущий месяц",
+    "nextMonth": "Следующий месяц",
+    "prevButton": "← Назад",
+    "nextButton": "Вперёд →"
+  },
+  "bookingSkeleton": {
+    "tabWhatYoullDo": "Чем вы займётесь",
+    "tabDescription": "Описание",
+    "tabDetails": "Подробности",
+    "tabCancellation": "Отмена",
+    "tabPrices": "Цены",
+    "tabReviews": "Отзывы",
+    "loading": "Загрузка...",
+    "activity": "Активность",
+    "yes": "Да",
+    "no": "Нет",
+    "selectDateToSeePrices": "Выберите дату, чтобы увидеть цены."
+  },
+  "activitiesPage": {
+    "title": "Активности",
+    "unableToLoad": "Невозможно загрузить активности в данный момент.",
+    "noActivitiesAvailable": "Нет доступных активностей.",
+    "noActivitiesFound": "Активности не найдены.",
+    "showingCount": "Показано {count} {count, plural, one {активность} few {активности} other {активностей}}",
+    "showingCountWithStats": "Показано {count} {count, plural, one {активность} few {активности} other {активностей}} ({classifications} классификаций, {groups} групп, {events} событий)",
+    "apiUnavailableTitle": "API временно недоступно.",
+    "apiUnavailableDesc": "Отображаются кэшированные данные. При первом посещении каталог синхронизируется в фоновом режиме.",
+    "manualSync": "Ручная синхронизация",
+    "errorLabel": "Ошибка:"
+  },
+  "youMightAlsoLike": {
+    "title": "Вам также может понравиться",
+    "errors": {
+      "loadFailed": "Не удалось загрузить похожие туры. Попробуйте позже."
+    }
+  },
+  "atlanticoStylePage": {
+    "fallbackDescription": "Откройте для себя этот удивительный опыт на Тенерифе.",
+    "showMore": "Показать больше",
+    "showLess": "Показать меньше",
+    "smallGroup": "Небольшая группа",
+    "pickupService": "Услуга трансфера",
+    "option": "Вариант",
+    "adults": "Взрослые",
+    "reviewsComingSoon": "Раздел отзывов скоро появится.",
+    "children": "Дети",
+    "infants": "Младенцы",
+    "cancellation": {
+      "free": "Бесплатная отмена до 24 часов до экскурсии. При отмене в течение 24 часов до экскурсии возврат средств не производится.",
+      "title": "Бесплатная отмена",
+      "policy": "Условия отмены"
+    },
+    "tabs": {
+      "whatYoullDo": "Чем вы займётесь",
+      "description": "Описание",
+      "details": "Подробности",
+      "prices": "Цены",
+      "reviews": "Отзывы"
+    }
+  },
+  "premiumActivity": {
+    "chooseYourExperience": "Выберите свой опыт",
+    "informationNotAvailable": "Информация недоступна.",
+    "whatsIncludedPlaceholder": "Информация о том, что включено, будет отображена здесь.",
+    "noAdditionalDescription": "Нет дополнительного описания.",
+    "noDescriptionAvailable": "Описание недоступно.",
+    "tabs": {
+      "whatYouDo": "Чем вы займётесь",
+      "overview": "Обзор",
+      "whatsIncluded": "Что включено",
+      "description": "Описание",
+      "cancellationPolicy": "Условия отмены"
+    }
+  },
+  "vibeListing": {
+    "availability": "Доступность",
+    "today": "Сегодня",
+    "tomorrow": "Завтра",
+    "selectDates": "Выбрать даты",
+    "all": "Все",
+    "duration": "Продолжительность",
+    "duration0to3h": "0-3 часа",
+    "duration3to5h": "3-5 часов",
+    "duration5to7h": "5-7 часов",
+    "durationAllDay": "Целый день (7ч+)",
+    "noToursMatchFilters": "Нет туров, соответствующих вашим фильтрам.",
+    "loadingImage": "Загрузка изображения...",
+    "loadingAvailability": "Загрузка доступности...",
+    "imageUnavailable": "Изображение недоступно",
+    "availabilityNotAvailable": "Доступность недоступна",
+    "availableToday": "Доступно сегодня",
+    "availableTomorrow": "Доступно завтра",
+    "checkAvailability": "Проверить доступность",
+    "errors": {
+      "unavailable": "Доступность недоступна"
+    }
+  },
+  "bookingPanel": {
+    "quantity": "Количество",
+    "adults": "Взрослые",
+    "meetingPickupPoints": "Места встречи и трансфера",
+    "loading": "Загрузка...",
+    "itemAddedToCart": "Товар добавлен в корзину",
+    "selectTime": "Выберите время *",
+    "errors": {
+      "tourGroupRequired": "Требуется группа тура",
+      "pleaseSelectOption": "Пожалуйста, выберите вариант",
+      "pleaseSelectDate": "Пожалуйста, выберите дату",
+      "pleaseSelectDateLoroParque": "Пожалуйста, выберите дату для Loro Parque",
+      "siamLoroDifferentDays": "Siam Park и Loro Parque должны быть в разные дни",
+      "pleaseSelectEndDate": "Пожалуйста, выберите дату окончания",
+      "endDateAfterStart": "Дата окончания должна быть не раньше даты начала",
+      "atLeastOneParticipant": "Требуется минимум 1 участник",
+      "atLeastOneAdult": "Требуется минимум 1 взрослый",
+      "pleaseSelectTime": "Пожалуйста, выберите время",
+      "pricesBeingCalculated": "Цены рассчитываются"
+    }
+  },
+  "activityDetail": {
+    "errors": {
+      "groupDetails": "Не удалось загрузить детали активности. Попробуйте позже.",
+      "eventDetails": "Не удалось загрузить детали события. Попробуйте позже.",
+      "limits": "Не удалось загрузить информацию о доступности. Попробуйте позже."
+    },
+    "bookYourExperience": "Забронируйте ваш опыт",
+    "selectOption": "Выберите вариант",
+    "chooseOption": "Выберите вариант...",
+    "selectOptionAndDate": "Выберите вариант и дату, чтобы увидеть цены.",
+    "description": "Описание",
+    "noAdditionalDescription": "Нет дополнительного описания.",
+    "noDescriptionAvailable": "Описание недоступно.",
+    "duration": "Продолжительность",
+    "hours": "часов",
+    "childAge": "Возраст детей",
+    "reviews": "Отзывы",
+    "noReviewsAvailable": "Отзывы недоступны.",
+    "selectDate": "Выберите дату",
+    "loadingCalendar": "Загрузка календаря...",
+    "adult": "Взрослый",
+    "child": "Ребёнок",
+    "infant": "Младенец"
+  },
   "common": {
+    "activityFallback": "Активность {code}",
+    "noImage": "Нет изображения",
+    "priceOnRequest": "Цена по запросу",
+    "smallGroup": "Небольшая группа",
+    "pickupService": "Услуга трансфера",
     "siteName": "Tenerife Activity",
     "search": "Поиск",
     "searchInput": "Поле поиска",
@@ -153,6 +338,11 @@
       "secure": "Безопасное бронирование партнера",
       "secureDesc": "Безопасно и защищено"
     }
+  },
+  "vibePage": {
+    "noToursAvailable": "Нет доступных туров",
+    "noToursFound": "Туры для классификации «{classification}» не найдены.",
+    "notMappedToClassification": "Это настроение не связано с классификацией Atlantico."
   },
   "vibe": {
     "notFound": "Настроение не найдено",
@@ -699,7 +889,8 @@
       "termsRequired": "Вы должны принять условия",
       "cartEmpty": "Ваша корзина пуста",
       "multiItemNotSupported": "Только одна активность может быть забронирована за раз. Удалите другие товары из корзины.",
-      "paymentFailed": "Инициирование платежа не удалось. Пожалуйста, попробуйте снова."
+      "paymentFailed": "Инициирование платежа не удалось. Пожалуйста, попробуйте снова.",
+      "meetingPointsLoadFailed": "Не удалось загрузить точки встречи. Вы можете ввести её вручную ниже."
     },
     "success": {
       "title": "Платеж успешен",

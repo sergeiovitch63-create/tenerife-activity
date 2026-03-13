@@ -8,6 +8,7 @@ import { buildMetadata } from '@/lib/seo'
 import { type Locale } from '@/i18n/request'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { getClassificationNameForVibe } from '@/lib/vibes/vibe-classification-mapping'
+import { enrichGroupsWithImages } from '@/lib/vibe/enrich-groups-with-images.server'
 import { VibeListingClient } from '@/components/vibe/VibeListingClient'
 
 // Mark page as dynamic (uses headers())
@@ -53,6 +54,7 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
 
   // Get translated vibe title
   const tVibes = await getTranslations({ locale, namespace: 'vibes' })
+  const tVibePage = await getTranslations({ locale, namespace: 'vibePage' })
   const translatedTitle = getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title)
 
   // Map locale to Atlantico language code
@@ -140,7 +142,11 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
                     const groupsData = await groupsResponse.json()
                     
                     if (groupsData.ok && Array.isArray(groupsData.groups)) {
-                      groups = groupsData.groups
+                      groups = await enrichGroupsWithImages(
+                        groupsData.groups,
+                        atlLang,
+                        origin
+                      )
                     }
                   }
                 } catch (groupsError) {
@@ -229,12 +235,12 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
           ) : (
             <div className="glass-panel p-6 md:p-8 text-center py-16 space-y-6">
               <h2 className="text-2xl font-semibold text-glass-900">
-                No tours available
+                {tVibePage('noToursAvailable')}
               </h2>
               <p className="text-lg text-glass-600 max-w-md mx-auto">
                 {classificationName
-                  ? `No tours found for "${classificationName}" classification.`
-                  : 'This vibe is not mapped to an Atlantico classification.'}
+                  ? tVibePage('noToursFound', { classification: classificationName })
+                  : tVibePage('notMappedToClassification')}
               </p>
             </div>
           )}

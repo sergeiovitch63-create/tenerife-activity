@@ -49,6 +49,7 @@ function getExperienceBadges(experience: Experience): BadgeConfig[] {
 
 export function ExperienceCard({ experience, variant = 'grid' }: ExperienceCardProps) {
   const t = useTranslations('experience')
+  const tBadges = useTranslations('badges')
   const displayBadges = getExperienceBadges(experience)
   
   // Get image URL (prefer first from array, fallback to single imageUrl)
@@ -94,7 +95,7 @@ export function ExperienceCard({ experience, variant = 'grid' }: ExperienceCardP
                 <div className="flex gap-2 flex-shrink-0 pt-0.5">
                   {displayBadges.map((badge, idx) => (
                     <Badge key={idx} variant={badge.variant}>
-                      {badge.label}
+                      {tBadges(badge.labelKey)}
                     </Badge>
                   ))}
                 </div>
@@ -174,7 +175,7 @@ export function ExperienceCard({ experience, variant = 'grid' }: ExperienceCardP
               <div className="flex gap-2 flex-shrink-0">
                 {displayBadges.map((badge, idx) => (
                   <Badge key={idx} variant={badge.variant}>
-                    {badge.label}
+                    {tBadges(badge.labelKey)}
                   </Badge>
                 ))}
               </div>

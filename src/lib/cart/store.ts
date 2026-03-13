@@ -10,6 +10,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { CartItem, PriceSnapshot } from './types'
 import { generateCartItemKey, isCartItemExpired, createCartItem } from './types'
+import { setCartCookie } from './cookie'
 
 interface CartState {
   items: CartItem[]
@@ -101,8 +102,21 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
-      storage: createJSONStorage(() => localStorage),
-      // Only persist items that are not expired
+      storage: createJSONStorage(() => ({
+        getItem: (name: string) => localStorage.getItem(name),
+        setItem: (name: string, value: string) => {
+          localStorage.setItem(name, value)
+          try {
+            const parsed = JSON.parse(value) as { state?: { items?: CartItem[] } }
+            const items = parsed?.state?.items ?? []
+            const valid = items.filter((i) => !isCartItemExpired(i))
+            setCartCookie(valid)
+          } catch {
+            // ignore
+          }
+        },
+        removeItem: (name: string) => localStorage.removeItem(name),
+      })),
       partialize: (state) => ({
         items: state.items.filter((i) => !isCartItemExpired(i)),
       }),

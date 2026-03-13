@@ -8,6 +8,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import type { Vibe } from '@/core/entities/vibe'
 import { vibeRepository } from '@/config/repositories'
@@ -71,6 +72,7 @@ function ExperienceRow({
   selected = false,
   onToggleSelect,
 }: ExperienceRowProps) {
+  const t = useTranslations('common')
   const [vibeId, setVibeId] = useState(curation?.vibe_id || item.vibeId || '1')
   const [enabled, setEnabled] = useState(curation?.enabled ?? true)
   const [featured, setFeatured] = useState(curation?.featured ?? false)
@@ -119,7 +121,7 @@ function ExperienceRow({
           />
         ) : (
           <div className="w-16 h-16 bg-glass-200 rounded flex items-center justify-center">
-            <span className="text-xs text-glass-400">No image</span>
+            <span className="text-xs text-glass-400">{t('noImage')}</span>
           </div>
         )}
       </td>
@@ -127,7 +129,7 @@ function ExperienceRow({
         {item.price && item.price > 0
           ? `${item.currency || '€'}${item.price}`
           : item.price === null
-            ? 'Price on request'
+            ? t('priceOnRequest')
             : 'N/A'}
       </td>
       <td className="px-4 py-3">

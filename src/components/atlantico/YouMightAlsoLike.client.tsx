@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
@@ -28,14 +29,19 @@ interface YouMightAlsoLikeProps {
 }
 
 export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) {
+  const t = useTranslations('youMightAlsoLike')
+  const tCommon = useTranslations('common')
   const [tours, setTours] = useState<Tour[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (!code) {
       setLoading(false)
+      setError(false)
       return
     }
+    setError(false)
     let cancelled = false
     fetch(
       `/api/atlantico/related-tours?code=${encodeURIComponent(code)}&lang=${encodeURIComponent(lang)}`
@@ -46,7 +52,9 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
           setTours(data.tours)
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
@@ -55,11 +63,21 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
     }
   }, [code, lang])
 
-  if (loading || tours.length === 0) return null
+  if (loading) return null
+  if (error) {
+    return (
+      <div className="mt-12 pt-8 border-t border-glass-200">
+        <p className="text-sm text-amber-600 dark:text-amber-400">
+          {t('errors.loadFailed')}
+        </p>
+      </div>
+    )
+  }
+  if (tours.length === 0) return null
 
   return (
     <div className="mt-12 pt-8 border-t border-glass-200">
-      <h2 className="text-xl font-bold text-glass-900 mb-4">You might also like</h2>
+      <h2 className="text-xl font-bold text-glass-900 mb-4">{t('title')}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {tours.map((t) => (
             <Link
@@ -76,7 +94,7 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-glass-400 text-xs">
-                    No image
+                    {tCommon('noImage')}
                   </div>
                 )}
               </div>

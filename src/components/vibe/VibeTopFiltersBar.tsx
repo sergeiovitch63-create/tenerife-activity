@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/ui/lib/cn'
 
 type AvailabilityFilter = 'all' | 'today' | 'tomorrow' | 'dates'
@@ -72,6 +73,7 @@ export function VibeTopFiltersBar({
   onDurationChange,
   onPriceChange,
 }: VibeTopFiltersBarProps) {
+  const t = useTranslations('vibeFilters')
   const [openFilter, setOpenFilter] = useState<string | null>(null)
   const availabilityRef = useRef<HTMLButtonElement>(null)
   const durationRef = useRef<HTMLButtonElement>(null)
@@ -107,9 +109,9 @@ export function VibeTopFiltersBar({
 
   const getPriceLabel = () => {
     if (priceMin === priceRange.min && priceMax === priceRange.max) {
-      return 'Price'
+      return t('price')
     }
-    return `€${priceMin} - €${priceMax}`
+    return t('priceRange', { min: priceMin, max: priceMax })
   }
 
   const hasActiveFilters = availability !== 'all' || duration !== 'all' || priceMin !== priceRange.min || priceMax !== priceRange.max
@@ -275,7 +277,7 @@ export function VibeTopFiltersBar({
             <div className="space-y-4 min-w-[280px]">
               <div>
                 <div className="text-sm font-semibold text-glass-700 mb-3">
-                  Price: €{priceMin} - €{priceMax}
+                  {t('priceRange', { min: priceMin, max: priceMax })}
                 </div>
                 <div className="space-y-3">
                   <div>

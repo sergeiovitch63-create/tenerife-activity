@@ -6,6 +6,7 @@
  */
 
 import { Link } from '@/navigation'
+import { getTranslations } from 'next-intl/server'
 import { ClientImage } from '../catalog/ClientImage'
 import type { VipTourMockData } from '@/content/vibes/vip-tours.mock'
 
@@ -24,7 +25,8 @@ function formatPrice(amount: number, currency: string = 'EUR'): string {
 /**
  * VIP Tour Mock Card Component
  */
-export function VipTourMockCard({ mockData }: { mockData: VipTourMockData }) {
+export async function VipTourMockCard({ mockData }: { mockData: VipTourMockData }) {
+  const t = await getTranslations('common')
   const title = mockData.title
   const description = mockData.shortDescription
   const price = mockData.fromPrice
@@ -105,7 +107,7 @@ export function VipTourMockCard({ mockData }: { mockData: VipTourMockData }) {
                 </div>
               </>
             ) : (
-              <div className="text-sm text-glass-500 font-medium">Price on request</div>
+              <div className="text-sm text-glass-500 font-medium">{t('priceOnRequest')}</div>
             )}
           </div>
         </div>

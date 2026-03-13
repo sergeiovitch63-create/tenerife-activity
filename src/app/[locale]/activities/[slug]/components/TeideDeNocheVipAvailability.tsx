@@ -10,6 +10,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 
 // Export TimeSlot interface for use in parent
 export interface TimeSlot {
@@ -43,6 +44,8 @@ export function TeideDeNocheVipAvailability({
   onDateSelect,
   onPriceChange,
 }: TeideDeNocheVipAvailabilityProps) {
+  const t = useTranslations('teideVip')
+  const locale = useLocale()
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -504,22 +507,12 @@ export function TeideDeNocheVipAvailability({
     }
   }, [selectedDate, selectedDateSlots, onDateSelect, onPriceChange])
 
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ]
-
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const monthName = currentMonth.toLocaleDateString(locale, { month: 'long' })
+  const dayNames = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) =>
+      new Date(2024, 0, 7 + i).toLocaleDateString(locale, { weekday: 'short' })
+    )
+  }, [locale])
 
   return (
     <div className="w-full">
@@ -535,7 +528,7 @@ export function TeideDeNocheVipAvailability({
             <span className="text-glass-600">←</span>
           </button>
           <h3 className="text-lg font-semibold text-glass-900">
-            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+            {monthName} {currentMonth.getFullYear()}
           </h3>
           <button
             onClick={goToNextMonth}
@@ -548,7 +541,7 @@ export function TeideDeNocheVipAvailability({
 
         {/* Loading state */}
         {loading && (
-          <div className="text-center py-8 text-glass-500">Loading availability...</div>
+          <div className="text-center py-8 text-glass-500">{t('loadingAvailability')}</div>
         )}
 
         {/* Error state */}
@@ -562,9 +555,9 @@ export function TeideDeNocheVipAvailability({
         {/* No availability state */}
         {!loading && !error && availableDates.length === 0 && (
           <div className="text-center py-8 text-glass-500">
-            <div className="font-medium">No availability returned for this month</div>
+            <div className="font-medium">{t('noAvailabilityThisMonth')}</div>
             <div className="text-sm mt-1">
-              Please check back later or try a different month
+              {t('checkBackLater')}
             </div>
           </div>
         )}
@@ -633,9 +626,9 @@ export function TeideDeNocheVipAvailability({
       {selectedDate && (
         <div className="mt-4 border border-glass-200 rounded-lg p-4 bg-white">
           <div className="text-center py-2">
-            <div className="text-sm text-glass-600 mb-1">Selected date</div>
+            <div className="text-sm text-glass-600 mb-1">{t('selectedDate')}</div>
             <div className="text-lg font-semibold text-glass-900">{selectedDate}</div>
-            <div className="text-xs text-glass-500 mt-2">Available on this date</div>
+            <div className="text-xs text-glass-500 mt-2">{t('availableOnThisDate')}</div>
           </div>
         </div>
       )}

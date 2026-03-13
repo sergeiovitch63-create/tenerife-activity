@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 import { cn } from '@/ui/lib/cn'
@@ -61,6 +62,8 @@ const WEEKDAY_MAP: Record<string, number> = {
 }
 
 export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
+  const t = useTranslations('common')
+  const tVibe = useTranslations('vibeListing')
   // Determine active weekdays from availability preview
   const activeWeekdays = new Set<number>()
   
@@ -79,7 +82,7 @@ export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
     if (availabilityPreview.loading) {
       availabilityLabel = 'Loading...'
     } else if (availabilityPreview.error) {
-      availabilityLabel = null
+      availabilityLabel = tVibe('errors.unavailable')
     } else if (availabilityPreview.hasToday || availabilityPreview.availableToday) {
       availabilityLabel = 'Available today'
     } else if (availabilityPreview.hasTomorrow || availabilityPreview.availableTomorrow) {
@@ -133,7 +136,7 @@ export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
           {/* Group Size Icon (placeholder) */}
           <div className="flex items-center gap-1">
             <span>👥</span>
-            <span>Small group</span>
+            <span>{t('smallGroup')}</span>
           </div>
 
           {/* Collection Service Icon (placeholder) */}

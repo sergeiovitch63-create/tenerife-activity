@@ -1,5 +1,190 @@
 {
+  "catalogPage": {
+    "errorLabel": "Fehler:",
+    "loadingCatalog": "Katalog wird geladen...",
+    "noClassificationsAvailable": "Keine Klassifikationen verfügbar."
+  },
+  "badges": {
+    "topRated": "Beste Bewertung",
+    "bestseller": "Bestseller",
+    "family": "Familie",
+    "new": "Neu"
+  },
+  "vibeFilters": {
+    "price": "Preis",
+    "priceRange": "Preis: {min} € - {max} €"
+  },
+  "overviewInfoBar": {
+    "reducedGroup": "Kleine Gruppe",
+    "pickupService": "Abholservice",
+    "wheelchairAccessible": "Rollstuhlgerecht",
+    "duration": "Dauer",
+    "yes": "Ja",
+    "no": "Nein",
+    "dash": "—"
+  },
+  "teideVip": {
+    "loadingAvailability": "Verfügbarkeit wird geladen...",
+    "errorLoadingAvailability": "Fehler beim Laden der Verfügbarkeit",
+    "noAvailabilityThisMonth": "Keine Verfügbarkeit für diesen Monat",
+    "checkBackLater": "Bitte versuchen Sie es später erneut oder wählen Sie einen anderen Monat",
+    "selectedDate": "Gewähltes Datum",
+    "availableOnThisDate": "An diesem Datum verfügbar"
+  },
+  "calendar": {
+    "failedToFetchLimits": "Limits konnten nicht geladen werden",
+    "failedToFetchAvailability": "Verfügbarkeit konnte nicht geladen werden",
+    "noAvailabilityThisMonthShowing": "Keine Verfügbarkeit in diesem Monat → Anzeige von {month}",
+    "noAvailabilityFound": "Keine Verfügbarkeit gefunden",
+    "noAvailabilityFound12Months": "Keine Verfügbarkeit für die nächsten 12 Monate für diese Option gefunden. Bitte versuchen Sie eine andere Option.",
+    "previousMonth": "Vormonat",
+    "nextMonth": "Nächster Monat",
+    "prevButton": "← Zurück",
+    "nextButton": "Weiter →"
+  },
+  "bookingSkeleton": {
+    "tabWhatYoullDo": "Was Sie erwartet",
+    "tabDescription": "Beschreibung",
+    "tabDetails": "Details",
+    "tabCancellation": "Stornierung",
+    "tabPrices": "Preise",
+    "tabReviews": "Bewertungen",
+    "loading": "Laden...",
+    "activity": "Aktivität",
+    "yes": "Ja",
+    "no": "Nein",
+    "selectDateToSeePrices": "Wählen Sie ein Datum, um die Preise zu sehen."
+  },
+  "activitiesPage": {
+    "title": "Aktivitäten",
+    "unableToLoad": "Aktivitäten können derzeit nicht geladen werden.",
+    "noActivitiesAvailable": "Keine Aktivitäten verfügbar.",
+    "noActivitiesFound": "Keine Aktivitäten gefunden.",
+    "showingCount": "{count} {count, plural, one {Aktivität} other {Aktivitäten}} angezeigt",
+    "showingCountWithStats": "{count} {count, plural, one {Aktivität} other {Aktivitäten}} angezeigt ({classifications} Klassifikationen, {groups} Gruppen, {events} Events)",
+    "apiUnavailableTitle": "API vorübergehend nicht verfügbar.",
+    "apiUnavailableDesc": "Anzeige der gecachten Daten. Bei Ihrem ersten Besuch wird der Katalog im Hintergrund synchronisiert.",
+    "manualSync": "Manuelle Synchronisation",
+    "errorLabel": "Fehler:"
+  },
+  "youMightAlsoLike": {
+    "title": "Das könnte Ihnen auch gefallen",
+    "errors": {
+      "loadFailed": "Verknüpfte Touren konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+    }
+  },
+  "atlanticoStylePage": {
+    "fallbackDescription": "Entdecken Sie dieses beeindruckende Erlebnis auf Teneriffa.",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "smallGroup": "Kleine Gruppe",
+    "pickupService": "Abholservice",
+    "option": "Option",
+    "adults": "Erwachsene",
+    "reviewsComingSoon": "Bewertungsbereich demnächst verfügbar.",
+    "children": "Kinder",
+    "infants": "Säuglinge",
+    "cancellation": {
+      "free": "Kostenlose Stornierung bis 24 Stunden vor der Exkursion. Bei Stornierung innerhalb von 24 Stunden vor der Exkursion erfolgt keine Rückerstattung.",
+      "title": "Kostenlose Stornierung",
+      "policy": "Stornierungsbedingungen"
+    },
+    "tabs": {
+      "whatYoullDo": "Was Sie erwartet",
+      "description": "Beschreibung",
+      "details": "Details",
+      "prices": "Preise",
+      "reviews": "Bewertungen"
+    }
+  },
+  "premiumActivity": {
+    "chooseYourExperience": "Wählen Sie Ihr Erlebnis",
+    "informationNotAvailable": "Keine Informationen verfügbar.",
+    "whatsIncludedPlaceholder": "Informationen zu den Inklusivleistungen werden hier angezeigt.",
+    "noAdditionalDescription": "Keine zusätzliche Beschreibung.",
+    "noDescriptionAvailable": "Keine Beschreibung verfügbar.",
+    "tabs": {
+      "whatYouDo": "Was Sie erwartet",
+      "overview": "Überblick",
+      "whatsIncluded": "Im Preis enthalten",
+      "description": "Beschreibung",
+      "cancellationPolicy": "Stornierungsbedingungen"
+    }
+  },
+  "vibeListing": {
+    "availability": "Verfügbarkeit",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "selectDates": "Daten auswählen",
+    "all": "Alle",
+    "duration": "Dauer",
+    "duration0to3h": "0-3 Stunden",
+    "duration3to5h": "3-5 Stunden",
+    "duration5to7h": "5-7 Stunden",
+    "durationAllDay": "Ganztägig (7h+)",
+    "noToursMatchFilters": "Keine Touren entsprechen Ihren Filtern.",
+    "loadingImage": "Bild wird geladen...",
+    "loadingAvailability": "Verfügbarkeit wird geladen...",
+    "imageUnavailable": "Bild nicht verfügbar",
+    "availabilityNotAvailable": "Verfügbarkeit nicht verfügbar",
+    "availableToday": "Heute verfügbar",
+    "availableTomorrow": "Morgen verfügbar",
+    "checkAvailability": "Verfügbarkeit prüfen",
+    "errors": {
+      "unavailable": "Verfügbarkeit nicht verfügbar"
+    }
+  },
+  "bookingPanel": {
+    "quantity": "Anzahl",
+    "adults": "Erwachsene",
+    "meetingPickupPoints": "Treff- und Abholpunkte",
+    "loading": "Laden...",
+    "itemAddedToCart": "Artikel zum Warenkorb hinzugefügt",
+    "selectTime": "Uhrzeit auswählen *",
+    "errors": {
+      "tourGroupRequired": "Tour-Gruppe ist erforderlich",
+      "pleaseSelectOption": "Bitte wählen Sie eine Option",
+      "pleaseSelectDate": "Bitte wählen Sie ein Datum",
+      "pleaseSelectDateLoroParque": "Bitte wählen Sie ein Datum für Loro Parque",
+      "siamLoroDifferentDays": "Siam Park und Loro Parque müssen an verschiedenen Tagen sein",
+      "pleaseSelectEndDate": "Bitte wählen Sie das Enddatum",
+      "endDateAfterStart": "Das Enddatum muss am oder nach dem Startdatum liegen",
+      "atLeastOneParticipant": "Mindestens 1 Teilnehmer ist erforderlich",
+      "atLeastOneAdult": "Mindestens 1 Erwachsener ist erforderlich",
+      "pleaseSelectTime": "Bitte wählen Sie eine Uhrzeit",
+      "pricesBeingCalculated": "Die Preise werden berechnet"
+    }
+  },
+  "activityDetail": {
+    "errors": {
+      "groupDetails": "Aktivitätsdetails konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
+      "eventDetails": "Veranstaltungsdetails konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
+      "limits": "Verfügbarkeitsinformationen konnten nicht geladen werden. Bitte versuchen Sie es später erneut."
+    },
+    "bookYourExperience": "Buchen Sie Ihr Erlebnis",
+    "selectOption": "Option wählen",
+    "chooseOption": "Wählen Sie eine Option...",
+    "selectOptionAndDate": "Wählen Sie eine Option und ein Datum, um die Preise zu sehen.",
+    "description": "Beschreibung",
+    "noAdditionalDescription": "Keine zusätzliche Beschreibung.",
+    "noDescriptionAvailable": "Keine Beschreibung verfügbar.",
+    "duration": "Dauer",
+    "hours": "Stunden",
+    "childAge": "Kinderalter",
+    "reviews": "Bewertungen",
+    "noReviewsAvailable": "Keine Bewertungen verfügbar.",
+    "selectDate": "Datum auswählen",
+    "loadingCalendar": "Kalender wird geladen...",
+    "adult": "Erwachsener",
+    "child": "Kind",
+    "infant": "Säugling"
+  },
   "common": {
+    "activityFallback": "Aktivität {code}",
+    "noImage": "Kein Bild",
+    "priceOnRequest": "Preis auf Anfrage",
+    "smallGroup": "Kleine Gruppe",
+    "pickupService": "Abholservice",
     "siteName": "Tenerife Activity",
     "search": "Suchen",
     "searchInput": "Suchfeld",
@@ -153,6 +338,11 @@
       "secure": "Sichere Partnerbuchung",
       "secureDesc": "Sicher und geschützt"
     }
+  },
+  "vibePage": {
+    "noToursAvailable": "Keine Touren verfügbar",
+    "noToursFound": "Keine Touren für die Klassifikation „{classification}\" gefunden.",
+    "notMappedToClassification": "Diese Stimmung ist keiner Atlantico-Klassifikation zugeordnet."
   },
   "vibe": {
     "notFound": "Stimmung nicht gefunden",
@@ -699,7 +889,8 @@
       "termsRequired": "Sie müssen die Allgemeinen Geschäftsbedingungen akzeptieren",
       "cartEmpty": "Ihr Warenkorb ist leer",
       "multiItemNotSupported": "Es kann nur eine Aktivität gleichzeitig gebucht werden. Bitte entfernen Sie andere Artikel aus Ihrem Warenkorb.",
-      "paymentFailed": "Zahlungsinitiierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "paymentFailed": "Zahlungsinitiierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "meetingPointsLoadFailed": "Treffpunkte konnten nicht geladen werden. Sie können unten einen manuell eingeben."
     },
     "success": {
       "title": "Zahlung erfolgreich",

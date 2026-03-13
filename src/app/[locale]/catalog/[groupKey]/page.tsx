@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
@@ -79,6 +80,7 @@ function formatPrice(price: string | number | undefined): string {
 }
 
 export default function CatalogDetailPage() {
+  const t = useTranslations('common')
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   const groupKey = (params?.groupKey as string) || ''
@@ -593,7 +595,7 @@ export default function CatalogDetailPage() {
                     {price ? (
                       <div className="text-2xl font-bold text-ocean-600">{formatPrice(price)}</div>
                     ) : (
-                      <p className="text-glass-500">Price on request</p>
+                      <p className="text-glass-500">{t('priceOnRequest')}</p>
                     )}
                   </div>
                 )}
