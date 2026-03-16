@@ -39,7 +39,11 @@ type StarConfig = {
   duration: number
 }
 
-export function MarcoInspiredHero() {
+type MarcoInspiredHeroProps = {
+  autoOpen?: boolean
+}
+
+export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [isTyping, setIsTyping] = useState(false)
@@ -62,6 +66,15 @@ export function MarcoInspiredHero() {
   const progressPercent = Math.round(
     (Math.min(step, TOTAL_QUESTIONS) / TOTAL_QUESTIONS) * 100
   )
+
+  // Auto-open chat when requested (e.g. arriving from "Inspire-moi" CTA)
+  useMemo(() => {
+    if (autoOpen && !isOpen && step === 0) {
+      // open immediately and start first question
+      setIsOpen(true)
+      startQuestion(0)
+    }
+  }, [autoOpen, isOpen, step])
 
   const handleOpen = () => {
     if (isOpen) return

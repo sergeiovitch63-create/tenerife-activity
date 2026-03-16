@@ -22,8 +22,8 @@ export default async function InspiredPage({
   params: Promise<{ locale: string }>
 }) {
   return (
-    <main className="min-h-screen w-full overflow-hidden bg-[#0d2b35] text-white relative">
-      <MarcoInspiredHero />
+    <main className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#0d2b35] via-[#1a6b7c] to-[#0f3d4a] text-white relative">
+      <MarcoInspiredHero autoOpen />
     </main>
   )
 }
