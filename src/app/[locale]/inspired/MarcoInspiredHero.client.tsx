@@ -1,6 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { Activity } from '@/core/entities/activity'
+import { activitiesMock } from '@/data/mock/activities.mock'
+import {
+  getInspiredRecommendations,
+  type GetInspiredAnswers,
+} from '@/lib/recommendations/get-inspired'
 
 type Question = {
   text: string
@@ -49,6 +55,13 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
   const [isTyping, setIsTyping] = useState(false)
   const [choicesVisible, setChoicesVisible] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState<string | null>(null)
+  const [marcoAnswers, setMarcoAnswers] = useState<string[]>(
+    Array(TOTAL_QUESTIONS).fill('')
+  )
+  const [recommendedActivities, setRecommendedActivities] = useState<Activity[]>(
+    []
+  )
+  const [showRecommendations, setShowRecommendations] = useState(false)
 
   const stars = useMemo<StarConfig[]>(() => {
     const result: StarConfig[] = []
@@ -112,6 +125,10 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
   const handleChoice = (choice: string) => {
     if (isTyping) return
 
+    const updatedAnswers = [...marcoAnswers]
+    updatedAnswers[step] = choice
+    setMarcoAnswers(updatedAnswers)
+
     setStep((prev) => {
       const next = prev + 1
 
@@ -122,6 +139,19 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
         setCurrentQuestion(
           'Merci ! Je prépare une sélection d’activités rien que pour vous ✨'
         )
+
+        // Build recommendation inputs and compute activities
+        const answers: GetInspiredAnswers = {
+          mood: mapMarcoMood(updatedAnswers[1]),
+          time: mapMarcoTime(updatedAnswers[2]),
+          group: mapMarcoGroup(updatedAnswers[0]),
+          intensity: mapMarcoIntensity(updatedAnswers[4]),
+          budget: mapMarcoBudget(updatedAnswers[3]),
+        }
+
+        const recs = getInspiredRecommendations(activitiesMock, answers)
+        setRecommendedActivities(recs)
+        setShowRecommendations(true)
       }
 
       return next
@@ -228,6 +258,44 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
           </div>
         </div>
       </div>
+
+      {showRecommendations && recommendedActivities.length > 0 && (
+        <section className="recommendations-section">
+          <div className="recommendations-inner">
+            <h2 className="recommendations-title">
+              Nos idées d’activités pour vous
+            </h2>
+            <p className="recommendations-subtitle">
+              Sélection basée sur vos réponses à Marco. Vous pourrez bientôt
+              la personnaliser encore plus.
+            </p>
+            <div className="recommendations-grid">
+              {recommendedActivities.map((activity) => (
+                <a
+                  key={activity.id}
+                  href={`/activities/${activity.slug}`}
+                  className="recommendation-card"
+                >
+                  <div className="recommendation-header">
+                    <h3>{activity.title}</h3>
+                    <span className="price-from">
+                      Dès {activity.priceFrom.toFixed(0)} €
+                    </span>
+                  </div>
+                  <p className="location">{activity.location}</p>
+                  <div className="tags">
+                    {activity.tags.slice(0, 4).map((tag) => (
+                      <span key={tag} className="tag">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <style jsx>{`
         .marco-page {
@@ -736,8 +804,183 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
             opacity: 1;
           }
         }
+
+        .recommendations-section {
+          width: 100%;
+          padding: 3rem 1.5rem 4rem;
+          background: radial-gradient(
+              circle at 20% 0,
+              rgba(245, 239, 230, 0.25),
+              transparent 55%
+            ),
+            radial-gradient(
+              circle at 80% 0,
+              rgba(212, 168, 67, 0.18),
+              transparent 55%
+            );
+        }
+
+        .recommendations-inner {
+          max-width: 960px;
+          margin: 0 auto;
+          background: rgba(4, 18, 26, 0.9);
+          border-radius: 32px;
+          padding: 2.5rem 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(20px);
+        }
+
+        .recommendations-title {
+          font-size: 1.75rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          text-align: center;
+          color: var(--sand);
+        }
+
+        .recommendations-subtitle {
+          font-size: 0.95rem;
+          color: rgba(245, 239, 230, 0.7);
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+
+        .recommendations-grid {
+          display: grid;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+          gap: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+          .recommendations-inner {
+            padding: 2.75rem 2.5rem 3rem;
+          }
+
+          .recommendations-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        .recommendation-card {
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
+          padding: 1.25rem 1.35rem;
+          border-radius: 20px;
+          background: linear-gradient(
+              135deg,
+              rgba(255, 255, 255, 0.04),
+              rgba(4, 47, 61, 0.7)
+            );
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          text-decoration: none;
+          color: inherit;
+          transition: transform 0.18s ease, box-shadow 0.18s ease,
+            border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .recommendation-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+          border-color: rgba(232, 105, 74, 0.7);
+          background: linear-gradient(
+              135deg,
+              rgba(232, 105, 74, 0.16),
+              rgba(4, 47, 61, 0.9)
+            );
+        }
+
+        .recommendation-header {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.75rem;
+          align-items: baseline;
+        }
+
+        .recommendation-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--sand);
+        }
+
+        .price-from {
+          font-size: 0.9rem;
+          color: rgba(245, 239, 230, 0.85);
+          font-weight: 500;
+          white-space: nowrap;
+        }
+
+        .location {
+          font-size: 0.85rem;
+          color: rgba(245, 239, 230, 0.7);
+        }
+
+        .tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem;
+          margin-top: 0.25rem;
+        }
+
+        .tag {
+          padding: 0.18rem 0.55rem;
+          font-size: 0.75rem;
+          border-radius: 999px;
+          background: rgba(3, 105, 161, 0.2);
+          color: rgba(226, 232, 240, 0.9);
+          border: 1px solid rgba(148, 163, 184, 0.5);
+        }
       `}</style>
     </div>
   )
+}
+
+function mapMarcoGroup(answer: string | undefined | null): GetInspiredAnswers['group'] {
+  if (!answer) return null
+  if (answer.includes('famille')) return 'family'
+  if (answer.includes('couple')) return 'couple'
+  if (answer.includes('amis')) return 'friends'
+  if (answer.includes('Solo') || answer.includes('solo')) return 'solo'
+  return null
+}
+
+function mapMarcoMood(answer: string | undefined | null): GetInspiredAnswers['mood'] {
+  if (!answer) return null
+  if (answer.includes('Mer')) return 'ocean'
+  if (answer.includes('Montagne')) return 'adventure'
+  if (answer.includes('Aventure')) return 'adventure'
+  if (answer.includes('Tout découvrir')) return 'culture'
+  return null
+}
+
+function mapMarcoTime(
+  answer: string | undefined | null
+): GetInspiredAnswers['time'] {
+  if (!answer) return null
+  if (answer.includes('Demi-journée')) return 'halfday'
+  if (answer.includes('Journée complète')) return 'fullday'
+  if (answer.includes('Plusieurs jours')) return 'multiday'
+  return null
+}
+
+function mapMarcoBudget(
+  answer: string | undefined | null
+): GetInspiredAnswers['budget'] {
+  if (!answer) return null
+  if (answer.includes('Moins de 50')) return 'budget-1'
+  if (answer.includes('50–100')) return 'budget-2'
+  if (answer.includes('100–200') || answer.includes('Pas de limite')) {
+    return 'budget-3'
+  }
+  return null
+}
+
+function mapMarcoIntensity(
+  answer: string | undefined | null
+): GetInspiredAnswers['intensity'] {
+  if (!answer) return null
+  if (answer.includes('Mobilité réduite')) return 'low-intensity'
+  return null
 }
 
