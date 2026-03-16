@@ -18,6 +18,7 @@ import { getTranslatedVibeTitle } from '@/ui/components/vibe/vibe-translations'
 import { vibeRepository } from '@/config/repositories'
 import { locales, type Locale } from '@/i18n/request'
 import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
+import { VibeVideo } from '@/app/[locale]/vibe/[slug]/VibeVideo'
 
 interface PageParams {
   params: Promise<{ locale: string; slug: string }>
@@ -134,6 +135,10 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
               )}
             </div>
           </div>
+        </Container>
+        {/* Vibe video preview between title and activity cards */}
+        <Container size="lg" className="mt-6">
+          <VibeVideo slug={vibe.slug} />
         </Container>
       </Section>
 
