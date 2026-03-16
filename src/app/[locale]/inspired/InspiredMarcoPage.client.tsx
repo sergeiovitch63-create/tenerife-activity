@@ -154,7 +154,7 @@ export function InspiredMarcoPage() {
         <div className="absolute inset-x-[-10%] bottom-[-20%] h-[280px] bg-[radial-gradient(circle_at_20%_0,#f5efe6_0,transparent_55%),radial-gradient(circle_at_80%_10%,#d4a843_0,transparent_55%)] opacity-80 mix-blend-screen" />
       </div>
 
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-16 pt-28 md:flex-row md:items-center md:gap-10 md:pt-32">
+      <main className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-20 pt-24 md:flex-row md:items-center md:gap-12 md:pt-28 lg:pt-32">
         <section className="mb-10 flex-1 space-y-6 md:mb-0">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300/80">
             Votre aventure commence ici
@@ -183,7 +183,7 @@ export function InspiredMarcoPage() {
         </section>
 
         <section className="flex-1">
-          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/40 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
+          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/60 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
             <div className="absolute -top-3 right-5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
               En ligne
             </div>
@@ -288,7 +288,7 @@ export function InspiredMarcoPage() {
       </main>
 
       {hasFinished && recommendedActivities.length > 0 && (
-        <section className="relative z-10 bg-slate-950/40 py-10">
+        <section className="relative z-10 bg-slate-950/60 py-10 lg:py-14">
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
