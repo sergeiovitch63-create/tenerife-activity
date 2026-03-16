@@ -2,6 +2,26 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { InspiredMarcoPage } from './InspiredMarcoPage.client'
 import { experienceRepository } from '@/config/repositories'
+import type { Activity } from '@/core/entities/activity'
+
+function mapExperienceToActivity(experience: any): Activity {
+  return {
+    id: experience.id,
+    slug: experience.slug,
+    title: experience.title,
+    priceFrom: typeof experience.price === 'number' ? experience.price : 0,
+    duration: experience.duration ?? '',
+    location: experience.location ?? 'Tenerife',
+    media: {
+      type: 'image',
+      src:
+        (Array.isArray(experience.imageUrls) && experience.imageUrls[0]) ||
+        experience.imageUrl ||
+        '/logo.png',
+    },
+    tags: [],
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -24,6 +44,7 @@ export default async function InspiredPage({
 }) {
   await params
   const allExperiences = await experienceRepository.findAll()
+  const activities = allExperiences.map(mapExperienceToActivity)
 
-  return <InspiredMarcoPage activities={allExperiences} />
+  return <InspiredMarcoPage activities={activities} />
 }
