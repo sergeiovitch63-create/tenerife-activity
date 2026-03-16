@@ -106,7 +106,14 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
           : (null as GetInspiredAnswers['intensity']),
     }
 
-    return getInspiredRecommendations(activities, payload)
+    const scored = getInspiredRecommendations(activities, payload)
+
+    // Fallback: if no strong matches, propose a generic selection
+    if (scored.length > 0) {
+      return scored
+    }
+
+    return activities.slice(0, Math.min(6, activities.length))
   }, [activities, answers, hasFinished])
 
   const handleSelect = (value: string) => {
