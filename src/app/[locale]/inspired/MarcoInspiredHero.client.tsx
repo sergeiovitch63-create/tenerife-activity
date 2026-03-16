@@ -168,26 +168,6 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
             }}
           />
         ))}
-
-        <div className="hero-content">
-          <p className="hero-label">✦ Votre aventure commence ici</p>
-          <h1 className="hero-title">
-            Voyagez selon
-            <br />
-            <em>vos envies</em>
-          </h1>
-          <p className="hero-sub">Des excursions uniques à Ténérife</p>
-
-          <div className="marco-wrap">
-            <div className="speech-bubble">👋 Bonjour, je suis Marco !</div>
-            <img
-              className="marco-img"
-              src="/marco.png"
-              alt="Marco"
-            />
-            <div className="status-dot" />
-          </div>
-        </div>
       </section>
 
       <section className="inline-chat">
@@ -579,8 +559,14 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          margin-top: -3rem;
+          margin-top: -6rem;
           padding-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+          .inline-chat {
+            margin-top: -4rem;
+          }
         }
 
         .close-btn {
