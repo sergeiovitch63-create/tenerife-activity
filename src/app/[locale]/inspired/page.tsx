@@ -29,27 +29,67 @@ export default async function InspiredPage({
 
   return (
     <main className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#0d2b35] via-[#1a6b7c] to-[#0f3d4a] text-white relative">
-      {/* Hero content */}
+      {/* Hero content with "bonhomme" asking questions */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 sm:px-8">
-        <div className="max-w-3xl text-center space-y-6">
-          <p className="text-sm tracking-[0.3em] uppercase text-white/70">
-            Tenerife Activity
-          </p>
-          <h1 className="font-['Playfair_Display'] text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-            {title || 'Laissez Tenerife vous inspirer'}
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-white/85 leading-relaxed font-light max-w-2xl mx-auto">
-            {subtitle ||
-              "Fermez les yeux, imaginez l'océan, le Teide et une journée parfaite. Nous nous occupons du reste."}
-          </p>
-        </div>
+        <div className="max-w-5xl w-full flex flex-col gap-10 md:flex-row md:items-center">
+          {/* Left: main title/subtitle */}
+          <div className="flex-1 space-y-6 text-center md:text-left">
+            <p className="text-sm tracking-[0.3em] uppercase text-white/70">
+              Tenerife Activity
+            </p>
+            <h1 className="font-['Playfair_Display'] text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              {title || 'Laissez Tenerife vous inspirer'}
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-white/85 leading-relaxed font-light max-w-2xl md:max-w-none mx-auto md:mx-0">
+              {subtitle ||
+                "Fermez les yeux, imaginez l'océan, le Teide et une journée parfaite. Nous nous occupons du reste."}
+            </p>
 
-        {/* Small pill / tag line */}
-        <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 backdrop-blur-sm border border-white/15">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#e8694a]" />
-          <span className="text-xs sm:text-sm font-medium tracking-wide">
-            Créé sur-mesure pour vous
-          </span>
+            {/* Small pill / tag line */}
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2 backdrop-blur-sm border border-white/15">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#e8694a]" />
+              <span className="text-xs sm:text-sm font-medium tracking-wide">
+                Créé sur-mesure pour vous
+              </span>
+            </div>
+          </div>
+
+          {/* Right: little character asking questions */}
+          <div className="flex-1 flex justify-center md:justify-end">
+            <div className="relative max-w-sm w-full bg-white/5 border border-white/15 rounded-3xl p-5 sm:p-6 backdrop-blur-lg shadow-[0_18px_45px_rgba(0,0,0,0.45)]">
+              {/* Avatar circle */}
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#f5efe6] via-[#d4a843] to-[#e8694a] flex items-center justify-center text-[#0d2b35] font-bold text-xl shadow-md">
+                  M
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold">Marco, ton guide local</p>
+                  <p className="text-xs text-white/75">Dis‑moi ce que tu aimes, je m’occupe du reste.</p>
+                </div>
+              </div>
+
+              {/* Questions bubbles */}
+              <div className="mt-5 space-y-3 text-sm">
+                <div className="rounded-2xl bg-white/10 px-4 py-3 border border-white/10">
+                  <p>Tu voyages en couple, en famille ou entre amis&nbsp;?</p>
+                </div>
+                <div className="rounded-2xl bg-white/5 px-4 py-3 border border-white/5">
+                  <p>Plutôt aventure, détente ou coucher de soleil romantique&nbsp;?</p>
+                </div>
+                <div className="rounded-2xl bg-white/5 px-4 py-3 border border-white/5">
+                  <p>Tu préfères la mer, la montagne, ou un mix des deux&nbsp;?</p>
+                </div>
+              </div>
+
+              {/* Hint text */}
+              <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/55">
+                Une sélection d’expériences rien que pour toi
+              </p>
+
+              {/* Decorative accent */}
+              <div className="pointer-events-none absolute -right-5 -bottom-5 h-20 w-20 rounded-full bg-gradient-to-tr from-[#e8694a] via-[#d4a843] to-transparent opacity-40 blur-xl" />
+            </div>
+          </div>
         </div>
       </div>
 
