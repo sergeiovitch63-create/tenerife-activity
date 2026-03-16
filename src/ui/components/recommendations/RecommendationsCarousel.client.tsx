@@ -11,6 +11,8 @@ interface MustSeeItem {
   title: string
   subtitleKey: string
   image: string
+  /** Optional Atlantico group code (present when enriched server-side) */
+  code?: string
 }
 
 // Helper function to map subtitle strings to translation keys
@@ -71,6 +73,7 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
+  const [priceByCode, setPriceByCode] = useState<Record<string, number | undefined>>({})
 
   // Use server-enriched data when provided, else fallback to static
   const row1 = row1Prop ?? mustSeeRow1
@@ -108,6 +111,32 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
   // Memoize translation functions
   const tCommon = useTranslations('common')
   const tMustSee = useTranslations('mustSee')
+  const tBooking = useTranslations('booking')
+
+  // Fetch prices for must-see activities (best-effort, non-blocking)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/atlantico/must-see?lang=ENG')
+      .then((res) => (res.ok ? res.json() : { ok: false, tours: [] }))
+      .then((data: { ok?: boolean; tours?: Array<{ code: string; price?: number }> }) => {
+        if (!data.ok || !Array.isArray(data.tours) || cancelled) return
+        const map: Record<string, number | undefined> = {}
+        for (const tour of data.tours) {
+          if (tour.code) {
+            map[tour.code] = typeof tour.price === 'number' ? tour.price : undefined
+          }
+        }
+        if (!cancelled) {
+          setPriceByCode(map)
+        }
+      })
+      .catch(() => {
+        // Silent fail - carousel still works without prices
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   
   // Memoize hover handlers
   const handleMouseEnter = useCallback(() => setIsHovered(true), [])
@@ -132,6 +161,10 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
           {row1Duplicated.map((item, index) => {
             const href = getMustSeeHref(item.title)
             const linkKey = `row1-${item.title}-${index}`
+            const price =
+              item.code && Object.prototype.hasOwnProperty.call(priceByCode, item.code)
+                ? priceByCode[item.code]
+                : undefined
             return (
               <div key={linkKey} className="marquee-item">
                 <Link
@@ -172,6 +205,11 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                         {tMustSee(`itemCategories.${item.subtitleKey}`)}
                       </p>
                     )}
+                    {price != null && !Number.isNaN(price) && (
+                      <p className="text-xs font-semibold text-ocean-600">
+                        {tBooking('startingFrom')} {price.toFixed(2)} €
+                      </p>
+                    )}
                   </div>
                 </div>
                 </Link>
@@ -189,6 +227,10 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
           {row2Duplicated.map((item, index) => {
             const href = getMustSeeHref(item.title)
             const linkKey = `row2-${item.title}-${index}`
+            const price =
+              item.code && Object.prototype.hasOwnProperty.call(priceByCode, item.code)
+                ? priceByCode[item.code]
+                : undefined
             return (
               <div key={linkKey} className="marquee-item">
                 <Link
@@ -227,6 +269,11 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                     {item.subtitleKey && (
                       <p className="text-xs text-glass-600">
                         {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                      </p>
+                    )}
+                    {price != null && !Number.isNaN(price) && (
+                      <p className="text-xs font-semibold text-ocean-600">
+                        {tBooking('startingFrom')} {price.toFixed(2)} €
                       </p>
                     )}
                   </div>
