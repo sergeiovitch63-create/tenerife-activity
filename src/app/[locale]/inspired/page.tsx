@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { MarcoInspiredHero } from './MarcoInspiredHero.client'
+import { InspiredMarcoPage } from './InspiredMarcoPage.client'
 
 export async function generateMetadata({
   params,
@@ -21,9 +21,7 @@ export default async function InspiredPage({
 }: {
   params: Promise<{ locale: string }>
 }) {
-  return (
-    <main className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#0d2b35] via-[#1a6b7c] to-[#0f3d4a] text-white relative">
-      <MarcoInspiredHero autoOpen />
-    </main>
-  )
+  await params
+
+  return <InspiredMarcoPage />
 }
