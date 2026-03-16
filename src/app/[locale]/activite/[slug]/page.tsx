@@ -142,7 +142,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
       </Section>
 
       <Section variant="default" background="default">
-        <Container size="lg" className="py-8">
+        <Container size="lg" className="pt-4 pb-8">
           {error && (
             <div className="glass-panel p-6 mb-6 bg-red-50 border border-red-200 rounded-xl text-red-700">
               {error}

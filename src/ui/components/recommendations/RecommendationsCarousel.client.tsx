@@ -182,7 +182,7 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
                 {/* Card layout similar to "You might also like" */}
-                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer">
+                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer flex flex-col h-full">
                   <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
                     <Image
                       src={item.image}
@@ -196,20 +196,24 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                       quality={index < 4 ? 90 : 80}
                     />
                   </div>
-                  <div className="p-2.5 space-y-0.5">
-                    <p className="text-sm font-semibold text-glass-900 line-clamp-2">
-                      {item.title}
-                    </p>
-                    {item.subtitleKey && (
-                      <p className="text-xs text-glass-600">
-                        {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                  <div className="p-2.5 flex flex-col justify-between min-h-[72px]">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold text-glass-900 line-clamp-2">
+                        {item.title}
                       </p>
-                    )}
-                    {price != null && !Number.isNaN(price) && (
-                      <p className="text-xs font-semibold text-ocean-600">
-                        {tBooking('startingFrom')} {price.toFixed(2)} €
-                      </p>
-                    )}
+                      {item.subtitleKey && (
+                        <p className="text-xs text-glass-600">
+                          {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-1">
+                      {price != null && !Number.isNaN(price) && (
+                        <p className="text-xs font-semibold text-ocean-600">
+                          {tBooking('startingFrom')} {price.toFixed(2)} €
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 </Link>
@@ -248,7 +252,7 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
                 {/* Card layout similar to "You might also like" */}
-                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer">
+                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer flex flex-col h-full">
                   <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
                     <Image
                       src={item.image}
@@ -262,20 +266,24 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                       quality={index < 4 ? 90 : 80}
                     />
                   </div>
-                  <div className="p-2.5 space-y-0.5">
-                    <p className="text-sm font-semibold text-glass-900 line-clamp-2">
-                      {item.title}
-                    </p>
-                    {item.subtitleKey && (
-                      <p className="text-xs text-glass-600">
-                        {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                  <div className="p-2.5 flex flex-col justify-between min-h-[72px]">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-semibold text-glass-900 line-clamp-2">
+                        {item.title}
                       </p>
-                    )}
-                    {price != null && !Number.isNaN(price) && (
-                      <p className="text-xs font-semibold text-ocean-600">
-                        {tBooking('startingFrom')} {price.toFixed(2)} €
-                      </p>
-                    )}
+                      {item.subtitleKey && (
+                        <p className="text-xs text-glass-600">
+                          {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-1">
+                      {price != null && !Number.isNaN(price) && (
+                        <p className="text-xs font-semibold text-ocean-600">
+                          {tBooking('startingFrom')} {price.toFixed(2)} €
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 </Link>
