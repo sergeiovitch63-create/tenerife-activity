@@ -134,7 +134,8 @@ export function InspiredMarcoPage() {
     setHasFinished(false)
   }
 
-  const progressPercent = ((currentStepIndex + (hasFinished ? 1 : 0)) / STEPS.length) * 100
+  const progressPercent =
+    ((currentStepIndex + (hasFinished ? 1 : 0)) / STEPS.length) * 100
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-[#0d2b35] via-[#1a6b7c] to-[#0f3d4a] text-white">
@@ -151,7 +152,6 @@ export function InspiredMarcoPage() {
             />
           ))}
         </div>
-        <div className="absolute inset-x-[-10%] bottom-[-20%] h-[280px] bg-[radial-gradient(circle_at_20%_0,#f5efe6_0,transparent_55%),radial-gradient(circle_at_80%_10%,#d4a843_0,transparent_55%)] opacity-80 mix-blend-screen" />
       </div>
 
       <main className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-20 pt-24 md:flex-row md:items-center md:gap-12 md:pt-28 lg:pt-32">
@@ -183,13 +183,13 @@ export function InspiredMarcoPage() {
         </section>
 
         <section className="flex-1">
-          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/60 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
-            <div className="absolute -top-3 right-5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
+          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/80 px-6 pt-10 pb-6 shadow-[0_24px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
+            <div className="absolute top-4 right-4 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-300">
               En ligne
             </div>
 
             <div className="relative mb-4 flex flex-col items-center">
-              <div className="relative h-44 w-40 md:h-52 md:w-48">
+              <div className="relative h-56 w-48 md:h-64 md:w-56">
                 <Image
                   src="/marco.png"
                   alt="Marco"
@@ -198,7 +198,7 @@ export function InspiredMarcoPage() {
                   className="object-contain object-bottom"
                 />
               </div>
-              <div className="pointer-events-none absolute left-1/2 top-2 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
+              <div className="pointer-events-none absolute left-1/2 top-1 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
                 Marco, ton guide Tenerife
               </div>
             </div>
@@ -288,7 +288,7 @@ export function InspiredMarcoPage() {
       </main>
 
       {hasFinished && recommendedActivities.length > 0 && (
-        <section className="relative z-10 bg-slate-950/60 py-10 lg:py-14">
+        <section className="relative z-10 bg-transparent py-10 lg:py-14">
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
