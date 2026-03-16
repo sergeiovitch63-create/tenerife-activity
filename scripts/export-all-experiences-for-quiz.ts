@@ -10,7 +10,7 @@
 
 import { writeFile } from 'fs/promises'
 import { resolve } from 'path'
-import { experienceRepository } from '../src/config/repositories.ts'
+import { experienceRepository } from '../src/config/repositories'
 
 async function main() {
   console.log('[export-all-experiences-for-quiz] Fetching experiences...')
