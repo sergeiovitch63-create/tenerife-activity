@@ -11,8 +11,6 @@ interface MustSeeItem {
   title: string
   subtitleKey: string
   image: string
-  /** Optional Atlantico group code (present when enriched server-side) */
-  code?: string
 }
 
 // Helper function to map subtitle strings to translation keys
@@ -73,7 +71,6 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
-  const [priceByCode, setPriceByCode] = useState<Record<string, number | undefined>>({})
 
   // Use server-enriched data when provided, else fallback to static
   const row1 = row1Prop ?? mustSeeRow1
@@ -111,32 +108,6 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
   // Memoize translation functions
   const tCommon = useTranslations('common')
   const tMustSee = useTranslations('mustSee')
-  const tBooking = useTranslations('booking')
-
-  // Fetch prices for must-see activities (best-effort, non-blocking)
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/atlantico/must-see?lang=ENG')
-      .then((res) => (res.ok ? res.json() : { ok: false, tours: [] }))
-      .then((data: { ok?: boolean; tours?: Array<{ code: string; price?: number }> }) => {
-        if (!data.ok || !Array.isArray(data.tours) || cancelled) return
-        const map: Record<string, number | undefined> = {}
-        for (const tour of data.tours) {
-          if (tour.code) {
-            map[tour.code] = typeof tour.price === 'number' ? tour.price : undefined
-          }
-        }
-        if (!cancelled) {
-          setPriceByCode(map)
-        }
-      })
-      .catch(() => {
-        // Silent fail - carousel still works without prices
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
   
   // Memoize hover handlers
   const handleMouseEnter = useCallback(() => setIsHovered(true), [])
@@ -161,10 +132,6 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
           {row1Duplicated.map((item, index) => {
             const href = getMustSeeHref(item.title)
             const linkKey = `row1-${item.title}-${index}`
-            const price =
-              item.code && Object.prototype.hasOwnProperty.call(priceByCode, item.code)
-                ? priceByCode[item.code]
-                : undefined
             return (
               <div key={linkKey} className="marquee-item">
                 <Link
@@ -181,40 +148,30 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
-                {/* Card layout similar to "You might also like" */}
-                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer flex flex-col h-full">
-                  <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      width={224}
-                      height={168}
-                      className="w-full h-full object-cover"
-                      sizes="(max-width: 768px) 192px, 224px"
-                      loading={index < 4 ? 'eager' : 'lazy'}
-                      priority={index < 4}
-                      quality={index < 4 ? 90 : 80}
-                    />
-                  </div>
-                  <div className="p-2.5 flex flex-col justify-between min-h-[72px]">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-semibold text-glass-900 line-clamp-2">
-                        {item.title}
-                      </p>
-                      {item.subtitleKey && (
-                        <p className="text-xs text-glass-600">
-                          {tMustSee(`itemCategories.${item.subtitleKey}`)}
-                        </p>
-                      )}
-                    </div>
-                    <div className="mt-1">
-                      {price != null && !Number.isNaN(price) && (
-                        <p className="text-xs font-semibold text-ocean-600">
-                          {tBooking('startingFrom')} {price.toFixed(2)} €
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                {/* Square Image Card */}
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={160}
+                    height={160}
+                    className="w-full h-full object-cover"
+                    sizes="(max-width: 640px) 128px, 160px"
+                    loading={index < 4 ? 'eager' : 'lazy'}
+                    priority={index < 4}
+                    quality={index < 4 ? 90 : 80}
+                  />
+                </div>
+                {/* Title Below Card */}
+                <div className="text-center space-y-0.5">
+                  <p className="mt-3 text-sm md:text-base font-semibold text-white text-center whitespace-normal leading-snug line-clamp-2 max-w-[128px] md:max-w-[160px]">
+                    {item.title}
+                  </p>
+                  {item.subtitleKey && (
+                    <p className="text-xs md:text-sm text-white/70 truncate max-w-[128px] md:max-w-[160px]">
+                      {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                    </p>
+                  )}
                 </div>
                 </Link>
               </div>
@@ -231,10 +188,6 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
           {row2Duplicated.map((item, index) => {
             const href = getMustSeeHref(item.title)
             const linkKey = `row2-${item.title}-${index}`
-            const price =
-              item.code && Object.prototype.hasOwnProperty.call(priceByCode, item.code)
-                ? priceByCode[item.code]
-                : undefined
             return (
               <div key={linkKey} className="marquee-item">
                 <Link
@@ -251,40 +204,30 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
-                {/* Card layout similar to "You might also like" */}
-                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer flex flex-col h-full">
-                  <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      width={224}
-                      height={168}
-                      className="w-full h-full object-cover"
-                      sizes="(max-width: 768px) 192px, 224px"
-                      loading={index < 4 ? 'eager' : 'lazy'}
-                      priority={index < 4}
-                      quality={index < 4 ? 90 : 80}
-                    />
-                  </div>
-                  <div className="p-2.5 flex flex-col justify-between min-h-[72px]">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-semibold text-glass-900 line-clamp-2">
-                        {item.title}
-                      </p>
-                      {item.subtitleKey && (
-                        <p className="text-xs text-glass-600">
-                          {tMustSee(`itemCategories.${item.subtitleKey}`)}
-                        </p>
-                      )}
-                    </div>
-                    <div className="mt-1">
-                      {price != null && !Number.isNaN(price) && (
-                        <p className="text-xs font-semibold text-ocean-600">
-                          {tBooking('startingFrom')} {price.toFixed(2)} €
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                {/* Square Image Card */}
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={160}
+                    height={160}
+                    className="w-full h-full object-cover"
+                    sizes="(max-width: 640px) 128px, 160px"
+                    loading={index < 4 ? 'eager' : 'lazy'}
+                    priority={index < 4}
+                    quality={index < 4 ? 90 : 80}
+                  />
+                </div>
+                {/* Title Below Card */}
+                <div className="text-center space-y-0.5">
+                  <p className="mt-3 text-sm md:text-base font-semibold text-white text-center whitespace-normal leading-snug line-clamp-2 max-w-[128px] md:max-w-[160px]">
+                    {item.title}
+                  </p>
+                  {item.subtitleKey && (
+                    <p className="text-xs md:text-sm text-white/70 truncate max-w-[128px] md:max-w-[160px]">
+                      {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                    </p>
+                  )}
                 </div>
                 </Link>
               </div>
