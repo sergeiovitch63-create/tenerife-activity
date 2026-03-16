@@ -50,7 +50,6 @@ type MarcoInspiredHeroProps = {
 }
 
 export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) {
-  const [isOpen, setIsOpen] = useState(false)
   const [step, setStep] = useState(0)
   const [isTyping, setIsTyping] = useState(false)
   const [choicesVisible, setChoicesVisible] = useState(false)
@@ -102,25 +101,12 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
     []
   )
 
-  // Auto-open chat when requested (e.g. arriving from "Inspire-moi" CTA)
+  // Start questions automatically when page is shown (no overlay)
   useEffect(() => {
-    if (autoOpen && !isOpen && step === 0) {
-      setIsOpen(true)
-      startQuestion(0)
-    }
-  }, [autoOpen, isOpen, step, startQuestion])
-
-  const handleOpen = () => {
-    if (isOpen) return
-    setIsOpen(true)
     if (step === 0) {
       startQuestion(0)
     }
-  }
-
-  const handleClose = () => {
-    setIsOpen(false)
-  }
+  }, [step, startQuestion])
 
   const handleChoice = (choice: string) => {
     if (isTyping) return
@@ -192,7 +178,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
           </h1>
           <p className="hero-sub">Des excursions uniques à Ténérife</p>
 
-          <div className="marco-wrap" onClick={handleOpen}>
+          <div className="marco-wrap">
             <div className="speech-bubble">👋 Bonjour, je suis Marco !</div>
             <img
               className="marco-img"
@@ -201,18 +187,10 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
             />
             <div className="status-dot" />
           </div>
-
-          <button className="inspire-btn" onClick={handleOpen}>
-            <span className="btn-icon">✦</span> Inspire-moi
-          </button>
         </div>
       </section>
 
-      <div className={`chat-overlay ${isOpen ? 'open' : ''}`} id="chatOverlay">
-        <button className="close-btn" onClick={handleClose}>
-          ✕
-        </button>
-
+      <section className="inline-chat">
         <div className="progress-wrap">
           <div className="progress-label">Votre excursion idéale</div>
           <div className="progress-bar">
@@ -257,7 +235,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
             />
           </div>
         </div>
-      </div>
+      </section>
 
       {showRecommendations && recommendedActivities.length > 0 && (
         <section className="recommendations-section">
@@ -593,24 +571,16 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
           }
         }
 
-        .chat-overlay {
-          position: fixed;
-          inset: 0;
-          z-index: 200;
-          background: rgba(10, 32, 42, 0.9);
-          backdrop-filter: blur(18px);
+        .inline-chat {
+          position: relative;
+          z-index: 15;
+          width: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.45s ease;
-        }
-
-        .chat-overlay.open {
-          opacity: 1;
-          pointer-events: all;
+          margin-top: -3rem;
+          padding-bottom: 2rem;
         }
 
         .close-btn {
@@ -683,7 +653,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
             cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .chat-overlay.open .marco-stage {
+        .inline-chat .marco-stage {
           transform: translateY(0);
         }
 
