@@ -120,7 +120,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
     <>
       <Section variant="default" background="subtle">
         <Container size="lg">
-          <div className="glass-panel p-6 md:p-8">
+          <div className="glass-panel p-6 md:p-8 space-y-6">
             <div className="space-y-2">
               <Link href="/" className="text-xs text-ocean-700 hover:underline">
                 ← {tActivite('home')}
@@ -134,11 +134,10 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
                 </p>
               )}
             </div>
+
+            {/* Vibe video placed inside the same card as the title */}
+            <VibeVideo slug={vibe.slug} />
           </div>
-        </Container>
-        {/* Vibe video preview between title and activity cards */}
-        <Container size="lg" className="mt-6">
-          <VibeVideo slug={vibe.slug} />
         </Container>
       </Section>
 

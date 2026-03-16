@@ -148,30 +148,31 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
-                {/* Square Image Card */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    width={160}
-                    height={160}
-                    className="w-full h-full object-cover"
-                    sizes="(max-width: 640px) 128px, 160px"
-                    loading={index < 4 ? 'eager' : 'lazy'}
-                    priority={index < 4}
-                    quality={index < 4 ? 90 : 80}
-                  />
-                </div>
-                {/* Title Below Card */}
-                <div className="text-center space-y-0.5">
-                  <p className="mt-3 text-sm md:text-base font-semibold text-white text-center whitespace-normal leading-snug line-clamp-2 max-w-[128px] md:max-w-[160px]">
-                    {item.title}
-                  </p>
-                  {item.subtitleKey && (
-                    <p className="text-xs md:text-sm text-white/70 truncate max-w-[128px] md:max-w-[160px]">
-                      {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                {/* Card layout similar to "You might also like" */}
+                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer">
+                  <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      width={224}
+                      height={168}
+                      className="w-full h-full object-cover"
+                      sizes="(max-width: 768px) 192px, 224px"
+                      loading={index < 4 ? 'eager' : 'lazy'}
+                      priority={index < 4}
+                      quality={index < 4 ? 90 : 80}
+                    />
+                  </div>
+                  <div className="p-2.5 space-y-0.5">
+                    <p className="text-sm font-semibold text-glass-900 line-clamp-2">
+                      {item.title}
                     </p>
-                  )}
+                    {item.subtitleKey && (
+                      <p className="text-xs text-glass-600">
+                        {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 </Link>
               </div>
@@ -204,30 +205,31 @@ function RecommendationsCarouselComponent({ row1: row1Prop, row2: row2Prop }: Re
                 prefetch={true}
                 className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-xl"
               >
-                {/* Square Image Card */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden bg-white/10 shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-pointer">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    width={160}
-                    height={160}
-                    className="w-full h-full object-cover"
-                    sizes="(max-width: 640px) 128px, 160px"
-                    loading={index < 4 ? 'eager' : 'lazy'}
-                    priority={index < 4}
-                    quality={index < 4 ? 90 : 80}
-                  />
-                </div>
-                {/* Title Below Card */}
-                <div className="text-center space-y-0.5">
-                  <p className="mt-3 text-sm md:text-base font-semibold text-white text-center whitespace-normal leading-snug line-clamp-2 max-w-[128px] md:max-w-[160px]">
-                    {item.title}
-                  </p>
-                  {item.subtitleKey && (
-                    <p className="text-xs md:text-sm text-white/70 truncate max-w-[128px] md:max-w-[160px]">
-                      {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                {/* Card layout similar to "You might also like" */}
+                <div className="w-48 md:w-56 rounded-xl overflow-hidden bg-white/95 shadow-lg hover:shadow-xl border border-glass-200 transition-all cursor-pointer">
+                  <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      width={224}
+                      height={168}
+                      className="w-full h-full object-cover"
+                      sizes="(max-width: 768px) 192px, 224px"
+                      loading={index < 4 ? 'eager' : 'lazy'}
+                      priority={index < 4}
+                      quality={index < 4 ? 90 : 80}
+                    />
+                  </div>
+                  <div className="p-2.5 space-y-0.5">
+                    <p className="text-sm font-semibold text-glass-900 line-clamp-2">
+                      {item.title}
                     </p>
-                  )}
+                    {item.subtitleKey && (
+                      <p className="text-xs text-glass-600">
+                        {tMustSee(`itemCategories.${item.subtitleKey}`)}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 </Link>
               </div>
