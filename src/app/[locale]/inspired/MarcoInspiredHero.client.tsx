@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type Question = {
   text: string
@@ -66,15 +66,36 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
   const progressPercent = Math.round(
     (Math.min(step, TOTAL_QUESTIONS) / TOTAL_QUESTIONS) * 100
   )
+  const startQuestion = useCallback(
+    (index: number) => {
+      const question = QUESTIONS[index]
+      if (!question) return
+
+      setIsTyping(true)
+      setChoicesVisible(false)
+      setCurrentQuestion(null)
+
+      const delay = 700 + question.text.length * 11
+
+      window.setTimeout(() => {
+        setCurrentQuestion(question.text)
+        setIsTyping(false)
+
+        window.setTimeout(() => {
+          setChoicesVisible(true)
+        }, 180)
+      }, delay)
+    },
+    []
+  )
 
   // Auto-open chat when requested (e.g. arriving from "Inspire-moi" CTA)
-  useMemo(() => {
+  useEffect(() => {
     if (autoOpen && !isOpen && step === 0) {
-      // open immediately and start first question
       setIsOpen(true)
       startQuestion(0)
     }
-  }, [autoOpen, isOpen, step])
+  }, [autoOpen, isOpen, step, startQuestion])
 
   const handleOpen = () => {
     if (isOpen) return
@@ -86,26 +107,6 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
 
   const handleClose = () => {
     setIsOpen(false)
-  }
-
-  const startQuestion = (index: number) => {
-    const question = QUESTIONS[index]
-    if (!question) return
-
-    setIsTyping(true)
-    setChoicesVisible(false)
-    setCurrentQuestion(null)
-
-    const delay = 700 + question.text.length * 11
-
-    window.setTimeout(() => {
-      setCurrentQuestion(question.text)
-      setIsTyping(false)
-
-      window.setTimeout(() => {
-        setChoicesVisible(true)
-      }, 180)
-    }, delay)
   }
 
   const handleChoice = (choice: string) => {
