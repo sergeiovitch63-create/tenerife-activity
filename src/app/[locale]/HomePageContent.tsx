@@ -88,7 +88,7 @@ export function HomePageContent({
               </div>
               {/* CTA Button - Get Inspired */}
               <div className="flex justify-center px-4">
-                <Link href="/get-inspired">
+                <Link href="/inspired">
                   <Button variant="secondary" size="lg">
                     {t('nav.getInspired')}
                   </Button>
