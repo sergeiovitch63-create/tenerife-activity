@@ -5,7 +5,33 @@ import { experienceRepository } from '@/config/repositories'
 import type { Activity } from '@/core/entities/activity'
 import { MockExperienceRepository } from '@/data/mock/mock-experience.repository'
 
+const VIBE_TO_TAGS: Record<string, string[]> = {
+  'vip-tours':             ['luxury', 'chill', 'couple'],
+  'adventure-nature':      ['adventure', 'nature', 'high-intensity'],
+  'water-sports':          ['adventure', 'nature', 'medium-intensity'],
+  'diving-fishing':        ['adventure', 'nature', 'medium-intensity'],
+  'theme-parks':           ['entertainment', 'family', 'medium-intensity'],
+  'tickets-attractions':   ['culture', 'entertainment', 'low-intensity'],
+  'bus-excursions':        ['culture', 'low-intensity', 'time-halfday'],
+  'cable-car-observatory': ['nature', 'chill', 'low-intensity', 'time-1-2h'],
+  'boat-trips-cruises':    ['adventure', 'nature', 'chill', 'time-halfday'],
+  'shows-entertainment':   ['entertainment', 'chill', 'time-1-2h'],
+  'gastronomy-tastings':   ['culture', 'chill', 'time-1-2h'],
+  'car-rental':            ['adventure', 'time-fullday'],
+  'bike-rental':           ['adventure', 'medium-intensity'],
+}
+
+function priceToBudgetTag(price: number): string {
+  if (price <= 30) return 'budget-1'
+  if (price <= 100) return 'budget-2'
+  return 'budget-3'
+}
+
 function mapExperienceToActivity(experience: any): Activity {
+  const vibeTags = (experience.vibeId && VIBE_TO_TAGS[experience.vibeId]) ?? []
+  const budgetTag = typeof experience.price === 'number'
+    ? priceToBudgetTag(experience.price)
+    : 'budget-2'
   return {
     id: experience.id,
     slug: experience.slug,
@@ -20,7 +46,7 @@ function mapExperienceToActivity(experience: any): Activity {
         experience.imageUrl ||
         '/logo.png',
     },
-    tags: [],
+    tags: [...vibeTags, budgetTag],
   }
 }
 

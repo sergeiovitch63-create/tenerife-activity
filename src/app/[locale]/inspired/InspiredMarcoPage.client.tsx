@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
+import { Link } from '@/navigation'
 import type { Activity } from '@/core/entities/activity'
 import {
   getInspiredRecommendations,
@@ -311,33 +312,49 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
             </header>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {recommendedActivities.map((activity) => (
-                <a
+                <Link
                   key={activity.id}
-                  href={`/experience/${activity.slug}`}
-                  className="group flex flex-col rounded-2xl bg-slate-900/80 p-4 ring-1 ring-slate-700/60 transition hover:-translate-y-1 hover:bg-slate-900 hover:ring-sky-400/70"
+                  href={`/activity/${activity.slug}`}
+                  className="group flex flex-col rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border border-slate-200"
                 >
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-semibold text-white group-hover:text-sky-200">
+                  {/* Image */}
+                  <div className="relative h-44 w-full overflow-hidden bg-slate-100 flex-shrink-0">
+                    <Image
+                      src={activity.media.src}
+                      alt={activity.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex flex-col flex-1 p-4">
+                    <h3 className="text-sm font-semibold text-ocean-600 line-clamp-2 leading-tight mb-2 group-hover:text-ocean-700">
                       {activity.title}
                     </h3>
-                    <span className="whitespace-nowrap text-xs font-semibold text-amber-300">
-                      Dès {activity.priceFrom.toFixed(0)} €
-                    </span>
-                  </div>
-                  <p className="mb-2 text-xs text-slate-300">
-                    {activity.location} · {activity.duration}
-                  </p>
-                  <div className="mt-auto flex flex-wrap gap-1">
-                    {activity.tags.slice(0, 4).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-200"
-                      >
-                        {tag}
+
+                    {activity.location && (
+                      <p className="text-xs text-slate-500 mb-1">
+                        📍 {activity.location}
+                      </p>
+                    )}
+
+                    {activity.duration && (
+                      <p className="text-xs text-slate-500 mb-3">
+                        ⏱ {activity.duration}
+                      </p>
+                    )}
+
+                    {/* Price */}
+                    <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
+                      <span className="text-xs text-slate-400">from:</span>
+                      <span className="text-lg font-bold text-slate-900">
+                        {activity.priceFrom.toFixed(2)} €
                       </span>
-                    ))}
+                    </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
