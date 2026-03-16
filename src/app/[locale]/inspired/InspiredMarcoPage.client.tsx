@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import type { Activity } from '@/core/entities/activity'
-import { activitiesMock } from '@/data/mock/activities.mock'
 import {
   getInspiredRecommendations,
   type GetInspiredAnswers,
@@ -76,7 +75,11 @@ const STEPS: Step[] = [
   },
 ]
 
-export function InspiredMarcoPage() {
+type InspiredMarcoPageProps = {
+  activities: Activity[]
+}
+
+export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<StepId, string | null>>({
     group: null,
@@ -103,8 +106,8 @@ export function InspiredMarcoPage() {
           : (null as GetInspiredAnswers['intensity']),
     }
 
-    return getInspiredRecommendations(activitiesMock, payload)
-  }, [answers, hasFinished])
+    return getInspiredRecommendations(activities, payload)
+  }, [activities, answers, hasFinished])
 
   const handleSelect = (value: string) => {
     const stepId = currentStep.id
@@ -183,13 +186,13 @@ export function InspiredMarcoPage() {
         </section>
 
         <section className="flex-1">
-          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/80 px-6 pt-10 pb-6 shadow-[0_24px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
-            <div className="absolute top-4 right-4 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-300">
+          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/80 px-6 pt-14 pb-6 shadow-[0_24px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
+            <div className="absolute top-5 right-4 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-300">
               En ligne
             </div>
 
             <div className="relative mb-4 flex flex-col items-center">
-              <div className="relative h-56 w-48 md:h-64 md:w-56">
+              <div className="relative h-60 w-52 md:h-72 md:w-60">
                 <Image
                   src="/marco.png"
                   alt="Marco"
@@ -198,7 +201,7 @@ export function InspiredMarcoPage() {
                   className="object-contain object-bottom"
                 />
               </div>
-              <div className="pointer-events-none absolute left-1/2 top-1 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
+              <div className="pointer-events-none absolute left-1/2 -top-6 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
                 Marco, ton guide Tenerife
               </div>
             </div>
