@@ -1,41 +1,16 @@
 'use client'
 
-import { useRef, useMemo, useState, memo, useCallback } from 'react'
+import { useMemo, memo, useCallback, useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { cn } from '@/ui/lib/cn'
 import type { Vibe } from '@/core/entities/vibe'
 import { trackingProvider } from '@/config/tracking'
-import { useVibeVideoPlayback } from './useVibeVideoPlayback'
 import { vibeSlugToTranslationKey } from './vibe-translations'
 import { vibeThumbnails } from '@/data/vibeThumbnails'
 import Image from 'next/image'
-import { devWarn, devError } from '@/lib/dev'
+import { devWarn } from '@/lib/dev'
 import { setupPrefetchOnInteraction } from '@/lib/mobile/prefetch'
-import { useEffect } from 'react'
-
-// Mapping of vibe slugs to video files
-// MISSING VIDEOS NOW ADDED: vip-tours, car-rental, bike-rental, transfers-transport
-const VIBE_VIDEO_MAP: Record<string, string> = {
-  'vip-tours': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vip-Tours.mp4',
-  'theme-parks': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Vibe-Theme-Parks.mp4',
-  'tickets-attractions': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Tickets-Attractions.mp4',
-  'bus-excursions': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bus-Excursions.mp4',
-  'boat-trips-cruises': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Boat-Trips-Cruises.mp4',
-  'shows-entertainment': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Shows-Entertainment.mp4',
-  'water-sports': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Water-Sports.mp4',
-  'cable-car-observatory': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Cable-Car-Observatory.mp4',
-  'diving-fishing': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Diving-Fishing.mp4',
-  'adventure-nature': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Adventure-Nature.mp4',
-  'gastronomy-tastings': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Gastronomy-Tastings.mp4',
-  'car-rental': '/videos/car-rental.mp4',
-  'bike-rental': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Bike-Rental.mp4',
-  'transfers-transport': 'https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Transfers-Transport.mp4',
-}
-
-function getVibeVideoPath(slug: string): string | null {
-  return VIBE_VIDEO_MAP[slug] || null
-}
 
 interface VibeRowProps {
   vibe: Vibe
@@ -46,11 +21,8 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
   const t = useTranslations('vibes')
   const tCommon = useTranslations('common')
   const isMediaLeft = index % 2 === 0
-  const videoRef = useRef<HTMLVideoElement>(null)
-  // Use useMemo to ensure stable videoPath across renders
-  const videoPath = useMemo(() => getVibeVideoPath(vibe.slug), [vibe.slug])
-  const hasVideo = !!videoPath
-  
+  const linkRef = useRef<HTMLAnchorElement>(null)
+
   // Get translated vibe title
   const translationKey = vibeSlugToTranslationKey(vibe.slug)
   const translatedTitle = t(translationKey as any) || vibe.title
@@ -64,13 +36,6 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
     return thumb || null
   }, [vibe.slug])
   
-  const [isVideoReady, setIsVideoReady] = useState(false)
-  const [hasVideoError, setHasVideoError] = useState(false)
-  const linkRef = useRef<HTMLAnchorElement>(null)
-
-  // Register with video playback manager
-  const containerRef = useVibeVideoPlayback(vibe.id, videoRef)
-
   // Setup intelligent prefetching for mobile
   useEffect(() => {
     if (!linkRef.current) return
@@ -117,7 +82,6 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
           )}
         >
           <div
-            ref={hasVideo ? containerRef : undefined}
             className={cn(
               'relative w-full',
               'aspect-video',
@@ -129,94 +93,7 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
               'min-h-[180px]'
             )}
           >
-            {hasVideo ? (
-              <>
-                {/* Gradient background fallback (always present) */}
-                <div
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(to bottom, rgba(15, 23, 42, 0.3), rgba(30, 58, 138, 0.2))',
-                    zIndex: 0,
-                  }}
-                />
-
-                {/* Thumbnail poster layer - uses static thumbnail from /videos/thumbnails/ */}
-                {vibeThumbnail && (
-                  <div
-                    className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500"
-                    style={{
-                      zIndex: 1,
-                      opacity: isVideoReady ? 0 : 1,
-                    }}
-                  >
-                    <Image
-                      src={vibeThumbnail}
-                      alt={translatedTitle}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 41.666667vw"
-                      loading="lazy"
-                      decoding="async"
-                      priority={index < 3}
-                    />
-                  </div>
-                )}
-                
-                {/* Skeleton loader - shows while video is loading */}
-                {!isVideoReady && !hasVideoError && !vibeThumbnail && (
-                  <div
-                    className="absolute inset-0 w-full h-full pointer-events-none animate-pulse"
-                    style={{ zIndex: 1 }}
-                  >
-                    <div className="w-full h-full bg-gradient-to-br from-ocean-200 via-ocean-300 to-ocean-400" />
-                  </div>
-                )}
-
-                {/* Video element - ALWAYS rendered */}
-                <video
-                  ref={videoRef}
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                  controls={false}
-                  disablePictureInPicture
-                  poster={vibeThumbnail || undefined}
-                  className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-500 ease-out"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    opacity: hasVideoError ? 0 : isVideoReady ? 1 : 0,
-                    zIndex: 2,
-                  }}
-                  onLoadedData={() => {
-                    setIsVideoReady(true)
-                  }}
-                  onCanPlay={() => {
-                    setIsVideoReady(true)
-                  }}
-                  onPlaying={() => {
-                    setIsVideoReady(true)
-                  }}
-                  onError={() => {
-                    devError('[VIDEO_ERROR]', videoPath)
-                    setHasVideoError(true)
-                  }}
-                >
-                  <source src={videoPath} type="video/mp4" />
-                </video>
-
-                {/* Dark gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent pointer-events-none" style={{ zIndex: 3 }} />
-              </>
-            ) : (
-              vibeThumbnail ? (
+            {vibeThumbnail ? (
                 <>
                   <Image
                     src={vibeThumbnail}
@@ -237,8 +114,7 @@ function VibeRowComponent({ vibe, index }: VibeRowProps) {
                     {tCommon('videoPreview')}
                   </span>
                 </div>
-              )
-            )}
+              )}
           </div>
         </div>
 
