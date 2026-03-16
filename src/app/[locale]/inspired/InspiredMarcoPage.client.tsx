@@ -183,32 +183,28 @@ export function InspiredMarcoPage() {
         </section>
 
         <section className="flex-1">
-          <div className="relative mx-auto max-w-sm rounded-3xl bg-slate-950/40 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 backdrop-blur-xl">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="relative h-14 w-14 overflow-hidden rounded-full bg-sky-600/20 ring-2 ring-sky-300/80">
-                  <Image
-                    src="/marco.png"
-                    alt="Marco"
-                    fill
-                    sizes="56px"
-                    className="object-contain object-bottom"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Marco, ton guide Tenerife</p>
-                  <p className="text-xs text-sky-100/75">
-                    Toujours là pour t&apos;aider à choisir
-                  </p>
-                </div>
-              </div>
-              <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
-                En ligne
-              </span>
+          <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/40 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
+            <div className="absolute -top-3 right-5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300">
+              En ligne
             </div>
 
-            <div className="mb-4 space-y-2">
-              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/60">
+            <div className="relative mb-4 flex flex-col items-center">
+              <div className="relative h-44 w-40 md:h-52 md:w-48">
+                <Image
+                  src="/marco.png"
+                  alt="Marco"
+                  fill
+                  sizes="192px"
+                  className="object-contain object-bottom"
+                />
+              </div>
+              <div className="pointer-events-none absolute left-1/2 top-2 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
+                Marco, ton guide Tenerife
+              </div>
+            </div>
+
+            <div className="mb-4 w-full space-y-2">
+              <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/60 text-center">
                 Votre excursion idéale
               </p>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -217,19 +213,19 @@ export function InspiredMarcoPage() {
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <p className="text-xs text-white/60">
+              <p className="text-center text-xs text-white/60">
                 Étape {Math.min(currentStepIndex + 1, STEPS.length)} sur {STEPS.length}
               </p>
             </div>
 
             {!hasFinished ? (
-              <div className="space-y-4">
+              <div className="flex w-full flex-col gap-4">
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 shadow-md">
-                  <p className="font-semibold mb-1">{currentStep.title}</p>
+                  <p className="mb-1 font-semibold">{currentStep.title}</p>
                   <p className="text-xs text-slate-600">{currentStep.subtitle}</p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   {currentStep.options.map((option) => {
                     const isSelected = answers[currentStep.id] === option.value
                     return (
@@ -268,9 +264,9 @@ export function InspiredMarcoPage() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="flex w-full flex-col gap-4">
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 shadow-md">
-                  <p className="font-semibold mb-1">
+                  <p className="mb-1 font-semibold">
                     Merci ! Voici ce que je te recommande.
                   </p>
                   <p className="text-xs text-slate-600">
