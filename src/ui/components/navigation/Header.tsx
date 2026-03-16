@@ -167,9 +167,9 @@ export function Header() {
 
           {/* Right Group - Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <NavLink href="/must-see">{t('mustSee')}</NavLink>
-            <NavLink href="/get-inspired">{t('getInspired')}</NavLink>
-            <NavLink href="/contact">{t('contact')}</NavLink>
+          <NavLink href="/must-see">{t('mustSee')}</NavLink>
+          <NavLink href="/inspired">{t('getInspired')}</NavLink>
+          <NavLink href="/contact">{t('contact')}</NavLink>
             {/* Search Icon */}
             <button
               data-search-button

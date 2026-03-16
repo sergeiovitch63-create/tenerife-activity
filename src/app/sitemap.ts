@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const experiences = await experienceRepository.findAll()
 
   // Static routes for each locale
-  const staticRoutes = ['/', '/must-see', '/get-inspired', '/partners', '/search', '/contact']
+  const staticRoutes = ['/', '/must-see', '/inspired', '/partners', '/search', '/contact']
 
   // Build sitemap entries
   const entries: MetadataRoute.Sitemap = []

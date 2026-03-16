@@ -301,11 +301,9 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
         .marco-page {
           --sand: #f5efe6;
           --ocean: #1a6b7c;
-          --coral: #e8694a;
+          --accent: #0ea5e9;
           --deep: #0d2b35;
           --gold: #d4a843;
-          font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont,
-            'Segoe UI', sans-serif;
         }
 
         .hero {
@@ -350,7 +348,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
         }
 
         .wave:nth-child(2) {
-          background: var(--coral);
+          background: var(--accent);
           animation-delay: -3s;
           height: 120px;
           opacity: 0.06;
@@ -415,7 +413,6 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
         }
 
         .hero-title {
-          font-family: 'Playfair Display', serif;
           font-size: clamp(2rem, 6vw, 4rem);
           font-weight: 700;
           color: var(--sand);
@@ -427,7 +424,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
 
         .hero-title em {
           font-style: italic;
-          color: var(--coral);
+          color: var(--gold);
         }
 
         .hero-sub {
@@ -546,7 +543,7 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
           align-items: center;
           gap: 0.75rem;
           padding: 1rem 2.5rem;
-          background: var(--coral);
+          background: var(--accent);
           color: white;
           font-size: 1rem;
           font-weight: 500;
@@ -583,16 +580,16 @@ export function MarcoInspiredHero({ autoOpen = false }: MarcoInspiredHeroProps) 
 
         @keyframes pulseRing {
           0% {
-            box-shadow: 0 8px 40px rgba(232, 105, 74, 0.4),
-              0 0 0 0 rgba(232, 105, 74, 0.3);
+            box-shadow: 0 8px 40px rgba(14, 165, 233, 0.4),
+              0 0 0 0 rgba(14, 165, 233, 0.3);
           }
           70% {
-            box-shadow: 0 8px 40px rgba(232, 105, 74, 0.4),
-              0 0 0 20px rgba(232, 105, 74, 0);
+            box-shadow: 0 8px 40px rgba(14, 165, 233, 0.4),
+              0 0 0 20px rgba(14, 165, 233, 0);
           }
           100% {
-            box-shadow: 0 8px 40px rgba(232, 105, 74, 0.4),
-              0 0 0 0 rgba(232, 105, 74, 0);
+            box-shadow: 0 8px 40px rgba(14, 165, 233, 0.4),
+              0 0 0 0 rgba(14, 165, 233, 0);
           }
         }
 

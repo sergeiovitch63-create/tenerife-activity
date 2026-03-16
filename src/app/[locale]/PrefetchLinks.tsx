@@ -16,7 +16,7 @@ export function PrefetchLinks() {
     // All critical routes that users frequently visit
     const criticalRoutes = [
       '/',
-      '/get-inspired',
+      '/inspired',
       '/must-see',
       '/contact',
       '/activite/theme-parks',
@@ -32,12 +32,12 @@ export function PrefetchLinks() {
     // Routes that are likely to be visited next based on current page
     const contextualRoutes: Record<string, string[]> = {
       '/': [
-        '/get-inspired',
+        '/inspired',
         '/must-see',
         '/activite/theme-parks',
         '/activite/boat-trips-cruises',
       ],
-      '/get-inspired': [
+      '/inspired': [
         '/must-see',
         '/activite/theme-parks',
       ],
