@@ -152,7 +152,7 @@ export function MarcoInspiredHero() {
             <div className="speech-bubble">👋 Bonjour, je suis Marco !</div>
             <img
               className="marco-img"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2sAAAUhCAYAAAAVphygAAEAAElEQVR4nOz9d7wk13nfCX/PqdDh5skZg5xJgiTAJAaJikwSFaxoBad9vZI32NJ6/e5rWf4427uyV6+9smXJ8kryyrKoQFIMEqMYRFIkSJDIcQDMDCaHG7u7qs559o9zqrq6750BKInkEHi++Ny5HaqrTp2qwZxf/55gvPcoiqIoiqIoiqIoXwtM88vUL4kgQPo1GpGiKIqiKIqiKMrzGNN6LM++jYStTPO6qFhTFEVRFEVRFEX5i+dSAm16G3PJd+1f2FgURVEURVEURVGUPxcCjX5TsaYoiqIoiqIoinIFIQIGo2JNURRFURRFURTla8fmcMk6MFLFmqIoiqIoiqIoyhVELd9UrCmKoiiKoiiKonxN2eyuiVaDVBRFURRFURRFuRLYLNjUWVMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEURVGUKxAVa4qiKIqiKIqiKFcgKtYURVEURVEURVGuQFSsKYqiKIqiKIqiXIGoWFMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEURVGUKxAVa4qiKIqiKIqiKFcgKtYURVEURVEURVGuQFSsKYqiKIqiKIqiXIGoWFMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEURVGUKxAVa4qiKIqiKIqiKFcgKtYURVEURVEURVGuQFSsKYqiKIqiKIqiXIGoWFMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEU"
+              src="/marco.png"
               alt="Marco"
             />
             <div className="status-dot" />
@@ -208,7 +208,7 @@ export function MarcoInspiredHero() {
           <div className="marco-chat-figure">
             <img
               className="marco-chat-img"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2sAAAUhCAYAAAAVphygAAEAAElEQVR4nOz9d7wk13nfCX/PqdDh5skZg5xJgiTAJAaJikwSFaxoBad9vZI32NJ6/e5rWf4427uyV6+9smXJ8kryyrKoQFIMEqMYRFIkSJDIcQDMDCaHG7u7qs559o9zqrq6750BKInkEHi++Ny5HaqrTp2qwZxf/55gvPcoiqIoiqIoiqIoXwtM88vUL4kgQPo1GpGiKIqiKIqiKMrzGNN6LM++jYStTPO6qFhTFEVRFEVRFEX5i+dSAm16G3PJd+1f2FgURVEURVEURVGUPxcCjX5TsaYoiqIoiqIoinIFIQIGo2JNURRFURRFURTla8fmcMk6MFLFmqIoiqIoiqIoyhVELd9UrCmKoiiKoiiKonxN2eyuiVaDVBRFURRFURRFuRLYLNjUWVMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEURVGUKxAVa4qiKIqiKIqiKFcgKtYURVEURVEURVGuQFSsKYqiKIqiKIqiXIGoWFMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEURVGUKxAVa4qiKIqiKIqiKFcgKtYURVEURVEURVGuQFSsKYqiKIqiKIqiXIGoWFMURVEURVEURbkCUbGmKIqiKIqiKIpyBaJiTVEURVEURVEU5QpExZqiKIqiKIqiKMoViIo1RVEURVEU"
+              src="/marco.png"
               alt="Marco"
             />
           </div>
