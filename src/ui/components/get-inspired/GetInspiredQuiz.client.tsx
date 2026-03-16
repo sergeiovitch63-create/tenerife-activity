@@ -1,8 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Button } from '@/ui/components/shared/Button'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
+import { getInspiredRecommendations, type GetInspiredAnswers } from '@/lib/recommendations/get-inspired'
+import type { Activity } from '@/core/entities/activity'
+import type { GroupType, Mood, TimeAvailable } from '@/lib/recommendations/mapping'
 
 type QuizAnswers = {
   q1: string | null // Who are you travelling with?
@@ -13,17 +17,48 @@ type QuizAnswers = {
   q6: string | null // What matters most?
 }
 
-// Fixed mock results - always shown regardless of answers
-type MockResult = {
-  id: string
-  title: string
-  description: string
-  tags: string[]
+function mapAnswersToGetInspired(answers: QuizAnswers): GetInspiredAnswers {
+  const GROUP_MAP: Record<string, GroupType> = {
+    'Solo': 'solo',
+    'Couple': 'couple',
+    'Family': 'family',
+    'Friends': 'friends',
+    'Group (6+)': 'friends',
+  }
+  const MOOD_MAP: Record<string, Mood> = {
+    'Chill & Relax': 'relax',
+    'Adventure & Nature': 'adventure',
+    'Luxury & VIP': 'romantic',
+    'Culture & Shows': 'culture',
+    // 'Fun & Entertainment' has no direct Mood equivalent — omitted (scored via other answers)
+  }
+  const TIME_MAP: Record<string, TimeAvailable> = {
+    '1–2 hours': '2-3hours',
+    'Half day': 'halfday',
+    'Full day': 'fullday',
+    'Several days': 'multiday',
+  }
+
+  return {
+    group: (answers.q1 ? GROUP_MAP[answers.q1] ?? null : null),
+    mood:  (answers.q2 ? MOOD_MAP[answers.q2] ?? null : null),
+    intensity:
+      answers.q3 === 'Very relaxed' ? 'low-intensity'
+      : answers.q3 === 'Balanced'    ? 'medium-intensity'
+      : answers.q3 === 'Very active' ? 'high-intensity'
+      : null,
+    time:   (answers.q4 ? TIME_MAP[answers.q4] ?? null : null),
+    budget:
+      answers.q5 === '€ Budget'          ? 'budget-1'
+      : answers.q5 === '€€ Comfortable'  ? 'budget-2'
+      : answers.q5 === '€€€ Premium / VIP' ? 'budget-3'
+      : null,
+  }
 }
 
-export function GetInspiredQuiz() {
+export function GetInspiredQuiz({ activities }: { activities: Activity[] }) {
   const t = useTranslations('getInspired.quiz')
-  const tResults = useTranslations('getInspired.quiz.results.items')
+  const locale = useLocale()
   const [currentStep, setCurrentStep] = useState(1)
   const [answers, setAnswers] = useState<QuizAnswers>({
     q1: null,
@@ -33,66 +68,26 @@ export function GetInspiredQuiz() {
     q5: null,
     q6: null,
   })
-  const [hasError, setHasError] = useState(false)
-  
+
   const totalSteps = 6
   const isComplete = currentStep > totalSteps
 
-  // Get translated mock results
-  const getTranslatedMockResults = (): MockResult[] => {
-    const resultIds = ['1', '2', '3', '4']
-    return resultIds.map((id) => {
-      try {
-        const title = tResults(`${id}.title`)
-        const description = tResults(`${id}.description`)
-        // Get tags array from translation
-        const tagsRaw = tResults.raw(`${id}.tags`) as string[]
-        const tags = Array.isArray(tagsRaw) ? tagsRaw : []
-        
-        return {
-          id,
-          title,
-          description,
-          tags,
-        }
-      } catch (error) {
-        // Error loading translation - fallback will be used
-        return {
-          id,
-          title: t('results.experienceFallback'),
-          description: t('results.noDescription'),
-          tags: [],
-        }
-      }
-    })
-  }
-  
-  // Always get recommendations as an array with safe fallback
-  let recommendations: MockResult[] = []
+  // Compute recommendations from real data
+  let recommendations: Activity[] = []
   let useFallback = false
-  
+
   if (isComplete) {
-    try {
-      // Always return the translated mock results, ignoring answers
-      const result = getTranslatedMockResults()
-      if (Array.isArray(result) && result.length > 0) {
-        recommendations = result
-      } else {
-        recommendations = getTranslatedMockResults()
-        useFallback = true
-      }
-    } catch (error) {
-      // Error getting recommendations - fallback will be used
-      recommendations = getTranslatedMockResults()
+    const inspiredAnswers = mapAnswersToGetInspired(answers)
+    const result = getInspiredRecommendations(activities, inspiredAnswers)
+    if (result.length > 0) {
+      recommendations = result
+    } else if (activities.length > 0) {
+      // No tag matches — show top activities as fallback
+      recommendations = activities.slice(0, 4)
       useFallback = true
-      setHasError(true)
+    } else {
+      useFallback = true
     }
-  }
-  
-  // Safety: Always ensure we have recommendations
-  if (recommendations.length === 0) {
-    recommendations = getTranslatedMockResults()
-    useFallback = true
   }
 
   // Map question IDs to translation keys
@@ -146,20 +141,17 @@ export function GetInspiredQuiz() {
     },
   }
 
-  // Get translated question text
   const getQuestionText = (questionId: string): string => {
     const key = questionKeys[questionId]
     return key ? t(key) : t('questionFallback')
   }
 
-  // Get translated option text
   const getOptionText = (questionId: string, optionValue: string): string => {
     const keys = optionKeys[questionId]
     const key = keys?.[optionValue]
     return key ? t(key) : optionValue
   }
 
-  // Build questions array with translated text
   const questions = [
     {
       id: 'q1',
@@ -213,13 +205,11 @@ export function GetInspiredQuiz() {
 
   const handleAnswer = (questionId: keyof QuizAnswers, answer: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }))
-    
-    // Auto-advance to next question or show results
+
     setTimeout(() => {
       if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1)
       } else {
-        // Last question answered, show results
         setCurrentStep(totalSteps + 1)
       }
     }, 400)
@@ -239,21 +229,12 @@ export function GetInspiredQuiz() {
 
   const handleRestart = () => {
     setCurrentStep(1)
-    setAnswers({
-      q1: null,
-      q2: null,
-      q3: null,
-      q4: null,
-      q5: null,
-      q6: null,
-    })
+    setAnswers({ q1: null, q2: null, q3: null, q4: null, q5: null, q6: null })
   }
 
-  // Safety: Ensure currentQuestion exists
   const currentQuestion = questions[currentStep - 1] || questions[0] || null
   const currentAnswer = currentQuestion ? answers[currentQuestion.id as keyof QuizAnswers] : null
 
-  // Safety: If no current question and not complete, show first question
   if (!currentQuestion && !isComplete) {
     return (
       <div className="w-full max-w-3xl mx-auto px-4 py-8 md:py-12">
@@ -265,23 +246,22 @@ export function GetInspiredQuiz() {
   }
 
   if (isComplete) {
-    // Safe rendering function for recommendation cards
-    const renderRecommendationCard = (item: MockResult) => {
+    const renderRecommendationCard = (item: Activity) => {
       try {
-        if (!item || !item.id || !item.title) {
-          return null
-        }
-        
+        if (!item || !item.id || !item.title) return null
+
+        const description = [item.location, item.duration].filter(Boolean).join(' · ')
+
         return (
           <div
             key={item.id}
             className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20 transition-all duration-300 hover:bg-white/15 hover:shadow-xl hover:-translate-y-1"
           >
             <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
-              {item.title || t('results.experienceFallback')}
+              {item.title}
             </h3>
             <p className="text-white/85 mb-4 leading-relaxed">
-              {item.description || t('results.noDescription')}
+              {description || t('results.noDescription')}
             </p>
             {Array.isArray(item.tags) && item.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
@@ -298,35 +278,18 @@ export function GetInspiredQuiz() {
                 })}
               </div>
             )}
-            <Button variant="primary" size="md" fullWidth>
-              {t('buttons.viewExperience')}
-            </Button>
+            <Link href={`/${locale}/activity/${item.slug}`} className="block w-full">
+              <Button variant="primary" size="md" fullWidth>
+                {t('buttons.viewExperience')}
+              </Button>
+            </Link>
           </div>
         )
-      } catch (error) {
-        // Error rendering card - gracefully degrade
+      } catch {
         return null
       }
     }
-    
-    // Safe rendering of results
-    let safeRecommendations: MockResult[] = []
-    try {
-      safeRecommendations = Array.isArray(recommendations) 
-        ? recommendations.filter((item) => item && item.id && item.title)
-        : getTranslatedMockResults()
-      
-      // Final safety: ensure we always have recommendations
-      if (safeRecommendations.length === 0) {
-        safeRecommendations = getTranslatedMockResults()
-        useFallback = true
-      }
-    } catch (error) {
-      // Error processing recommendations - use fallback
-      safeRecommendations = getTranslatedMockResults()
-      useFallback = true
-    }
-    
+
     return (
       <div className="w-full max-w-7xl mx-auto px-4 py-8 md:py-12">
         <div className="space-y-8">
@@ -336,30 +299,23 @@ export function GetInspiredQuiz() {
               {useFallback ? t('results.titleFallback') : t('results.title')}
             </h2>
             <p className="text-lg text-white/85" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}>
-              {useFallback 
+              {useFallback
                 ? t('results.subtitleFallback')
                 : t('results.subtitle')}
             </p>
           </div>
 
-          {/* Results Grid - Always render with safe fallback */}
+          {/* Results Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {safeRecommendations.map((item, index) => {
-              try {
-                return (
-                  <div
-                    key={item.id}
-                    className="animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
-                  >
-                    {renderRecommendationCard(item)}
-                  </div>
-                )
-              } catch (error) {
-                // Error rendering recommendation - skip item
-                return null
-              }
-            }).filter(Boolean)}
+            {recommendations.map((item, index) => (
+              <div
+                key={item.id}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
+              >
+                {renderRecommendationCard(item)}
+              </div>
+            ))}
           </div>
 
           {/* Restart Button */}
@@ -453,4 +409,3 @@ export function GetInspiredQuiz() {
     </div>
   )
 }
-

@@ -4,6 +4,51 @@ import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { buildMetadata } from '@/lib/seo'
 import { type Locale } from '@/i18n/request'
+import { experienceRepository } from '@/config/repositories'
+import type { Activity } from '@/core/entities/activity'
+
+const VIBE_TO_TAGS: Record<string, string[]> = {
+  'vip-tours':             ['luxury', 'chill', 'couple'],
+  'adventure-nature':      ['adventure', 'nature', 'high-intensity'],
+  'water-sports':          ['adventure', 'nature', 'medium-intensity'],
+  'diving-fishing':        ['adventure', 'nature', 'medium-intensity'],
+  'theme-parks':           ['entertainment', 'family', 'medium-intensity'],
+  'tickets-attractions':   ['culture', 'entertainment', 'low-intensity'],
+  'bus-excursions':        ['culture', 'low-intensity', 'time-halfday'],
+  'cable-car-observatory': ['nature', 'chill', 'low-intensity', 'time-1-2h'],
+  'boat-trips-cruises':    ['adventure', 'nature', 'chill', 'time-halfday'],
+  'shows-entertainment':   ['entertainment', 'chill', 'time-1-2h'],
+  'gastronomy-tastings':   ['culture', 'chill', 'time-1-2h'],
+  'car-rental':            ['adventure', 'time-fullday'],
+  'bike-rental':           ['adventure', 'medium-intensity'],
+}
+
+function priceToBudgetTag(price: number): string {
+  if (price <= 30) return 'budget-1'
+  if (price <= 100) return 'budget-2'
+  return 'budget-3'
+}
+
+function mapExperienceToActivity(experience: any): Activity {
+  const vibeTags = (experience.vibeId && VIBE_TO_TAGS[experience.vibeId]) ?? []
+  const budgetTag = typeof experience.price === 'number'
+    ? priceToBudgetTag(experience.price)
+    : 'budget-2'
+  const firstImage =
+    (Array.isArray(experience.imageUrls) && experience.imageUrls[0]) ||
+    experience.imageUrl ||
+    '/logo.png'
+  return {
+    id: experience.id,
+    slug: experience.slug,
+    title: experience.title,
+    priceFrom: typeof experience.price === 'number' ? experience.price : 0,
+    duration: experience.duration ?? '',
+    location: experience.location ?? 'Tenerife',
+    media: { type: 'image', src: firstImage },
+    tags: [...vibeTags, budgetTag],
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -29,6 +74,14 @@ export default async function GetInspiredPage({
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'getInspired.hero' })
 
+  let activities: Activity[] = []
+  try {
+    const experiences = await experienceRepository.findAll()
+    activities = experiences.map(mapExperienceToActivity)
+  } catch {
+    // activities stays empty; quiz will show fallback
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -49,7 +102,7 @@ export default async function GetInspiredPage({
 
       {/* Quiz Section */}
       <Section variant="default" background="default" className="py-8 md:py-12">
-        <GetInspiredQuiz />
+        <GetInspiredQuiz activities={activities} />
       </Section>
     </>
   )
