@@ -313,7 +313,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
               {recommendedActivities.map((activity) => (
                 <a
                   key={activity.id}
-                  href={`/activities/${activity.slug}`}
+                  href={`/experience/${activity.slug}`}
                   className="group flex flex-col rounded-2xl bg-slate-900/80 p-4 ring-1 ring-slate-700/60 transition hover:-translate-y-1 hover:bg-slate-900 hover:ring-sky-400/70"
                 >
                   <div className="mb-3 flex items-start justify-between gap-2">
