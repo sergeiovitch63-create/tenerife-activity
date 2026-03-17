@@ -6,39 +6,19 @@
  */
 
 /**
- * Map Next.js locale to Atlántico language code (lowercase, 2 letters).
- *
- * Tenerife Activity uses locales like "fr", "es", "de", "en", "ru", "pl", "it".
- * Atlantico API accepte les mêmes codes en minuscules.
+ * Map Next.js locale to Atlántico language code.
+ * Always returns ENG: same data logic for all locales (translations later).
  */
-export function mapLocaleToAtlanticoLang(locale: string): 'en' | 'fr' | 'es' | 'de' | 'ru' | 'pl' | 'it' {
-  const normalized = (locale || '').toLowerCase()
-
-  switch (normalized) {
-    case 'fr':
-      return 'fr'
-    case 'es':
-      return 'es'
-    case 'de':
-      return 'de'
-    case 'ru':
-      return 'ru'
-    case 'pl':
-      return 'pl'
-    case 'it':
-      return 'it'
-    case 'en':
-    default:
-      return 'en'
-  }
+export function mapLocaleToAtlanticoLang(_locale: string): "CAS"|"ENG"|"FRA"|"RUS"|"ALE"|"ITA" {
+  return "ENG"
 }
 
 /**
- * Map Next.js locale to Atlántico language code (uppercase, 2 letters).
- * Kept for compatibility with any legacy callers expecting uppercase.
+ * Map Next.js locale to Atlántico language code (uppercase).
+ * Always returns ENG: same data logic for all locales (translations later).
  */
-export function mapLocaleToAtlanticoLangUpper(locale: string): string {
-  return mapLocaleToAtlanticoLang(locale).toUpperCase()
+export function mapLocaleToAtlanticoLangUpper(_locale: string): string {
+  return 'ENG'
 }
 
 
