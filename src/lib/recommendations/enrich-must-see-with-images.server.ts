@@ -93,40 +93,15 @@ async function fetchGroupImage(
   }
 }
 
-/**
- * Fetch Must See items with images from groupDetails.
- * Uses same concurrency pattern as enrich-groups-with-images.
- * Falls back to static local images when API has no image.
- */
 export async function fetchMustSeeItemsWithImages(
   atlLang: string,
   origin: string
 ): Promise<{ row1: MustSeeItem[]; row2: MustSeeItem[] }> {
   const row1Codes = MUST_SEE_ORDERED.slice(0, 7)   // first 7 = row1
   const row2Codes = MUST_SEE_ORDERED.slice(7, 16)  // next 8 = row2
-  const allItems = [...row1Codes, ...row2Codes]
-
-  const queue = [...allItems]
-  const results = new Map<string, string>()
-
-  const worker = async () => {
-    while (queue.length > 0) {
-      const item = queue.shift()
-      if (!item) break
-      const image = await fetchGroupImage(item.code, atlLang, origin)
-      if (image) {
-        results.set(item.code, image)
-      }
-    }
-  }
-
-  const workers = Array(Math.min(CONCURRENCY, allItems.length))
-    .fill(null)
-    .map(() => worker())
-  await Promise.all(workers)
 
   const toMustSeeItem = (item: { title: string; code: string }): MustSeeItem => {
-    const image = results.get(item.code) ?? STATIC_IMAGE_FALLBACK[item.title] ?? ''
+    const image = STATIC_IMAGE_FALLBACK[item.title] ?? ''
     return {
       title: item.title,
       subtitleKey: TITLE_TO_SUBTITLE[item.title] ?? item.title.toLowerCase().replace(/\s+/g, ''),
