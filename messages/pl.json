@@ -627,6 +627,85 @@
       }
     }
   },
+  "inspiredMarco": {
+    "hero": {
+      "kicker": "Twoja przygoda zaczyna się tutaj",
+      "titlePrefix": "Niech Marco",
+      "titleHighlight": "Cię zainspiruje",
+      "body": "W 4 szybkich pytaniach Marco filtruje dziesiątki doświadczeń na Teneryfie, aby zaproponować Ci wybór naprawdę dopasowany do Twojego pobytu.",
+      "chipCustom": "100% szyte na miarę",
+      "chipFast": "Mniej niż 60 sekund",
+      "badgeOnline": "Online",
+      "marcoBadge": "Marco, Twój przewodnik po Teneryfie",
+      "tripLabel": "Twoja idealna wycieczka",
+      "stepCounter": "Krok {current} z {total}"
+    },
+    "steps": {
+      "group": {
+        "title": "Z kim przyjeżdżasz?",
+        "subtitle": "Dopasowujemy doświadczenia do Waszego klimatu.",
+        "options": {
+          "family": "Z rodziną",
+          "couple": "W parze",
+          "friends": "Ze znajomymi",
+          "solo": "Solo"
+        }
+      },
+      "mood": {
+        "title": "Na jaki klimat masz ochotę?",
+        "subtitle": "Morze, góry, adrenalina czy totalny relaks.",
+        "options": {
+          "relax": "Chill & relaks",
+          "adventure": "Przygoda i natura",
+          "romantic": "Romantycznie",
+          "culture": "Chcę zobaczyć wszystko",
+          "ocean": "Najpierw ocean"
+        }
+      },
+      "time": {
+        "title": "Ile masz czasu?",
+        "subtitle": "Dopasujemy wyjście do Twojego planu dnia.",
+        "options": {
+          "2-3hours": "2–3 godziny",
+          "halfday": "Pół dnia",
+          "fullday": "Cały dzień",
+          "evening": "Wieczór",
+          "multiday": "Kilka dni"
+        }
+      },
+      "budget": {
+        "title": "A budżet?",
+        "subtitle": "Znajdziemy odpowiedni balans.",
+        "options": {
+          "budget1": "💚 Budżetowo",
+          "budget2": "💛 Wygodnie",
+          "budget3": "🧡 Premium / VIP"
+        }
+      },
+      "extras": {
+        "title": "Coś ważnego, o czym trzeba pamiętać?",
+        "subtitle": "Dbamy o wszystkich z życzliwością.",
+        "options": {
+          "none": "Nic szczególnego",
+          "kids": "Małe dzieci",
+          "lowIntensity": "Ograniczona mobilność"
+        }
+      }
+    },
+    "navigation": {
+      "back": "← Wstecz",
+      "restart": "Zacznij od nowa"
+    },
+    "finished": {
+      "title": "Dziękuję! Oto, co polecam.",
+      "subtitle": "Możesz wszystko zmienić, edytując swoje odpowiedzi w każdej chwili.",
+      "modifyAnswers": "Zmień moje odpowiedzi"
+    },
+    "results": {
+      "title": "Nasze pomysły dla Ciebie",
+      "subtitle": "Wybraliśmy {count} aktywności, które najlepiej pasują do Twoich odpowiedzi."
+    }
+  },
   "seo": {
     "siteName": "Tenerife Activity",
     "defaultDescription": "Premiumowe doświadczenia turystyczne na Teneryfie. Odkryj starannie wybrane aktywności, wycieczki i przygody na idealne wakacje na Wyspach Kanaryjskich.",

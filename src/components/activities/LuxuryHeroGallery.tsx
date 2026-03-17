@@ -146,8 +146,14 @@ export function LuxuryHeroGallery({
         </div>
       )}
 
-      {/* Gallery Section - Disney Style */}
-      <div className={`relative w-full ${fullScreenMobile ? 'h-screen md:h-[600px]' : 'h-[500px] md:h-[600px]'} ${fullScreenMobile ? 'grid grid-cols-1 md:grid-cols-3' : 'grid grid-cols-3'} gap-2 ${fullScreenMobile ? 'rounded-none md:rounded-lg' : 'rounded-lg'} overflow-hidden`}>
+      {/* Gallery Section - Disney / Atlantico style */}
+      <div
+        className={`relative w-full ${
+          fullScreenMobile ? 'h-screen md:h-[600px]' : 'h-[500px] md:h-[600px]'
+        } ${
+          fullScreenMobile ? 'grid grid-cols-1 md:grid-cols-3' : 'grid grid-cols-3'
+        } gap-2 ${fullScreenMobile ? 'rounded-none md:rounded-lg' : 'rounded-lg'} overflow-hidden`}
+      >
         {/* Main Large Image - Full screen on mobile for activity 508 */}
         <div 
           className={`${fullScreenMobile ? 'col-span-1 md:col-span-2' : 'col-span-2'} relative cursor-pointer group`}
@@ -165,12 +171,16 @@ export function LuxuryHeroGallery({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
 
-        {/* Thumbnails Stack (Right - 1 column) - Hidden on mobile for activity 508 */}
-        <div className={`${fullScreenMobile ? 'hidden md:flex' : 'flex'} col-span-1 flex-col gap-2`}>
+        {/* Thumbnails Grid (Right - 1 column = 4 small images) - Hidden on mobile for activity 508 */}
+        <div
+          className={`${
+            fullScreenMobile ? 'hidden md:grid' : 'grid'
+          } col-span-1 grid-rows-2 grid-cols-2 gap-2`}
+        >
           {thumbnails.map((img, idx) => (
             <div
               key={idx}
-              className="relative flex-1 cursor-pointer group overflow-hidden rounded"
+              className="relative cursor-pointer group overflow-hidden rounded"
               onClick={() => {
                 // Set clicked thumbnail as main image
                 const clickedIndex = images.findIndex(i => i === img)

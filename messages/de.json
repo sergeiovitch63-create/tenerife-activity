@@ -627,6 +627,85 @@
       }
     }
   },
+  "inspiredMarco": {
+    "hero": {
+      "kicker": "Dein Abenteuer beginnt hier",
+      "titlePrefix": "Lass Marco",
+      "titleHighlight": "dich inspirieren",
+      "body": "In 4 kurzen Fragen filtert Marco Dutzende von Teneriffa-Erlebnissen, um dir eine Auswahl vorzuschlagen, die wirklich zu deinem Aufenthalt passt.",
+      "chipCustom": "100% maßgeschneidert",
+      "chipFast": "Unter 60 Sekunden",
+      "badgeOnline": "Online",
+      "marcoBadge": "Marco, dein Teneriffa-Guide",
+      "tripLabel": "Dein ideales Erlebnis",
+      "stepCounter": "Schritt {current} von {total}"
+    },
+    "steps": {
+      "group": {
+        "title": "Mit wem kommst du?",
+        "subtitle": "Wir passen die Erlebnisse an eure Stimmung an.",
+        "options": {
+          "family": "Mit der Familie",
+          "couple": "Als Paar",
+          "friends": "Mit Freunden",
+          "solo": "Allein"
+        }
+      },
+      "mood": {
+        "title": "Auf welche Stimmung hast du Lust?",
+        "subtitle": "Meer, Berge, Adrenalin oder totale Entspannung.",
+        "options": {
+          "relax": "Chillen & Entspannen",
+          "adventure": "Abenteuer & Natur",
+          "romantic": "Romantisch",
+          "culture": "Alles entdecken",
+          "ocean": "Erstmal ans Meer"
+        }
+      },
+      "time": {
+        "title": "Wie viel Zeit hast du?",
+        "subtitle": "Wir richten das Erlebnis nach deinem Zeitplan.",
+        "options": {
+          "2-3hours": "2–3 Stunden",
+          "halfday": "Halber Tag",
+          "fullday": "Ganzer Tag",
+          "evening": "Abend",
+          "multiday": "Mehrere Tage"
+        }
+      },
+      "budget": {
+        "title": "Und wie hoch ist dein Budget?",
+        "subtitle": "Wir finden die richtige Balance.",
+        "options": {
+          "budget1": "💚 Smartes Budget",
+          "budget2": "💛 Komfort",
+          "budget3": "🧡 Premium / VIP"
+        }
+      },
+      "extras": {
+        "title": "Gibt es etwas Wichtiges zu beachten?",
+        "subtitle": "Wir bleiben aufmerksam und inklusiv für alle.",
+        "options": {
+          "none": "Nichts Besonderes",
+          "kids": "Kleine Kinder",
+          "lowIntensity": "Eingeschränkte Mobilität"
+        }
+      }
+    },
+    "navigation": {
+      "back": "← Zurück",
+      "restart": "Neu beginnen"
+    },
+    "finished": {
+      "title": "Danke! Hier ist, was ich dir empfehle.",
+      "subtitle": "Du kannst deine Antworten jederzeit anpassen.",
+      "modifyAnswers": "Antworten ändern"
+    },
+    "results": {
+      "title": "Unsere Ideen für dich",
+      "subtitle": "Eine Auswahl von {count} Aktivitäten, die am besten zu deinen Antworten passen."
+    }
+  },
   "seo": {
     "siteName": "Tenerife Activity",
     "defaultDescription": "Premium-Touristikerlebnisse in Teneriffa. Entdecke kuratierte Aktivitäten, Touren und Abenteuer für deinen perfekten Urlaub auf den Kanarischen Inseln.",
