@@ -27,16 +27,20 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
   const tCommon = await getTranslations('common')
   const lang = mapLocaleToAtlanticoLang(locale)
 
-  // Generic static fallback if Atlantico image is unavailable
-  const staticImageFallback = () => '/images/hero-poster.jpg'
+  // Primary image: local tours-list cover per code
+  const staticImageFallback = (code: string) => `/images/tours-list/${code}/cover.png`
+  // Secondary generic fallback if both local cover and Atlantico image fail
+  const genericFallbackImage = '/images/hero-poster.jpg'
 
   // Fetch group details for each code (including images)
   const activityPacks = await Promise.all(
     GROUP_CODES.map(async (code) => {
       let title = tCommon('activityFallback', { code })
       let description = ''
-      let image: string = staticImageFallback()
-      const fallbackImage = staticImageFallback()
+      // Always start with local tours-list cover for visual consistency
+      let image: string = staticImageFallback(code)
+      // Fallback used when the primary image fails to load
+      let fallbackImage: string | undefined = genericFallbackImage
 
       try {
         const details = await getGroupDetails(code, lang)
@@ -44,7 +48,7 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         const rawDesc = (details.desc ?? details.description ?? '') as string
         description = stripHtml(rawDesc)
 
-        // Extract image from groupDetails (image or images[0])
+        // Optionally use Atlantico image as secondary fallback
         let imageFilename: string | null = null
         if (details.image && typeof details.image === 'string' && details.image.trim()) {
           imageFilename = (details.image as string).trim()
@@ -56,7 +60,10 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         }
         if (imageFilename) {
           const url = buildAtlanticoImageUrl(imageFilename)
-          if (url) image = url
+          if (url) {
+            // Keep local cover as primary, use Atlantico as fallback
+            fallbackImage = url
+          }
         }
       } catch {
         // Fallback if API unavailable (e.g. during build) – keep static image
