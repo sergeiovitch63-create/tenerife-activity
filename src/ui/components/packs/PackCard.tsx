@@ -15,6 +15,7 @@ interface PackCardData {
   description: string
   badge?: string
   image: string
+  fallbackImage?: string
 }
 
 interface PackCardProps {
@@ -24,10 +25,15 @@ interface PackCardProps {
 
 export function PackCard({ pack, href }: PackCardProps) {
   const [imageError, setImageError] = useState(false)
+  const [currentSrc, setCurrentSrc] = useState(pack.image)
   const t = useTranslations('activityPacks')
 
   const handleImageError = () => {
-    setImageError(true)
+    if (pack.fallbackImage && currentSrc !== pack.fallbackImage) {
+      setCurrentSrc(pack.fallbackImage)
+    } else {
+      setImageError(true)
+    }
   }
 
   const baseClassName = cn(
@@ -46,9 +52,9 @@ export function PackCard({ pack, href }: PackCardProps) {
       >
       {/* Image Section */}
       <div className="relative w-full aspect-[16/10] bg-gradient-to-br from-ocean-100 to-ocean-300 overflow-hidden">
-        {!imageError ? (
+        {!imageError && currentSrc ? (
           <Image
-            src={pack.image}
+            src={currentSrc}
             alt={pack.title}
             fill
             loading="lazy"
@@ -112,9 +118,9 @@ export function PackCard({ pack, href }: PackCardProps) {
     <div className={baseClassName}>
       {/* Image Section */}
       <div className="relative w-full aspect-[16/10] bg-gradient-to-br from-ocean-100 to-ocean-300 overflow-hidden">
-        {!imageError ? (
+        {!imageError && currentSrc ? (
           <Image
-            src={pack.image}
+            src={currentSrc}
             alt={pack.title}
             fill
             loading="lazy"

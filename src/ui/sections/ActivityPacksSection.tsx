@@ -36,6 +36,7 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
       let title = tCommon('activityFallback', { code })
       let description = ''
       let image: string = staticImageFallback()
+      const fallbackImage = staticImageFallback()
 
       try {
         const details = await getGroupDetails(code, lang)
@@ -67,6 +68,7 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         title,
         description: description || t('subtitle'),
         image,
+        fallbackImage,
         href: `/activities/${code}`,
       }
     })
