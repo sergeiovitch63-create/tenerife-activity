@@ -109,10 +109,25 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
     }
 
     const scored = getInspiredRecommendations(activities, payload)
+    const scoredWithImages = scored.filter(
+      (activity) => activity.media && activity.media.src
+    )
 
     // Fallback: if no strong matches, propose a generic selection
+    if (scoredWithImages.length > 0) {
+      return scoredWithImages
+    }
+
     if (scored.length > 0) {
       return scored
+    }
+
+    const allWithImages = activities.filter(
+      (activity) => activity.media && activity.media.src
+    )
+
+    if (allWithImages.length > 0) {
+      return allWithImages.slice(0, Math.min(6, allWithImages.length))
     }
 
     return activities.slice(0, Math.min(6, activities.length))
