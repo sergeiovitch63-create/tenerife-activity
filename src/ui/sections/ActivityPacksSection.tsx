@@ -27,14 +27,15 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
   const tCommon = await getTranslations('common')
   const lang = mapLocaleToAtlanticoLang(locale)
 
-  const staticImageFallback = (code: string) => `/images/tours-list/${code}/cover.png`
+  // Generic static fallback if Atlantico image is unavailable
+  const staticImageFallback = () => '/images/hero-poster.jpg'
 
   // Fetch group details for each code (including images)
   const activityPacks = await Promise.all(
     GROUP_CODES.map(async (code) => {
       let title = tCommon('activityFallback', { code })
       let description = ''
-      let image: string = staticImageFallback(code)
+      let image: string = staticImageFallback()
 
       try {
         const details = await getGroupDetails(code, lang)
