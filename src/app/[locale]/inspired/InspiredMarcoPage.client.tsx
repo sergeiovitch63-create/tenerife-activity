@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Image from 'next/image'
 import { Link } from '@/navigation'
 import type { Activity } from '@/core/entities/activity'
 import {
   getInspiredRecommendations,
   type GetInspiredAnswers,
 } from '@/lib/recommendations/get-inspired'
+import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 
 type StepId = 'group' | 'mood' | 'time' | 'budget' | 'extras'
 
@@ -322,19 +322,11 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                   >
                     <article className="glass-panel rounded-2xl border border-glass-200 overflow-hidden flex flex-col bg-white/90 hover:shadow-lg hover:-translate-y-1 smooth-transition cursor-pointer h-full">
                       <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
-                        {activity.media?.src ? (
-                          <Image
-                            src={activity.media.src}
-                            alt={activity.title}
-                            fill
-                            className="w-full h-full object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
-                            Pas d&apos;image
-                          </div>
-                        )}
+                        <ToursListCardImage
+                          code={codeStr}
+                          alt={activity.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">
                         <h3 className="text-lg font-semibold text-glass-900 line-clamp-2">
@@ -346,7 +338,9 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                           </p>
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
-                          <span>{activity.duration ? `⏱ ${activity.duration}` : '\u00A0'}</span>
+                          <span>
+                            {activity.duration ? `⏱ ${activity.duration} h` : '\u00A0'}
+                          </span>
                           <span className="text-right">
                             {activity.priceFrom
                               ? `Starting from ${activity.priceFrom.toFixed(2)} €`

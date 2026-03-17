@@ -59,7 +59,7 @@ function mapTourToActivity(tour: any): Activity {
     priceFrom: price,
     duration:
       typeof tour.durationHours === 'number' && tour.durationHours > 0
-        ? `${tour.durationHours} h`
+        ? String(tour.durationHours)
         : '',
     location: 'Tenerife',
     media: {
