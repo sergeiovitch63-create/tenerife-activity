@@ -25,7 +25,8 @@
     "audit:limits": "tsx scripts/audit-atlantico-limits.ts",
     "audit2:dump": "tsx scripts/audit2-dump-raw.ts",
     "download:group-details-images": "node scripts/download-group-details-images.mjs",
-    "scan:group-images": "node scripts/scan-group-details-folders.mjs"
+    "scan:group-images": "node scripts/scan-group-details-folders.mjs",
+    "translate:atlantico": "node ./scripts/generate-atlantico-translations.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
@@ -45,6 +46,7 @@
     "autoprefixer": "^10.4.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.0",
+    "node-fetch": "^3.3.2",
     "playwright": "^1.57.0",
     "postcss": "^8.4.0",
     "prettier": "^3.3.0",
