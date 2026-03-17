@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import type { Activity } from '@/core/entities/activity'
 import {
@@ -19,69 +20,74 @@ type Step = {
   options: { label: string; value: string }[]
 }
 
-const STEPS: Step[] = [
-  {
-    id: 'group',
-    title: 'Tu viens avec qui ?',
-    subtitle: 'On adapte les expériences à votre vibe.',
-    options: [
-      { label: 'En famille', value: 'family' },
-      { label: 'En couple', value: 'couple' },
-      { label: 'Entre amis', value: 'friends' },
-      { label: 'Solo', value: 'solo' },
-    ],
-  },
-  {
-    id: 'mood',
-    title: 'Quelle ambiance te fait rêver ?',
-    subtitle: 'Mer, montagne, adrénaline ou détente totale.',
-    options: [
-      { label: 'Chill & détente', value: 'relax' },
-      { label: 'Aventure & nature', value: 'adventure' },
-      { label: 'Romantique', value: 'romantic' },
-      { label: 'Tout découvrir', value: 'culture' },
-      { label: "Océan d'abord", value: 'ocean' },
-    ],
-  },
-  {
-    id: 'time',
-    title: 'Tu as combien de temps ?',
-    subtitle: 'On cale la sortie sur ton planning.',
-    options: [
-      { label: '2–3 heures', value: '2-3hours' },
-      { label: 'Demi‑journée', value: 'halfday' },
-      { label: 'Journée complète', value: 'fullday' },
-      { label: 'Soirée', value: 'evening' },
-      { label: 'Plusieurs jours', value: 'multiday' },
-    ],
-  },
-  {
-    id: 'budget',
-    title: 'Et niveau budget ?',
-    subtitle: 'On trouve le bon équilibre.',
-    options: [
-      { label: '💚 Opti‑budget', value: 'budget-1' },
-      { label: '💛 Confort', value: 'budget-2' },
-      { label: '🧡 Premium / VIP', value: 'budget-3' },
-    ],
-  },
-  {
-    id: 'extras',
-    title: 'Un point important à respecter ?',
-    subtitle: 'On reste bienveillants avec tout le monde.',
-    options: [
-      { label: 'Rien de particulier', value: 'none' },
-      { label: 'Enfants en bas âge', value: 'kids' },
-      { label: 'Mobilité réduite', value: 'low-intensity' },
-    ],
-  },
-]
-
 type InspiredMarcoPageProps = {
   activities: Activity[]
 }
 
 export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
+  const t = useTranslations('inspiredMarco')
+
+  const steps: Step[] = useMemo(
+    () => [
+      {
+        id: 'group',
+        title: t('steps.group.title'),
+        subtitle: t('steps.group.subtitle'),
+        options: [
+          { label: t('steps.group.options.family'), value: 'family' },
+          { label: t('steps.group.options.couple'), value: 'couple' },
+          { label: t('steps.group.options.friends'), value: 'friends' },
+          { label: t('steps.group.options.solo'), value: 'solo' },
+        ],
+      },
+      {
+        id: 'mood',
+        title: t('steps.mood.title'),
+        subtitle: t('steps.mood.subtitle'),
+        options: [
+          { label: t('steps.mood.options.relax'), value: 'relax' },
+          { label: t('steps.mood.options.adventure'), value: 'adventure' },
+          { label: t('steps.mood.options.romantic'), value: 'romantic' },
+          { label: t('steps.mood.options.culture'), value: 'culture' },
+          { label: t('steps.mood.options.ocean'), value: 'ocean' },
+        ],
+      },
+      {
+        id: 'time',
+        title: t('steps.time.title'),
+        subtitle: t('steps.time.subtitle'),
+        options: [
+          { label: t('steps.time.options.2-3hours'), value: '2-3hours' },
+          { label: t('steps.time.options.halfday'), value: 'halfday' },
+          { label: t('steps.time.options.fullday'), value: 'fullday' },
+          { label: t('steps.time.options.evening'), value: 'evening' },
+          { label: t('steps.time.options.multiday'), value: 'multiday' },
+        ],
+      },
+      {
+        id: 'budget',
+        title: t('steps.budget.title'),
+        subtitle: t('steps.budget.subtitle'),
+        options: [
+          { label: t('steps.budget.options.budget1'), value: 'budget-1' },
+          { label: t('steps.budget.options.budget2'), value: 'budget-2' },
+          { label: t('steps.budget.options.budget3'), value: 'budget-3' },
+        ],
+      },
+      {
+        id: 'extras',
+        title: t('steps.extras.title'),
+        subtitle: t('steps.extras.subtitle'),
+        options: [
+          { label: t('steps.extras.options.none'), value: 'none' },
+          { label: t('steps.extras.options.kids'), value: 'kids' },
+          { label: t('steps.extras.options.lowIntensity'), value: 'low-intensity' },
+        ],
+      },
+    ],
+    [t]
+  )
+
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<StepId, string | null>>({
     group: null,
@@ -92,7 +98,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
   })
   const [hasFinished, setHasFinished] = useState(false)
 
-  const currentStep = STEPS[currentStepIndex]
+  const currentStep = steps[currentStepIndex]
 
   const recommendedActivities: Activity[] = useMemo(() => {
     if (!hasFinished) return []
@@ -162,7 +168,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
   }
 
   const progressPercent =
-    ((currentStepIndex + (hasFinished ? 1 : 0)) / STEPS.length) * 100
+    ((currentStepIndex + (hasFinished ? 1 : 0)) / steps.length) * 100
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-[#0d2b35] via-[#1a6b7c] to-[#0f3d4a] text-white">
@@ -184,27 +190,25 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
       <main className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 pb-20 pt-24 md:flex-row md:items-center md:gap-12 md:pt-28 lg:pt-32">
         <section className="mb-10 flex-1 space-y-6 md:mb-0">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300/80">
-            Votre aventure commence ici
+            {t('hero.kicker')}
           </p>
           <h1 className="text-balance text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
-            Laisse Marco{' '}
+            {t('hero.titlePrefix')}{' '}
             <span className="text-sky-300">
-              t&apos;inspirer
+              {t('hero.titleHighlight')}
             </span>
           </h1>
           <p className="max-w-xl text-base text-white/85 md:text-lg">
-            En 4 questions rapides, Marco filtre des dizaines d&apos;expériences
-            à Ténérife pour te proposer une sélection vraiment adaptée à ton
-            séjour.
+            {t('hero.body')}
           </p>
           <div className="flex flex-wrap gap-3 text-sm text-white/80">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              100% sur‑mesure
+              {t('hero.chipCustom')}
             </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-sky-300" />
-              Moins de 60 secondes
+              {t('hero.chipFast')}
             </span>
           </div>
         </section>
@@ -212,7 +216,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
         <section className="flex-1">
           <div className="relative mx-auto flex max-w-md flex-col items-center rounded-3xl bg-slate-950/80 px-6 pt-14 pb-6 shadow-[0_24px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/10 backdrop-blur-xl md:max-w-lg">
             <div className="absolute top-5 right-4 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-300">
-              En ligne
+              {t('hero.badgeOnline')}
             </div>
 
             <div className="relative mb-4 flex flex-col items-center">
@@ -226,13 +230,13 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                 />
               </div>
               <div className="pointer-events-none absolute left-1/2 -top-6 w-max -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-xs font-medium text-slate-900 shadow-lg">
-                Marco, ton guide Tenerife
+                {t('hero.marcoBadge')}
               </div>
             </div>
 
             <div className="mb-4 w-full space-y-2">
               <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/60 text-center">
-                Votre excursion idéale
+                {t('hero.tripLabel')}
               </p>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
@@ -241,7 +245,11 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                 />
               </div>
               <p className="text-center text-xs text-white/60">
-                Étape {Math.min(currentStepIndex + 1, STEPS.length)} sur {STEPS.length}
+                {t.rich('hero.stepCounter', {
+                  current: Math.min(currentStepIndex + 1, steps.length),
+                  total: steps.length,
+                  strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+                })}
               </p>
             </div>
 
@@ -279,14 +287,14 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                     className="rounded-full px-2 py-1 text-xs text-white/70 hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"
                     disabled={currentStepIndex === 0}
                   >
-                    ← Retour
+                    {t('navigation.back')}
                   </button>
                   <button
                     type="button"
                     onClick={handleRestart}
                     className="rounded-full px-2 py-1 text-xs text-white/70 hover:bg-white/10"
                   >
-                    Tout recommencer
+                    {t('navigation.restart')}
                   </button>
                 </div>
               </div>
@@ -294,10 +302,10 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
               <div className="flex w-full flex-col gap-4">
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-900 shadow-md">
                   <p className="mb-1 font-semibold">
-                    Merci ! Voici ce que je te recommande.
+                    {t('finished.title')}
                   </p>
                   <p className="text-xs text-slate-600">
-                    Tu peux ajuster en changeant tes réponses à tout moment.
+                    {t('finished.subtitle')}
                   </p>
                 </div>
 
@@ -306,7 +314,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                   onClick={handleRestart}
                   className="w-full rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white hover:bg-white/15"
                 >
-                  Modifier mes réponses
+                  {t('finished.modifyAnswers')}
                 </button>
               </div>
             )}
@@ -321,8 +329,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
               <div>
                 <h2 className="text-2xl font-semibold">Nos idées pour toi</h2>
                 <p className="text-sm text-white/70">
-                  Une sélection de {recommendedActivities.length} activités qui
-                  matchent le mieux avec tes réponses.
+                  {t('results.subtitle', { count: recommendedActivities.length })}
                 </p>
               </div>
             </header>

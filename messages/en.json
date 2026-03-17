@@ -607,6 +607,85 @@
       }
     }
   },
+  "inspiredMarco": {
+    "hero": {
+      "kicker": "Your adventure starts here",
+      "titlePrefix": "Let Marco",
+      "titleHighlight": "inspire you",
+      "body": "In 4 quick questions, Marco filters dozens of Tenerife experiences to propose a selection truly adapted to your stay.",
+      "chipCustom": "100% tailor‑made",
+      "chipFast": "Under 60 seconds",
+      "badgeOnline": "Online",
+      "marcoBadge": "Marco, your Tenerife guide",
+      "tripLabel": "Your ideal excursion",
+      "stepCounter": "Step {current} of {total}"
+    },
+    "steps": {
+      "group": {
+        "title": "Who are you coming with?",
+        "subtitle": "We adapt experiences to your vibe.",
+        "options": {
+          "family": "With family",
+          "couple": "As a couple",
+          "friends": "With friends",
+          "solo": "Solo"
+        }
+      },
+      "mood": {
+        "title": "What kind of vibe are you dreaming of?",
+        "subtitle": "Sea, mountains, adrenaline or total relaxation.",
+        "options": {
+          "relax": "Chill & relax",
+          "adventure": "Adventure & nature",
+          "romantic": "Romantic",
+          "culture": "See it all",
+          "ocean": "Ocean first"
+        }
+      },
+      "time": {
+        "title": "How much time do you have?",
+        "subtitle": "We fit the experience to your schedule.",
+        "options": {
+          "2-3hours": "2–3 hours",
+          "halfday": "Half‑day",
+          "fullday": "Full day",
+          "evening": "Evening",
+          "multiday": "Several days"
+        }
+      },
+      "budget": {
+        "title": "And your budget?",
+        "subtitle": "We’ll find the right balance.",
+        "options": {
+          "budget1": "💚 Smart budget",
+          "budget2": "💛 Comfortable",
+          "budget3": "🧡 Premium / VIP"
+        }
+      },
+      "extras": {
+        "title": "Anything important to keep in mind?",
+        "subtitle": "We stay kind and inclusive with everyone.",
+        "options": {
+          "none": "Nothing special",
+          "kids": "Young children",
+          "lowIntensity": "Reduced mobility"
+        }
+      }
+    },
+    "navigation": {
+      "back": "← Back",
+      "restart": "Start over"
+    },
+    "finished": {
+      "title": "Thank you! Here’s what I recommend.",
+      "subtitle": "You can tweak things any time by changing your answers.",
+      "modifyAnswers": "Modify my answers"
+    },
+    "results": {
+      "title": "Our ideas for you",
+      "subtitle": "A selection of {count} activities that best match your answers."
+    }
+  },
   "seo": {
     "siteName": "Tenerife Activity",
     "defaultDescription": "Premium tourism experiences in Tenerife. Discover curated activities, tours, and adventures for your perfect Canary Islands getaway.",
