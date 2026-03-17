@@ -310,52 +310,56 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                 </p>
               </div>
             </header>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {recommendedActivities.map((activity) => (
-                <Link
-                  key={activity.id}
-                  href={`/activity/${activity.slug}`}
-                  className="group flex flex-col rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border border-slate-200"
-                >
-                  {/* Image */}
-                  <div className="relative h-44 w-full overflow-hidden bg-slate-100 flex-shrink-0">
-                    <Image
-                      src={activity.media.src}
-                      alt={activity.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendedActivities.map((activity) => {
+                const codeStr = String(activity.slug || activity.id || '').trim()
 
-                  {/* Content */}
-                  <div className="flex flex-col flex-1 p-4">
-                    <h3 className="text-sm font-semibold text-ocean-600 line-clamp-2 leading-tight mb-2 group-hover:text-ocean-700">
-                      {activity.title}
-                    </h3>
-
-                    {activity.location && (
-                      <p className="text-xs text-slate-500 mb-1">
-                        📍 {activity.location}
-                      </p>
-                    )}
-
-                    {activity.duration && (
-                      <p className="text-xs text-slate-500 mb-3">
-                        ⏱ {activity.duration}
-                      </p>
-                    )}
-
-                    {/* Price */}
-                    <div className="mt-auto flex items-center justify-between pt-3 border-t border-slate-100">
-                      <span className="text-xs text-slate-400">from:</span>
-                      <span className="text-lg font-bold text-slate-900">
-                        {activity.priceFrom.toFixed(2)} €
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                return (
+                  <Link
+                    key={activity.id}
+                    href={`/activite/group-details?code=${encodeURIComponent(codeStr)}`}
+                    className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-2xl"
+                  >
+                    <article className="glass-panel rounded-2xl border border-glass-200 overflow-hidden flex flex-col bg-white/90 hover:shadow-lg hover:-translate-y-1 smooth-transition cursor-pointer h-full">
+                      <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
+                        {activity.media?.src ? (
+                          <Image
+                            src={activity.media.src}
+                            alt={activity.title}
+                            fill
+                            className="w-full h-full object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">
+                            Pas d&apos;image
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">
+                        <h3 className="text-lg font-semibold text-glass-900 line-clamp-2">
+                          {activity.title}
+                        </h3>
+                        {activity.duration && (
+                          <p className="text-sm text-glass-700 leading-relaxed">
+                            ⏱ {activity.duration}
+                          </p>
+                        )}
+                        <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
+                          <span>
+                            {activity.duration ? activity.duration : '\u00A0'}
+                          </span>
+                          <span className="text-right">
+                            {activity.priceFrom
+                              ? `Starting from ${activity.priceFrom.toFixed(2)} €`
+                              : ''}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </section>
