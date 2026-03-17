@@ -36,7 +36,7 @@ const STATIC_IMAGE_FALLBACK: Record<string, string> = {
   'Club Termal': '/images/home/must-see/club-termal.jpg',
   'Loro Parque': '/images/home/must-see/Loro-Parque.png',
   'Flamenco': '/images/home/must-see/flamenco.png',
-  'Siam Park': '/images/home/must-see/Siam-Park.png',
+  'Siam Park': '/images/home/must-see/Siam park .png',
   'Jungle Park': '/images/home/must-see/Jungle-Park.png',
   'Shogun Boat': '/images/home/must-see/Shogun-Boat.jpg',
   'Aqualand': '/images/home/must-see/Aqualand.png',

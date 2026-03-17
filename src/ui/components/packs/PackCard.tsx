@@ -16,6 +16,7 @@ interface PackCardData {
   badge?: string
   image: string
   fallbackImage?: string
+  fromPrice?: number | null
 }
 
 interface PackCardProps {
@@ -27,6 +28,7 @@ export function PackCard({ pack, href }: PackCardProps) {
   const [imageError, setImageError] = useState(false)
   const [currentSrc, setCurrentSrc] = useState(pack.image)
   const t = useTranslations('activityPacks')
+  const tActivite = useTranslations('activite')
 
   const handleImageError = () => {
     if (pack.fallbackImage && currentSrc !== pack.fallbackImage) {
@@ -97,6 +99,13 @@ export function PackCard({ pack, href }: PackCardProps) {
           </p>
         )}
 
+        {/* Starting from price */}
+        {typeof pack.fromPrice === 'number' && pack.fromPrice > 0 && (
+          <p className="text-sm font-semibold text-ocean-700">
+            {tActivite('startingFrom')} {pack.fromPrice.toFixed(2)} €
+          </p>
+        )}
+
         {/* CTA */}
         <div className="pt-2 mt-auto">
           {href ? (
@@ -160,6 +169,13 @@ export function PackCard({ pack, href }: PackCardProps) {
         {pack.description && (
           <p className="text-base text-glass-600 leading-relaxed line-clamp-3 flex-1 min-h-[4.5rem]">
             {pack.description}
+          </p>
+        )}
+
+        {/* Starting from price */}
+        {typeof pack.fromPrice === 'number' && pack.fromPrice > 0 && (
+          <p className="text-sm font-semibold text-ocean-700">
+            {tActivite('startingFrom')} {pack.fromPrice.toFixed(2)} €
           </p>
         )}
 

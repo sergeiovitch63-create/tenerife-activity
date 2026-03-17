@@ -6,21 +6,15 @@ import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 
-/**
- * Activity Packs Section - 4 featured group details (168, 169, 102, 41)
- *
- * Fetches group details from Atlantico API and displays cards linking to activity pages.
- * Images: primary from /images/home/must-see/* (static), with Atlantico as secondary fallback.
- */
 const GROUP_CODES = ['168', '169', '102', '41'] as const
 
-// Static images stored in public/images/home/must-see/*
+// Static cover images stored in public/images/home/must-see/*
 // Order must match GROUP_CODES.
 const MUST_SEE_STATIC_IMAGES: string[] = [
-  '/images/home/must-see/Shogun-Boat.jpg',
-  '/images/home/must-see/Jungle-Park.png',
-  '/images/home/must-see/Loro-Parque.png',
-  '/images/home/must-see/Aqualand.jpg',
+  '/images/home/must-see/Loro-Parque.png', // Twin Ticket (Loro + Siam)
+  '/images/home/must-see/Aqualand.png',    // Two Parks Ticket (Aqualand + Jungle)
+  '/images/home/must-see/buggy.jpg',       // Booster Packs (adrenaline / ocean)
+  '/images/home/must-see/scandal-dinner-show.jpg', // Special Packs (evening shows / water)
 ]
 
 function stripHtml(html: string): string {
@@ -36,10 +30,10 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
   const tCommon = await getTranslations('common')
   const lang = mapLocaleToAtlanticoLang(locale)
 
-  // Primary image: local must-see static asset (public/images/home/must-see/*)
+  // Static covers for when Atlantico images are missing
   const staticImageFallback = (index: number) =>
     MUST_SEE_STATIC_IMAGES[index] || '/images/hero-poster.jpg'
-  // Secondary generic fallback if both static and Atlantico image fail
+  // Generic fallback of last resort
   const genericFallbackImage = '/images/hero-poster.jpg'
 
   // Fetch group details for each code (including images)
@@ -47,10 +41,10 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
     GROUP_CODES.map(async (code, index) => {
       let title = tCommon('activityFallback', { code })
       let description = ''
-      // Always start with local must-see static image for visual consistency
-      let image: string = staticImageFallback(index)
-      // Fallback used when the primary image fails to load
-      let fallbackImage: string | undefined = genericFallbackImage
+      let image: string = ''
+      // Fallback used when the primary Atlantico image fails to load
+      let fallbackImage: string | undefined = staticImageFallback(index) || genericFallbackImage
+      let fromPrice: number | null = null
 
       try {
         const details = await getGroupDetails(code, lang)
@@ -58,7 +52,19 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         const rawDesc = (details.desc ?? details.description ?? '') as string
         description = stripHtml(rawDesc)
 
-        // Optionally use Atlantico image as secondary fallback
+        // "À partir de" price – use groupDetails.price when available
+        const rawPrice = details.price
+        if (typeof rawPrice === 'number') {
+          fromPrice = rawPrice
+        } else if (typeof rawPrice === 'string') {
+          const normalized = rawPrice.replace(',', '.')
+          const parsed = parseFloat(normalized)
+          if (Number.isFinite(parsed)) {
+            fromPrice = parsed
+          }
+        }
+
+        // Use first Atlantico image (group cover / tour list) as primary
         let imageFilename: string | null = null
         if (details.image && typeof details.image === 'string' && details.image.trim()) {
           imageFilename = (details.image as string).trim()
@@ -71,12 +77,15 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         if (imageFilename) {
           const url = buildAtlanticoImageUrl(imageFilename)
           if (url) {
-            // Keep local cover as primary, use Atlantico as fallback
-            fallbackImage = url
+            image = url
           }
         }
       } catch {
-        // Fallback if API unavailable (e.g. during build) – keep static image
+        // Fallback if API unavailable (e.g. during build)
+      }
+
+      if (!image) {
+        image = fallbackImage ?? genericFallbackImage
       }
 
       return {
@@ -86,7 +95,8 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
         description: description || t('subtitle'),
         image,
         fallbackImage,
-        href: `/activities/${code}`,
+        href: `/activite/group-details?code=${encodeURIComponent(code)}`,
+        fromPrice,
       }
     })
   )

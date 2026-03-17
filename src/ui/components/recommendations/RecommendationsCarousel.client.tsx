@@ -39,7 +39,7 @@ const mustSeeRow1: MustSeeItem[] = [
   { title: 'Club Termal', subtitleKey: 'relaxation', image: '/images/home/must-see/club-termal.jpg' },
   { title: 'Loro Parque', subtitleKey: 'zoo', image: '/images/home/must-see/Loro-Parque.png' },
   { title: 'Flamenco', subtitleKey: 'show', image: '/images/home/must-see/flamenco.png' },
-  { title: 'Siam Park', subtitleKey: 'themePark', image: '/images/home/must-see/Siam-Park.png' },
+  { title: 'Siam Park', subtitleKey: 'themePark', image: '/images/home/must-see/Siam park .png' },
   { title: 'Jungle Park', subtitleKey: 'zoo', image: '/images/home/must-see/Jungle-Park.png' },
   { title: 'Shogun Boat', subtitleKey: 'boatTour', image: '/images/home/must-see/Shogun-Boat.jpg' },
   { title: 'Aqualand', subtitleKey: 'waterPark', image: '/images/home/must-see/Aqualand.png' },
