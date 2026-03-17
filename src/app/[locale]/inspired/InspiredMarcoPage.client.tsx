@@ -340,15 +340,13 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                         <h3 className="text-lg font-semibold text-glass-900 line-clamp-2">
                           {activity.title}
                         </h3>
-                        {activity.duration && (
-                          <p className="text-sm text-glass-700 leading-relaxed">
-                            ⏱ {activity.duration}
+                        {activity.description && (
+                          <p className="text-sm text-glass-700 leading-relaxed line-clamp-4">
+                            {activity.description}
                           </p>
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
-                          <span>
-                            {activity.duration ? activity.duration : '\u00A0'}
-                          </span>
+                          <span>{activity.duration ? `⏱ ${activity.duration}` : '\u00A0'}</span>
                           <span className="text-right">
                             {activity.priceFrom
                               ? `Starting from ${activity.priceFrom.toFixed(2)} €`

@@ -11,6 +11,7 @@ export type Activity = {
   priceFrom: number;
   duration: string;
   location: string;
+  description?: string;
   media: ActivityMedia;
   tags: string[];
 };

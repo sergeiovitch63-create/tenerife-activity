@@ -55,6 +55,7 @@ function mapTourToActivity(tour: any): Activity {
     id: String(tour.code ?? tour.id),
     slug: String(tour.code ?? tour.id),
     title: tour.title,
+    description: tour.excerpt || '',
     priceFrom: price,
     duration:
       typeof tour.durationHours === 'number' && tour.durationHours > 0
@@ -63,7 +64,9 @@ function mapTourToActivity(tour: any): Activity {
     location: 'Tenerife',
     media: {
       type: 'image',
-      src: tour.imageUrl || '/logo.png',
+      // Use real tour image when available; otherwise leave empty
+      // so the card shows the "no image" placeholder instead of a logo.
+      src: tour.imageUrl || '',
     },
     tags: [...vibeTags, budgetTag],
   }
