@@ -338,11 +338,21 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                   >
                     <article className="glass-panel rounded-2xl border border-glass-200 overflow-hidden flex flex-col bg-white/90 hover:shadow-lg hover:-translate-y-1 smooth-transition cursor-pointer h-full">
                       <div className="relative w-full aspect-[4/3] bg-glass-100 overflow-hidden">
-                        <ToursListCardImage
-                          code={codeStr}
-                          alt={activity.title}
-                          className="w-full h-full object-cover"
-                        />
+                        {activity.media?.src ? (
+                          <Image
+                            src={activity.media.src}
+                            alt={activity.title}
+                            fill
+                            className="w-full h-full object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <ToursListCardImage
+                            code={codeStr}
+                            alt={activity.title}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                       </div>
                       <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">
                         <h3 className="text-lg font-semibold text-glass-900 line-clamp-2">
