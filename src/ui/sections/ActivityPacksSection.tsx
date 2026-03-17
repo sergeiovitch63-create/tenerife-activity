@@ -10,9 +10,18 @@ import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
  * Activity Packs Section - 4 featured group details (168, 169, 102, 41)
  *
  * Fetches group details from Atlantico API and displays cards linking to activity pages.
- * Images: /images/tours-list/{code}/cover.png
+ * Images: primary from /images/home/must-see/* (static), with Atlantico as secondary fallback.
  */
 const GROUP_CODES = ['168', '169', '102', '41'] as const
+
+// Static images stored in public/images/home/must-see/*
+// Order must match GROUP_CODES.
+const MUST_SEE_STATIC_IMAGES: string[] = [
+  '/images/home/must-see/Shogun-Boat.jpg',
+  '/images/home/must-see/Jungle-Park.png',
+  '/images/home/must-see/Loro-Parque.png',
+  '/images/home/must-see/Aqualand.jpg',
+]
 
 function stripHtml(html: string): string {
   if (!html || typeof html !== 'string') return ''
@@ -27,18 +36,19 @@ export async function ActivityPacksSection({ locale }: { locale: string }) {
   const tCommon = await getTranslations('common')
   const lang = mapLocaleToAtlanticoLang(locale)
 
-  // Primary image: local tours-list cover per code
-  const staticImageFallback = (code: string) => `/images/tours-list/${code}/cover.png`
-  // Secondary generic fallback if both local cover and Atlantico image fail
+  // Primary image: local must-see static asset (public/images/home/must-see/*)
+  const staticImageFallback = (index: number) =>
+    MUST_SEE_STATIC_IMAGES[index] || '/images/hero-poster.jpg'
+  // Secondary generic fallback if both static and Atlantico image fail
   const genericFallbackImage = '/images/hero-poster.jpg'
 
   // Fetch group details for each code (including images)
   const activityPacks = await Promise.all(
-    GROUP_CODES.map(async (code) => {
+    GROUP_CODES.map(async (code, index) => {
       let title = tCommon('activityFallback', { code })
       let description = ''
-      // Always start with local tours-list cover for visual consistency
-      let image: string = staticImageFallback(code)
+      // Always start with local must-see static image for visual consistency
+      let image: string = staticImageFallback(index)
       // Fallback used when the primary image fails to load
       let fallbackImage: string | undefined = genericFallbackImage
 
