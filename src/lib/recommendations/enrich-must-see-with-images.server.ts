@@ -33,21 +33,21 @@ const TITLE_TO_SUBTITLE: Record<string, string> = {
 
 /** Static fallback images when API has no image */
 const STATIC_IMAGE_FALLBACK: Record<string, string> = {
-  'Club Termal': '/images/home/must-see/row-1/club-termal.jpg',
-  'Loro Parque': '/images/home/must-see/row-1/Loro-Parque.png',
-  'Flamenco': '/images/home/must-see/row-1/flamenco.png',
-  'Siam Park': '/images/home/must-see/row-1/Siam-Park.png',
-  'Jungle Park': '/images/home/must-see/row-1/Jungle-Park.png',
-  'Shogun Boat': '/images/home/must-see/row-1/Shogun-Boat.jpg',
-  'Aqualand': '/images/home/must-see/row-1/Aqualand.png',
-  'Buggy': '/images/home/must-see/row-2/buggy.jpg',
-  'La Palma con Almuerzo': '/images/home/must-see/row-2/la-palma-con-almuerzo.jpg',
-  'Poema del Mar Gran Canaria': '/images/home/must-see/row-2/poema-del-mar-gran-canaria.jpg',
-  'Scandal Dinner Show': '/images/home/must-see/row-2/scandal-dinner-show.jpg',
-  'Teide by Night': '/images/home/must-see/row-2/teide-by-night.jpg',
-  'Teide Tour with Cable Car': '/images/home/must-see/row-2/teide-tour-with-cable-car.jpg',
-  'Utopia': '/images/home/must-see/row-2/utopia.jpg',
-  'Sky of Tenerife': '/images/home/must-see/row-2/sky-of-tenerife.jpg',
+  'Club Termal': '/images/home/must-see/club-termal.jpg',
+  'Loro Parque': '/images/home/must-see/Loro-Parque.png',
+  'Flamenco': '/images/home/must-see/flamenco.png',
+  'Siam Park': '/images/home/must-see/Siam-Park.png',
+  'Jungle Park': '/images/home/must-see/Jungle-Park.png',
+  'Shogun Boat': '/images/home/must-see/Shogun-Boat.jpg',
+  'Aqualand': '/images/home/must-see/Aqualand.png',
+  'Buggy': '/images/home/must-see/buggy.jpg',
+  'La Palma con Almuerzo': '/images/home/must-see/la-palma-con-almuerzo.jpg',
+  'Poema del Mar Gran Canaria': '/images/home/must-see/poema-del-mar-gran-canaria.jpg',
+  'Scandal Dinner Show': '/images/home/must-see/scandal-dinner-show.jpg',
+  'Teide by Night': '/images/home/must-see/teide-by-night.jpg',
+  'Teide Tour with Cable Car': '/images/home/must-see/teide-tour-with-cable-car.jpg',
+  'Utopia': '/images/home/must-see/utopia.jpg',
+  'Sky of Tenerife': '/images/home/must-see/sky-of-tenerife.jpg',
 }
 
 export interface MustSeeItem {

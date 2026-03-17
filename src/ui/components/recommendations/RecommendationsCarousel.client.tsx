@@ -34,28 +34,27 @@ function getSubtitleKey(subtitle: string): string {
   return mapping[subtitle] || subtitle.toLowerCase().replace(/\s+/g, '')
 }
 
-// Row 1 - Must See items with exact order matching actual filenames
+// Row 1 - Must See items, using flat /must-see/ paths
 const mustSeeRow1: MustSeeItem[] = [
-  { title: 'Club Termal', subtitleKey: 'relaxation', image: '/images/home/must-see/row-1/club-termal.jpg' },
-  { title: 'Loro Parque', subtitleKey: 'zoo', image: '/images/home/must-see/row-1/Loro-Parque.png' },
-  { title: 'Flamenco', subtitleKey: 'show', image: '/images/home/must-see/row-1/flamenco.png' },
-  { title: 'Siam Park', subtitleKey: 'themePark', image: '/images/home/must-see/row-1/Siam-Park.png' },
-  { title: 'Jungle Park', subtitleKey: 'zoo', image: '/images/home/must-see/row-1/Jungle-Park.png' },
-  { title: 'Shogun Boat', subtitleKey: 'boatTour', image: '/images/home/must-see/row-1/Shogun-Boat.jpg' },
-  { title: 'Aqualand', subtitleKey: 'waterPark', image: '/images/home/must-see/row-1/Aqualand.png' },
+  { title: 'Club Termal', subtitleKey: 'relaxation', image: '/images/home/must-see/club-termal.jpg' },
+  { title: 'Loro Parque', subtitleKey: 'zoo', image: '/images/home/must-see/Loro-Parque.png' },
+  { title: 'Flamenco', subtitleKey: 'show', image: '/images/home/must-see/flamenco.png' },
+  { title: 'Siam Park', subtitleKey: 'themePark', image: '/images/home/must-see/Siam-Park.png' },
+  { title: 'Jungle Park', subtitleKey: 'zoo', image: '/images/home/must-see/Jungle-Park.png' },
+  { title: 'Shogun Boat', subtitleKey: 'boatTour', image: '/images/home/must-see/Shogun-Boat.jpg' },
+  { title: 'Aqualand', subtitleKey: 'waterPark', image: '/images/home/must-see/Aqualand.png' },
 ]
 
-// Row 2 - Files found in /public/images/home/must-see/row-2/
-// FOUND ROW-2 IMAGES (UPDATED): buggy.jpg, la-palma-con-almuerzo.jpg, poema-del-mar.jpg, scandal-dinner-show.jpg, sky-of-tenerife.jpg, teide-by-night.jpg, teide-tour-with-cable-car.jpg, utopia.jpg
+// Row 2 - Files located in /public/images/home/must-see/
 const mustSeeRow2: MustSeeItem[] = [
-  { title: 'Buggy', subtitleKey: 'adventure', image: '/images/home/must-see/row-2/buggy.jpg' },
-  { title: 'La Palma con Almuerzo', subtitleKey: 'islandTour', image: '/images/home/must-see/row-2/la-palma-con-almuerzo.jpg' },
-  { title: 'Poema del Mar Gran Canaria', subtitleKey: 'aquarium', image: '/images/home/must-see/row-2/poema-del-mar-gran-canaria.jpg' },
-  { title: 'Scandal Dinner Show', subtitleKey: 'nightShow', image: '/images/home/must-see/row-2/scandal-dinner-show.jpg' },
-  { title: 'Teide by Night', subtitleKey: 'stargazing', image: '/images/home/must-see/row-2/teide-by-night.jpg' },
-  { title: 'Teide Tour with Cable Car', subtitleKey: 'nature', image: '/images/home/must-see/row-2/teide-tour-with-cable-car.jpg' },
-  { title: 'Utopia', subtitleKey: 'party', image: '/images/home/must-see/row-2/utopia.jpg' },
-  { title: 'Sky of Tenerife', subtitleKey: 'paragliding', image: '/images/home/must-see/row-2/sky-of-tenerife.jpg' },
+  { title: 'Buggy', subtitleKey: 'adventure', image: '/images/home/must-see/buggy.jpg' },
+  { title: 'La Palma con Almuerzo', subtitleKey: 'islandTour', image: '/images/home/must-see/la-palma-con-almuerzo.jpg' },
+  { title: 'Poema del Mar Gran Canaria', subtitleKey: 'aquarium', image: '/images/home/must-see/poema-del-mar-gran-canaria.jpg' },
+  { title: 'Scandal Dinner Show', subtitleKey: 'nightShow', image: '/images/home/must-see/scandal-dinner-show.jpg' },
+  { title: 'Teide by Night', subtitleKey: 'stargazing', image: '/images/home/must-see/teide-by-night.jpg' },
+  { title: 'Teide Tour with Cable Car', subtitleKey: 'nature', image: '/images/home/must-see/teide-tour-with-cable-car.jpg' },
+  { title: 'Utopia', subtitleKey: 'party', image: '/images/home/must-see/utopia.jpg' },
+  { title: 'Sky of Tenerife', subtitleKey: 'paragliding', image: '/images/home/must-see/sky-of-tenerife.jpg' },
 ]
 
 // Removed dev logging - use React DevTools for debugging
