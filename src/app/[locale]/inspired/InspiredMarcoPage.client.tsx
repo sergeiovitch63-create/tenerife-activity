@@ -143,7 +143,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
     const stepId = currentStep.id
     setAnswers((prev) => ({ ...prev, [stepId]: value }))
 
-    if (currentStepIndex < STEPS.length - 1) {
+    if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex((prev) => prev + 1)
     } else {
       setHasFinished(true)

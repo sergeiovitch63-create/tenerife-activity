@@ -44,8 +44,7 @@ export function LuxuryHeroGallery({
 
   // Get main image and thumbnails
   const mainImage = images[mainImageIndex] || images[0]
-  const thumbnails = images.filter((_, idx) => idx !== mainImageIndex).slice(0, 3) // Show max 3 thumbnails
-  const remainingCount = images.length - thumbnails.length - 1 // -1 for main image
+  const thumbnails = images.filter((_, idx) => idx !== mainImageIndex).slice(0, 4) // Show max 4 thumbnails
 
   return (
     <div className="relative w-full">
@@ -192,35 +191,6 @@ export function LuxuryHeroGallery({
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
             </div>
           ))}
-          
-          {/* Badge showing remaining images count */}
-          {remainingCount > 0 && (
-            <div 
-              className="relative flex-1 bg-glass-100 rounded cursor-pointer group overflow-hidden"
-              onClick={() => {
-                // Cycle to next image set
-                const nextIndex = (mainImageIndex + 1) % images.length
-                setMainImageIndex(nextIndex)
-              }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 transition-colors">
-                <div className="text-center text-white">
-                  <div className="text-2xl font-bold">+{remainingCount}</div>
-                  <div className="text-xs">more photos</div>
-                </div>
-              </div>
-              {/* Show a preview of the next image behind the badge */}
-              {images[thumbnails.length + 1] && (
-                <SafeImage
-                  src={images[thumbnails.length + 1]}
-                  alt="More photos"
-                  fill
-                  sizes="33vw"
-                  className="object-cover opacity-30"
-                />
-              )}
-            </div>
-          )}
         </div>
       </div>
 
