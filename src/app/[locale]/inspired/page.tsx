@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { InspiredMarcoPage } from './InspiredMarcoPage.client'
-import { experienceRepository } from '@/config/repositories'
 import type { Activity } from '@/core/entities/activity'
-import { MockExperienceRepository } from '@/data/mock/mock-experience.repository'
+import { mapLocaleToLang } from '@/lib/atlantico/locale'
 
 const VIBE_TO_TAGS: Record<string, string[]> = {
   'vip-tours':             ['luxury', 'chill', 'couple'],
@@ -27,24 +26,44 @@ function priceToBudgetTag(price: number): string {
   return 'budget-3'
 }
 
-function mapExperienceToActivity(experience: any): Activity {
-  const vibeTags = (experience.vibeId && VIBE_TO_TAGS[experience.vibeId]) ?? []
-  const budgetTag = typeof experience.price === 'number'
-    ? priceToBudgetTag(experience.price)
-    : 'budget-2'
+function mapTourToActivity(tour: any): Activity {
+  // Derive "vibe-like" tags from tour.code using mapping table.
+  // tours-enriched uses groupsList as source of truth; we only use
+  // a lightweight vibe mapping here for recommendation scoring.
+  const vibeTags =
+    (tour.vibeId && VIBE_TO_TAGS[String(tour.vibeId)]) ??
+    ((tour._raw?.groupDetails?.classificationCode ||
+      tour._raw?.groupList?.classificationCode) &&
+      VIBE_TO_TAGS[
+        String(
+          tour._raw?.groupDetails?.classificationCode ||
+            tour._raw?.groupList?.classificationCode
+        )
+      ]) ??
+    []
+
+  const price =
+    typeof tour.fromPrice === 'number'
+      ? tour.fromPrice
+      : typeof tour.price === 'number'
+        ? tour.price
+        : 0
+
+  const budgetTag = price > 0 ? priceToBudgetTag(price) : 'budget-2'
+
   return {
-    id: experience.id,
-    slug: experience.slug,
-    title: experience.title,
-    priceFrom: typeof experience.price === 'number' ? experience.price : 0,
-    duration: experience.duration ?? '',
-    location: experience.location ?? 'Tenerife',
+    id: String(tour.code ?? tour.id),
+    slug: String(tour.code ?? tour.id),
+    title: tour.title,
+    priceFrom: price,
+    duration:
+      typeof tour.durationHours === 'number' && tour.durationHours > 0
+        ? `${tour.durationHours} h`
+        : '',
+    location: 'Tenerife',
     media: {
       type: 'image',
-      src:
-        (Array.isArray(experience.imageUrls) && experience.imageUrls[0]) ||
-        experience.imageUrl ||
-        '/logo.png',
+      src: tour.imageUrl || '/logo.png',
     },
     tags: [...vibeTags, budgetTag],
   }
@@ -69,23 +88,36 @@ export default async function InspiredPage({
 }: {
   params: Promise<{ locale: string }>
 }) {
-  await params
-  let experiences: any[] = []
+  const { locale } = await params
+  const lang = mapLocaleToLang(locale)
+
+  const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
+  const headersList = await import('next/headers').then((m) => m.headers)
+  const hdrs = headersList()
+  const host = hdrs.get('host') || 'localhost:3000'
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+  const origin = envBase || `${protocol}://${host}`
+
+  let tours: any[] = []
 
   try {
-    experiences = await experienceRepository.findAll()
+    const res = await fetch(
+      `${origin}/api/atlantico/tours-enriched/${encodeURIComponent(lang)}`,
+      { next: { revalidate: 600 } }
+    )
+
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data.items)) {
+        tours = data.items
+      }
+    }
   } catch {
-    // Fallback to mock data if Atlantico repository fails
-    const mockRepo = new MockExperienceRepository()
-    experiences = await mockRepo.findAll()
+    // In case of failure, keep tours as empty array; InspiredMarcoPage
+    // will gracefully fallback to an empty recommendations list.
   }
 
-  if (!experiences || experiences.length === 0) {
-    const mockRepo = new MockExperienceRepository()
-    experiences = await mockRepo.findAll()
-  }
-
-  const activities = experiences.map(mapExperienceToActivity)
+  const activities: Activity[] = tours.map(mapTourToActivity)
 
   return <InspiredMarcoPage activities={activities} />
 }

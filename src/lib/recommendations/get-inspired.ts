@@ -118,13 +118,12 @@ export function scoreActivity(activity: Activity, userTags: string[]): number {
  * Scoring logic:
  * 1. Convert answers to tags
  * 2. Score each activity by number of matching tags
- * 3. Sort by score (descending)
- * 4. Return top 3-6 activities
- * 5. If fewer than 3 results, return all available (min 0)
+ * 3. Sort by score (descending), then by price ascending
+ * 4. Return all matching activities (score > 0), ordered by relevance
  * 
  * @param activities - Array of all available activities
  * @param answers - User's quiz answers
- * @returns Array of 3-6 best matching activities (or fewer if not enough matches)
+ * @returns Array of all matching activities sorted by best match first
  */
 export function getInspiredRecommendations(
   activities: Activity[],
@@ -155,13 +154,11 @@ export function getInspiredRecommendations(
     return a.activity.priceFrom - b.activity.priceFrom
   })
 
-  // Extract activities
+  // Extract activities in sorted order.
+  // We intentionally return all matches so the UI
+  // can display the full set of relevant activities.
   const recommended = matchingActivities.map((item) => item.activity)
 
-  // Return 3-6 best activities (or all available if fewer than 3)
-  // If we have more than 6, return top 6
-  // If we have 3-6, return all
-  // If we have less than 3, return all available (could be 0, 1, or 2)
-  return recommended.slice(0, Math.min(6, recommended.length))
+  return recommended
 }
 
