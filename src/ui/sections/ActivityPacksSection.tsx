@@ -8,13 +8,13 @@ import { buildAtlanticoImageUrl } from '@/lib/atlantico/client'
 
 const GROUP_CODES = ['168', '169', '102', '41'] as const
 
-// Static cover images stored in public/images/home/must-see/*
+// Static cover images stored in public/images/home/activity-packs/*
 // Order must match GROUP_CODES.
 const MUST_SEE_STATIC_IMAGES: string[] = [
-  '/images/home/must-see/Loro-Parque.png', // Twin Ticket (Loro + Siam)
-  '/images/home/must-see/Aqualand.png',    // Two Parks Ticket (Aqualand + Jungle)
-  '/images/home/must-see/buggy.jpg',       // Booster Packs (adrenaline / ocean)
-  '/images/home/must-see/scandal-dinner-show.jpg', // Special Packs (evening shows / water)
+  '/images/home/activity-packs/twin-ticket.png',        // Twin Ticket (168)
+  '/images/home/activity-packs/Two Parks Ticket.png',   // Two Parks Ticket (169)
+  '/images/home/activity-packs/Booster Packs.png',      // Booster Packs (102)
+  '/images/home/activity-packs/Special Packs.png',      // Special Packs (41)
 ]
 
 function stripHtml(html: string): string {

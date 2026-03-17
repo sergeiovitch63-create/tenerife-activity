@@ -16,6 +16,7 @@ import { atlanticoAssetUrl } from '@/lib/atlantico/assets'
 import { decodeTextFromApi, sanitizeAtlanticoHtml } from '@/lib/atlantico/htmlAssets'
 import { FaqSections } from '@/components/atlantico/FaqSections'
 import { LuxuryHeroGallery } from './LuxuryHeroGallery'
+import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { isVipTourGroup, getVipTourLocalImages } from '@/lib/atlantico/vip-tours-images'
 
 interface PremiumActivityPageProps {
@@ -206,6 +207,7 @@ function EventIcon({ filename }: { filename: string }) {
 export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity508 = false }: PremiumActivityPageProps) {
   const tPage = useTranslations('premiumActivity')
   const tTabs = useTranslations('premiumActivity.tabs')
+  const atlLang = mapLocaleToLang(locale)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(resolved?.t_id || null)
   const [activeTab, setActiveTab] = useState<'overview' | 'included' | 'cancellation' | 'description' | 'what-you-do'>(
     isActivity508 ? 'what-you-do' : 'overview'
@@ -220,7 +222,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
   const isVipTour = isVipTourGroup(resolved?.t_group) || isVipTourGroup(slug)
   const groupCode = String(resolved?.t_group || slug || '')
 
-  const language = resolved?.language || 'ENG'
+  const language = atlLang || resolved?.language || 'ENG'
   const t_group = resolved?.t_group || ''
 
   // Auto-select first event if available
@@ -243,8 +245,8 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
         }
       })
       
-      // Fetch groupDetails for content
-      fetch(`/api/atlantico/group/${t_group}/${language}`)
+      // Fetch groupDetails for content (localized)
+      fetch(`/api/atlantico/group/${t_group}/${atlLang}`)
         .then(res => res.ok ? res.json() : null)
         .then((data) => {
           if (data) setGroupDetails(data)
@@ -253,7 +255,8 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
       return
     }
     
-    fetch(`/api/atlantico/group/${t_group}/${language}`)
+    // Fetch groupDetails for content (localized)
+    fetch(`/api/atlantico/group/${t_group}/${atlLang}`)
       .then(res => res.ok ? res.json() : null)
       .then(async (data) => {
         if (data) {
@@ -283,7 +286,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
         }
       })
       .catch(() => {})
-  }, [t_group, language, isVipTour, groupCode])
+  }, [t_group, atlLang, isVipTour, groupCode])
 
   // Fetch eventDetails when eventId is selected
   useEffect(() => {
@@ -294,8 +297,8 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
     // Fetch event details - try normalized route first, fallback to raw route
     Promise.race([
-      fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(language)}`).then(res => res.ok ? res.json() : null),
-      fetch(`/api/atlantico/event/${selectedEventId}/${language}`).then(res => res.ok ? res.json() : null)
+      fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(atlLang)}`).then(res => res.ok ? res.json() : null),
+      fetch(`/api/atlantico/event/${selectedEventId}/${atlLang}`).then(res => res.ok ? res.json() : null)
     ])
       .then(async (data) => {
         if (data) {
@@ -365,7 +368,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
           console.error('[ACTIVITY_508] Error fetching event details:', error)
         }
       })
-  }, [selectedEventId, language])
+  }, [selectedEventId, atlLang])
 
   // Get activity title and duration
   const activityTitle = groupDetails?.name || eventDetails?.name || eventDetails?.title || 'Activity'
@@ -529,7 +532,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
               {/* What you do - above Overview */}
               {activityWillDo && (
                 <div id="section-what-you-do" className="scroll-mt-24">
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">What you do</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">{tTabs('whatYouDo')}</h2>
                   <div className="space-y-8">
                     {activityWillDo ? (
                       <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-8">
@@ -551,7 +554,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
               {/* Overview */}
               <div id="section-overview" className="scroll-mt-24">
-                <h2 className="text-3xl font-bold text-glass-900 mb-6">Overview</h2>
+                <h2 className="text-3xl font-bold text-glass-900 mb-6">{tTabs('overview')}</h2>
                 <div className="space-y-8">
                   {activityDescription && (isActivity508 ? (() => {
                     const raw = decodeTextFromApi(activityDescription || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
@@ -587,7 +590,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
               {/* What&apos;s Included */}
               <div id="section-included" className="scroll-mt-24">
-                <h2 className="text-3xl font-bold text-glass-900 mb-6">What&apos;s Included</h2>
+                <h2 className="text-3xl font-bold text-glass-900 mb-6">{tTabs('whatsIncluded')}</h2>
                 <div className="space-y-8">
                   {activityFAQ ? (
                     <FaqSections faq={activityFAQ} fallbackRaw />
@@ -602,7 +605,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
               {/* Description - Only for activity 508 */}
               {isActivity508 && (
                 <div id="section-description" className="scroll-mt-24">
-                  <h2 className="text-3xl font-bold text-glass-900 mb-6">Description</h2>
+                  <h2 className="text-3xl font-bold text-glass-900 mb-6">{tTabs('description')}</h2>
                   <div className="space-y-8">
                     {groupDetails?.desc ? (
                       (() => {
