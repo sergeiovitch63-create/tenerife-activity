@@ -267,8 +267,16 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
           
           if (Array.isArray(data.images) && data.images.length > 0) {
             for (const img of data.images) {
-              if (typeof img === 'string' && img.trim() && (img.startsWith('http://') || img.startsWith('https://'))) {
-                images.push(img.trim())
+              if (typeof img === 'string' && img.trim()) {
+                const raw = img.trim()
+                if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                  images.push(raw)
+                } else {
+                  const url = await atlanticoAssetUrl(raw, 'tour', { activityId: t_group, page: 'details' })
+                  if (url) {
+                    images.push(url)
+                  }
+                }
               }
             }
           }
@@ -337,8 +345,16 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
           
           if (Array.isArray(data.images) && data.images.length > 0) {
             for (const img of data.images) {
-              if (typeof img === 'string' && img.trim() && (img.startsWith('http://') || img.startsWith('https://'))) {
-                eventImages.push(img.trim())
+              if (typeof img === 'string' && img.trim()) {
+                const raw = img.trim()
+                if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                  eventImages.push(raw)
+                } else {
+                  const url = await atlanticoAssetUrl(raw, 'tour', { activityId: selectedEventId, page: 'details' })
+                  if (url) {
+                    eventImages.push(url)
+                  }
+                }
               }
             }
           }
