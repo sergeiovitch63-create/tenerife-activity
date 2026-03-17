@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Image from 'next/image'
 import { Link } from '@/navigation'
 import type { Activity } from '@/core/entities/activity'
 import {
