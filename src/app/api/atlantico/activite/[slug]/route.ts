@@ -24,7 +24,7 @@ type Tour = {
 }
 
 const REVALIDATE = 60
-const EXCLUDED_CODES = ['222', '551', '492', '476', '514']
+const EXCLUDED_CODES = ['222', '551', '492', '514']
 
 export async function GET(
   request: NextRequest,
