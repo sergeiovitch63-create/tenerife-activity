@@ -27,7 +27,6 @@ type EventOption = {
   childPrice: number | null
   infantPrice: number | null
   features: string[]
-  /** Departure times from eventDetails.times (e.g. ["10:00", "14:00"]) */
   times?: string[]
   /** Raw hicon strings from API: "0_hicon-drinks", "1_hicon-free_bus" */
   hiconIcons?: string[]
@@ -180,14 +179,9 @@ function OptionCard({
   tFerry: () => string
 }) {
   const [expanded, setExpanded] = useState(false)
-  const [selectedTime, setSelectedTime] = useState<string | null>(
-    option.times && option.times.length > 0 ? option.times[0] : null
-  )
   const desc = stripHtml(option.desc || '')
   const truncated = desc.length > DESCRIPTION_TRUNCATE && !expanded
   const displayDesc = truncated ? desc.slice(0, DESCRIPTION_TRUNCATE) + '...' : desc
-  const times = option.times && option.times.length > 0 ? option.times : []
-  const hasMultipleTimes = times.length > 1
 
   return (
     <div
@@ -208,39 +202,6 @@ function OptionCard({
           </button>
         )}
       </div>
-      {/* Departure times */}
-      {times.length > 0 && (
-        <div className="border-t border-glass-200 pt-4 mt-4 space-y-2">
-          <p className="text-sm font-semibold text-ocean-700">
-            {hasMultipleTimes ? tOptions('timesMany') : tOptions('timesOne')}
-          </p>
-          {hasMultipleTimes ? (
-            <div className="flex flex-wrap gap-2">
-              {times.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setSelectedTime(t)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-1 ${
-                    selectedTime === t
-                      ? 'bg-ocean-600 text-white'
-                      : 'bg-glass-100 text-glass-800 hover:bg-ocean-50 hover:text-ocean-700'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-glass-800 font-medium flex items-center gap-2">
-              <svg className="w-4 h-4 text-ocean-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {times[0]}
-            </p>
-          )}
-        </div>
-      )}
       {option.hiconIcons && option.hiconIcons.length > 0 ? (
         (() => {
           const { included, notIncluded } = parseHiconIcons(option.hiconIcons)
@@ -356,11 +317,46 @@ export function GroupDetails508LuxLayout({
   // No option pre-selected: Manage your booking appears only when user clicks Sélectionner
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [eventOptions, setEventOptions] = useState<EventOption[]>([])
-  const [openSection, setOpenSection] = useState<'what-you-do' | 'overview' | 'description' | 'included' | 'cancellation' | 'prices' | null>('prices')
+  const ACCORDION_IDS = ['what-you-do', 'overview', 'description', 'included', 'cancellation', 'prices'] as const
+  type AccordionId = (typeof ACCORDION_IDS)[number]
+  const [isDesktop, setIsDesktop] = useState(false)
+  const [openSectionsDesktop, setOpenSectionsDesktop] = useState<Set<AccordionId>>(
+    () => new Set<AccordionId>()
+  )
+  const [openSectionMobile, setOpenSectionMobile] = useState<AccordionId | null>('prices')
   const [loadingOptions, setLoadingOptions] = useState(true)
   const [optionsSectionInView, setOptionsSectionInView] = useState(false)
   const manageBookingRef = useRef<HTMLDivElement>(null)
   const optionsSectionRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)')
+    const apply = () => setIsDesktop(mql.matches)
+    apply()
+    mql.addEventListener('change', apply)
+    return () => mql.removeEventListener('change', apply)
+  }, [])
+
+  useEffect(() => {
+    if (!isDesktop) return
+    setOpenSectionsDesktop(new Set<AccordionId>(ACCORDION_IDS))
+  }, [isDesktop])
+
+  const isAccordionOpen = (id: AccordionId) =>
+    isDesktop ? openSectionsDesktop.has(id) : openSectionMobile === id
+
+  const toggleAccordion = (id: AccordionId) => {
+    if (isDesktop) {
+      setOpenSectionsDesktop((prev) => {
+        const next = new Set(prev)
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
+        return next
+      })
+      return
+    }
+    setOpenSectionMobile((prev) => (prev === id ? null : id))
+  }
 
   // lang from server is Atlantico format (ENG, ESP, etc.)
   const atlLang = lang || 'ENG'
@@ -697,8 +693,8 @@ export function GroupDetails508LuxLayout({
 
       {/* Hero carousel - same as other group details */}
       <div className="container mx-auto px-4 sm:px-6 pt-4 pb-6 sm:pb-8 max-w-7xl">
-        <div className="max-w-full sm:max-w-xl mx-auto aspect-square rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-glass-200 bg-white">
-          <GroupDetailsHeroCarousel galleryUrls={galleryUrls} heroUrl={heroUrl} alt={name} className="!h-full" />
+        <div className="w-full mx-auto rounded-xl sm:rounded-2xl overflow-hidden shadow-lg border border-glass-200 bg-white h-72 md:h-80 lg:h-[420px]">
+          <GroupDetailsHeroCarousel galleryUrls={galleryUrls} heroUrl={heroUrl} alt={name} className="!h-full !w-full" />
         </div>
       </div>
 
@@ -710,8 +706,8 @@ export function GroupDetails508LuxLayout({
               <Accordion
                 id="section-what-you-do"
                 title={tTabs('whatYouDo')}
-                isOpen={openSection === 'what-you-do'}
-                onToggle={() => setOpenSection(openSection === 'what-you-do' ? null : 'what-you-do')}
+                isOpen={isAccordionOpen('what-you-do')}
+                onToggle={() => toggleAccordion('what-you-do')}
               >
                 <div
                   className="prose prose-base max-w-none text-glass-700 leading-relaxed"
@@ -757,8 +753,8 @@ export function GroupDetails508LuxLayout({
                 <Accordion
                   id="section-description"
                   title={tDescription('title')}
-                  isOpen={openSection === 'description'}
-                  onToggle={() => setOpenSection(openSection === 'description' ? null : 'description')}
+                  isOpen={isAccordionOpen('description')}
+                  onToggle={() => toggleAccordion('description')}
                 >
                   <p className="text-glass-700 leading-relaxed text-sm sm:text-base">{rest}{!rest.endsWith('.') && !rest.endsWith('!') && !rest.endsWith('?') ? '.' : ''}</p>
                 </Accordion>
@@ -768,8 +764,8 @@ export function GroupDetails508LuxLayout({
             <Accordion
               id="section-included"
               title={tIncluded('title')}
-              isOpen={openSection === 'included'}
-              onToggle={() => setOpenSection(openSection === 'included' ? null : 'included')}
+              isOpen={isAccordionOpen('included')}
+              onToggle={() => toggleAccordion('included')}
             >
               {code === '326' && (
                 <p className="text-sm font-semibold text-amber-800 bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
@@ -786,8 +782,8 @@ export function GroupDetails508LuxLayout({
             <Accordion
               id="section-cancellation"
               title={tCancellation('title')}
-              isOpen={openSection === 'cancellation'}
-              onToggle={() => setOpenSection(openSection === 'cancellation' ? null : 'cancellation')}
+              isOpen={isAccordionOpen('cancellation')}
+              onToggle={() => toggleAccordion('cancellation')}
             >
               {cancellationPolicy ? (
                 <div className="text-glass-700 leading-relaxed whitespace-pre-line text-sm sm:text-base">{decodeTextFromApi(cancellationPolicy)}</div>
@@ -806,8 +802,8 @@ export function GroupDetails508LuxLayout({
             <Accordion
               id="section-prices"
               title={tPrices('title')}
-              isOpen={openSection === 'prices'}
-              onToggle={() => setOpenSection(openSection === 'prices' ? null : 'prices')}
+              isOpen={isAccordionOpen('prices')}
+              onToggle={() => toggleAccordion('prices')}
             >
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
@@ -868,12 +864,18 @@ export function GroupDetails508LuxLayout({
             </Accordion>
               )
             })()}
+          </div>
 
-            {/* Option cards */}
+          {/* Right column - Options + Manage your booking (desktop sidebar; stacks below on mobile) */}
+          <div className="lg:col-span-1 space-y-6 lg:space-y-8">
+            {/* Option cards (now on the right on desktop) */}
             {eventIds.length > 0 && (
-              <div id="section-options" className="pt-6 sm:pt-8 mt-4 border-t border-glass-200 scroll-mt-20 sm:scroll-mt-24">
+              <div
+                id="section-options"
+                className="bg-white border border-glass-200 rounded-xl p-5 sm:p-6 shadow-sm scroll-mt-20 sm:scroll-mt-24"
+              >
                 <h2 className="text-lg sm:text-xl font-bold text-glass-900 mb-4 sm:mb-6">
-                  {(eventOptions.length || eventIds.length) === 1 
+                  {(eventOptions.length || eventIds.length) === 1
                     ? tOptions('title', { count: eventOptions.length || eventIds.length })
                     : tOptions('title_plural', { count: eventOptions.length || eventIds.length })}
                 </h2>
@@ -889,102 +891,135 @@ export function GroupDetails508LuxLayout({
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(eventOptions.length > 0 ? eventOptions : eventIds.map((eid) => ({ eventId: eid, name: tOptions('placeholderTitle', { id: eid }), desc: '', price: null as number | null, childPrice: null as number | null, infantPrice: null as number | null, features: [] }))).map(
-                      (opt) => (
-                        <OptionCard
-                          key={opt.eventId}
-                          option={opt}
-                          isSelected={selectedEventId === opt.eventId}
-                          onSelect={() => handleSelectOption(opt.eventId)}
-                          groupCode={code}
-                          tOptions={tOptions}
-                          tLabels={tLabels}
-                          tCta={tCta}
-                          tIcons={tIcons}
-                          tFerry={() => t('ferryIdentityNotice')}
-                        />
-                      )
-                    )}
+                    {(eventOptions.length > 0
+                      ? eventOptions
+                      : eventIds.map((eid) => ({
+                          eventId: eid,
+                          name: tOptions('placeholderTitle', { id: eid }),
+                          desc: '',
+                          price: null as number | null,
+                          childPrice: null as number | null,
+                          infantPrice: null as number | null,
+                          features: [],
+                        }))).map((opt) => (
+                      <OptionCard
+                        key={opt.eventId}
+                        option={opt}
+                        isSelected={selectedEventId === opt.eventId}
+                        onSelect={() => handleSelectOption(opt.eventId)}
+                        groupCode={code}
+                        tOptions={tOptions}
+                        tLabels={tLabels}
+                        tCta={tCta}
+                        tIcons={tIcons}
+                        tFerry={() => t('ferryIdentityNotice')}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
             )}
           </div>
-
-          {/* Right column - Manage your booking (hidden until option is selected) */}
-          {(currentEventId || eventIds.length === 0) && (
-          <div ref={manageBookingRef} id="manage-your-booking" className="lg:col-span-1 scroll-mt-24">
-            <div className="sticky top-4">
-              {currentEventId && events.length > 0 ? (
-                <ActivityBookingPanel
-                  key={selectedEventId}
-                  t_group={code}
-                  initialEventId={selectedEventId}
-                  events={events}
-                  locale={locale}
-                  tourName={decodeTextFromApi(name)}
-                  language={atlLang}
-                  duration={durationStr}
-                  startingPrice={startingPrice}
-                  cancellationPolicy={cancellationPolicy}
-                  cancellationTitle={tCancellation('title')}
-                  childAge={childAge}
-                  infantAge={infantAge}
-                  showChildSelector={selectedOption?.childPrice != null}
-                  showInfantSelector={selectedOption?.infantPrice != null}
-                  useQuantityLabel={(selectedOption?.price ?? 0) > 200}
-                  isCombination={
-                    isCombinationEvent(code, selectedEventId) ||
-                    (String(code).includes('168') && ['21', '22', '23'].includes(String(selectedEventId).trim()))
-                  }
-                />
-              ) : (
-                <div className="bg-white border border-glass-200 rounded-xl p-5 sm:p-6 shadow-lg space-y-5 sm:space-y-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-glass-900">{tManage('title')}</h3>
-                  <div className="grid grid-cols-1 gap-3 pb-4 border-b border-glass-200">
-                    {durationStr && (
-                      <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <div className="text-xs font-medium text-ocean-700 uppercase tracking-wide">{tLabels('duration')}</div>
-                            <div className="text-lg font-bold text-glass-900">{durationStr} {tLabels('hours')}</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    {groupPriceNum != null && (
-                      <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg className="w-6 h-6 text-ocean-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.25 7.756a4.5 4.5 0 1 0 0 8.488M7.5 10.5h5.25m-5.25 3h5.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <div className="text-xs font-medium text-ocean-700 uppercase tracking-wide">{tLabels('startingFrom')}</div>
-                            <div className="text-lg font-bold text-glass-900">€{groupPriceNum.toFixed(2)}</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-sm text-glass-600">{tManage('noEvents')}</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Link href="/debug/event-details" className="text-xs text-ocean-600 hover:text-ocean-700 hover:underline focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-1 rounded">
-                      → eventDetails debug
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          )}
         </div>
+
+        {/* Full-width: Manage your booking (appears after selecting an option) */}
+        {(currentEventId || eventIds.length === 0) && (
+          <div ref={manageBookingRef} id="manage-your-booking" className="mt-8 sm:mt-10 scroll-mt-24">
+            {currentEventId && events.length > 0 ? (
+              <ActivityBookingPanel
+                key={selectedEventId}
+                t_group={code}
+                initialEventId={selectedEventId}
+                events={events}
+                locale={locale}
+                tourName={decodeTextFromApi(name)}
+                language={atlLang}
+                duration={durationStr}
+                startingPrice={startingPrice}
+                cancellationPolicy={cancellationPolicy}
+                cancellationTitle={tCancellation('title')}
+                childAge={childAge}
+                infantAge={infantAge}
+                showChildSelector={selectedOption?.childPrice != null}
+                showInfantSelector={selectedOption?.infantPrice != null}
+                useQuantityLabel={(selectedOption?.price ?? 0) > 200}
+                isCombination={
+                  isCombinationEvent(code, selectedEventId) ||
+                  (String(code).includes('168') && ['21', '22', '23'].includes(String(selectedEventId).trim()))
+                }
+              />
+            ) : (
+              <div className="bg-white border border-glass-200 rounded-xl p-5 sm:p-6 shadow-lg space-y-5 sm:space-y-6">
+                <h3 className="text-lg sm:text-xl font-bold text-glass-900">{tManage('title')}</h3>
+                <div className="grid grid-cols-1 gap-3 pb-4 border-b border-glass-200">
+                  {durationStr && (
+                    <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-6 h-6 text-ocean-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-xs font-medium text-ocean-700 uppercase tracking-wide">{tLabels('duration')}</div>
+                          <div className="text-lg font-bold text-glass-900">
+                            {durationStr} {tLabels('hours')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {groupPriceNum != null && (
+                    <div className="bg-gradient-to-br from-ocean-50 to-blue-50 rounded-xl p-4 border border-ocean-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-ocean-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-6 h-6 text-ocean-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M14.25 7.756a4.5 4.5 0 1 0 0 8.488M7.5 10.5h5.25m-5.25 3h5.25M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-xs font-medium text-ocean-700 uppercase tracking-wide">{tLabels('startingFrom')}</div>
+                          <div className="text-lg font-bold text-glass-900">€{groupPriceNum.toFixed(2)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-glass-600">{tManage('noEvents')}</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link
+                    href="/debug/event-details"
+                    className="text-xs text-ocean-600 hover:text-ocean-700 hover:underline focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:ring-offset-1 rounded"
+                  >
+                    → eventDetails debug
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* You might also like - related tours from same classification */}
         <YouMightAlsoLike code={code} lang={lang} locale={locale} />

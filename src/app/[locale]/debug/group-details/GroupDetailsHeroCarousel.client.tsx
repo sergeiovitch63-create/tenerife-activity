@@ -60,46 +60,94 @@ export function GroupDetailsHeroCarousel({
     el.scrollBy({ left: direction === 'left' ? -el.clientWidth : el.clientWidth, behavior: 'smooth' })
   }
 
-  const baseClasses = 'relative w-full h-56 md:h-72 lg:h-80 overflow-hidden cursor-pointer'
+  const baseClasses = 'relative w-full h-56 md:h-72 lg:h-80 overflow-hidden'
   const containerClasses = className ? `${baseClasses} ${className}` : baseClasses
+
+  const ImageButton = ({
+    url,
+    index,
+    className: imgClassName,
+  }: {
+    url: string
+    index: number
+    className: string
+  }) => (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => openLightbox(index)}
+      onKeyDown={(e) => e.key === 'Enter' && openLightbox(index)}
+      className={`${imgClassName} cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500`}
+    >
+      <img src={url} alt={`${alt} ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
+    </div>
+  )
 
   return (
     <>
       <div className={containerClasses}>
         {galleryUrls.length > 0 ? (
           <>
+            {/* Desktop: Atlantico-style grid (1 large + 4 thumbnails) */}
+            <div className="hidden lg:grid w-full h-full grid-cols-4 grid-rows-2 gap-2">
+              <ImageButton url={galleryUrls[0]} index={0} className="col-span-2 row-span-2 overflow-hidden rounded-2xl" />
+              <div className="col-span-2 row-span-2 grid grid-cols-2 grid-rows-2 gap-2">
+                {galleryUrls.slice(1, 5).map((url, idx) => (
+                  <ImageButton
+                    key={`${url}-${idx}`}
+                    url={url}
+                    index={idx + 1}
+                    className="overflow-hidden rounded-2xl"
+                  />
+                ))}
+                {/* If we have fewer than 5 images, fill remaining cells with the next ones (or repeat none) */}
+                {galleryUrls.length < 5 &&
+                  Array.from({ length: Math.max(0, 4 - (galleryUrls.length - 1)) }).map((_, fillerIdx) => (
+                    <div
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`filler-${fillerIdx}`}
+                      className="bg-gradient-to-br from-glass-50 to-glass-100 rounded-2xl border border-glass-200"
+                    />
+                  ))}
+              </div>
+            </div>
+
+            {/* Mobile/tablet: carousel */}
             <div
               ref={heroScrollRef}
-              className="w-full h-full overflow-x-auto flex snap-x snap-mandatory scroll-smooth scrollbar-hide"
+              className="lg:hidden w-full h-full overflow-x-auto flex snap-x snap-mandatory scroll-smooth scrollbar-hide cursor-pointer"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {galleryUrls.map((url, index) => (
-                <div
+                <ImageButton
                   key={url}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => openLightbox(index)}
-                  onKeyDown={(e) => e.key === 'Enter' && openLightbox(index)}
-                  className="w-full h-full min-w-full flex-shrink-0 snap-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500"
-                >
-                  <img src={url} alt={`${alt} ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                </div>
+                  url={url}
+                  index={index}
+                  className="w-full h-full min-w-full flex-shrink-0 snap-center"
+                />
               ))}
             </div>
+
             {galleryUrls.length > 1 && (
               <>
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); scrollHero('left') }}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors z-10"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    scrollHero('left')
+                  }}
+                  className="lg:hidden absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors z-10"
                   aria-label="Photo précédente"
                 >
                   ‹
                 </button>
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); scrollHero('right') }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors z-10"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    scrollHero('right')
+                  }}
+                  className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors z-10"
                   aria-label="Photo suivante"
                 >
                   ›
@@ -113,7 +161,7 @@ export function GroupDetailsHeroCarousel({
             tabIndex={0}
             onClick={() => openLightbox(0)}
             onKeyDown={(e) => e.key === 'Enter' && openLightbox(0)}
-            className="w-full h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500"
+            className="w-full h-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500"
           >
             <img src={heroUrl} alt={alt} className="w-full h-full object-cover" />
           </div>

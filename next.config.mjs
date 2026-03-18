@@ -1,7 +1,6 @@
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
-
 function hostnameFromEnvUrl(v) {
   if (!v || typeof v !== 'string' || !v.trim()) return null
   try {
@@ -17,14 +16,6 @@ const nextConfig = {
   
   // Enable SWC minification for faster builds and smaller bundles
   swcMinify: true,
-  
-  // Compiler optimizations
-  compiler: {
-    // Remove console.log in production (smaller bundle)
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'], // Keep error and warn for debugging
-    } : false,
-  },
   
   // Exclude heavy dependencies from Serverless Functions to stay under 250MB limit
   // Using outputFileTracingExcludes for maximum effect

@@ -32,7 +32,7 @@ if (!ANTHROPIC_API_KEY) {
 const TARGET_LANGS = ['fr', 'es', 'de', 'ru', 'pl', 'it']
 
 // Claude model – adjust to the exact deployed ID if needed
-const MODEL = 'claude-3.7-sonnet-20250219'
+const MODEL = 'claude-haiku-4-5-20251001'
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
