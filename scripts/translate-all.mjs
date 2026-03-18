@@ -321,7 +321,7 @@ async function main() {
     }
   }
 
-  const outPath = path.join(__dirname, '..', 'data', 'atlantico-translations-full.json')
+  const outPath = path.join(__dirname, '..', 'src', 'data', 'atlantico-translations-full.json')
   await fs.writeFile(outPath, JSON.stringify(out, null, 2), 'utf8')
   console.log(`\nDone. Wrote translations to ${outPath}`)
 }

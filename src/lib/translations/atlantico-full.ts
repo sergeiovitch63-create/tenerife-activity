@@ -22,7 +22,7 @@
  */
 
 import type { Locale } from '@/i18n/request'
-import fullTranslations from '../../data/atlantico-translations-full.json'
+import fullTranslations from '@/data/atlantico-translations-full.json'
 
 type AtlanticoLang = 'fr' | 'es' | 'de' | 'ru' | 'pl' | 'it'
 
