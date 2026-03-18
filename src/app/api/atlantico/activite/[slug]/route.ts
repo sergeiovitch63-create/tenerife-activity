@@ -162,8 +162,10 @@ export async function GET(
           const g: Record<string, unknown> = await groupRes.json()
           const code = String(g?.Code ?? g?.code ?? g?.id ?? groupId).trim()
           if (allExcluded.includes(code)) continue
+          const rawId = g?.id
+          const id: string | number = typeof rawId === 'string' || typeof rawId === 'number' ? rawId : groupId
           tours.push({
-            id: g?.id ?? groupId,
+            id,
             code: code || groupId,
             name: String(g?.name ?? g?.Name ?? g?.title ?? ''),
             desc: typeof g?.desc === 'string' ? g.desc : String(g?.description ?? g?.Desc ?? ''),
