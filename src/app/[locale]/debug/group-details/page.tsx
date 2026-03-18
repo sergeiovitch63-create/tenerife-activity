@@ -62,7 +62,8 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
   const { locale } = await params
   const query = (await searchParams) || {}
 
-  const lang = mapLocaleToLang(locale) // Atlantico format: ENG, ESP, etc.
+  // Force stable Atlantico base language (ENG) regardless of site locale
+  const lang = 'ENG'
   const code = query.code || ''
 
   if (!code) {
@@ -102,7 +103,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
     const origin = envBase ? envBase : `${protocol}://${host}`
 
     const res = await fetch(
-      `${origin}/api/atlantico/group-details/${encodeURIComponent(code)}/${encodeURIComponent(lang)}`,
+      `${origin}/api/atlantico/group-details/${encodeURIComponent(code)}/ENG`,
       { cache: 'no-store' }
     )
 

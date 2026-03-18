@@ -133,7 +133,7 @@ export function CheckoutClient({
         eventIds.map(async (eventId) => {
           try {
             const response = await fetch(
-              `/api/atlantico/event-details?eventId=${eventId}&lang=${validItems[0]?.language || 'ENG'}`
+              `/api/atlantico/event-details?eventId=${eventId}&lang=ENG`
             )
             if (response.ok) {
               const data = await response.json()

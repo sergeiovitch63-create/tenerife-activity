@@ -305,7 +305,7 @@ export function PremiumActivityPage({ locale = 'en', resolved, slug, isActivity5
 
     // Fetch event details - try normalized route first, fallback to raw route
     Promise.race([
-      fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(atlLang)}`).then(res => res.ok ? res.json() : null),
+      fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=ENG`).then(res => res.ok ? res.json() : null),
       fetch(`/api/atlantico/event/${selectedEventId}/${atlLang}`).then(res => res.ok ? res.json() : null)
     ])
       .then(async (data) => {

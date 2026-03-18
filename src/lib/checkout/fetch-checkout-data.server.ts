@@ -49,7 +49,7 @@ async function fetchMeetingPoints(
     eventIds.map(async (eventId) => {
       try {
         const res = await fetch(
-          `${origin}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=${encodeURIComponent(lang)}`,
+          `${origin}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=ENG`,
           { cache: 'no-store' }
         )
         if (!res.ok) return

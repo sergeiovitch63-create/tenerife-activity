@@ -49,7 +49,8 @@ export default async function EventDetailsDebugPage({ params, searchParams }: Pa
   const { locale } = await params
   const query = (await searchParams) || {}
 
-  const lang = mapLocaleToLang(locale)
+  // Force stable Atlantico base language (ENG) regardless of site locale
+  const lang = 'ENG'
   const eventId = query.eventId || ''
 
   if (!eventId) {

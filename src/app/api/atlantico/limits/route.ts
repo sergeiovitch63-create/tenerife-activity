@@ -299,7 +299,7 @@ export async function GET(request: NextRequest) {
       try {
         // Build internal API URL (use request URL as base)
         const baseUrl = request.nextUrl.origin
-        const eventDetailsUrl = `${baseUrl}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=${encodeURIComponent(lang)}`
+        const eventDetailsUrl = `${baseUrl}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=ENG`
         
         // Fetch event details to get times
         const eventDetailsResponse = await fetch(eventDetailsUrl, {

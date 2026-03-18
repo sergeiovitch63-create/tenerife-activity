@@ -60,7 +60,8 @@ export default async function ActiviteGroupDetailsPage({ params, searchParams }:
   const { locale } = await params
   const query = (await searchParams) || {}
 
-  const lang = mapLocaleToLang(locale)
+  // Force stable Atlantico base language (ENG) regardless of site locale
+  const lang = 'ENG'
   const code = query.code || ''
   const tActivite = await getTranslations({ locale, namespace: 'activite' })
   const tGroupDetails = await getTranslations({ locale, namespace: 'groupDetails' })
@@ -93,7 +94,7 @@ export default async function ActiviteGroupDetailsPage({ params, searchParams }:
   try {
     const [detailsRes, imagesRes] = await Promise.all([
       fetch(
-        `${origin}/api/atlantico/group-details/${encodeURIComponent(code)}/${encodeURIComponent(lang)}`,
+        `${origin}/api/atlantico/group-details/${encodeURIComponent(code)}/ENG`,
         fetchOpts
       ),
       fetch(

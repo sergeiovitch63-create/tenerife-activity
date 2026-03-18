@@ -325,7 +325,7 @@ export function ActivityDetailClient({
           // Fetch eventDetails to get times
           if (selectedEventId) {
             try {
-              const eventDetailsRes = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=${encodeURIComponent(lang)}`)
+              const eventDetailsRes = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(selectedEventId)}&lang=ENG`)
               if (eventDetailsRes.ok) {
                 const eventDetails = await eventDetailsRes.json()
                 const times = Array.isArray(eventDetails.times) ? eventDetails.times.filter((t: string) => t && t !== '00:00' && t !== '') : []

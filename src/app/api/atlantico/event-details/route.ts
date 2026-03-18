@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchJson } from '@/lib/atlantico/client'
-import { mapLocaleToAtlanticoLang } from '@/lib/atlantico/lang'
 
 /**
  * Meeting point can be a string or an object with more details
@@ -96,26 +95,21 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl
     const eventId = searchParams.get('eventId')
-    const lang = searchParams.get('lang')
+    // Force stable base language (ENG) regardless of site locale
+    const forcedLang = 'ENG'
 
-    if (!eventId || !lang) {
+    if (!eventId) {
       return NextResponse.json(
         {
           error: 'Missing parameters',
-          message: 'eventId and lang are required',
+          message: 'eventId is required',
         },
         { status: 400 }
       )
     }
 
-    // Normalize language - use proper mapping (CAS/ENG/FRA/RUS/ALE/ITA)
-    // If lang is already in correct format, use it; otherwise map from locale
-    const normalizedLang = lang.length === 3 && ['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA'].includes(lang.toUpperCase())
-      ? lang.toUpperCase()
-      : mapLocaleToAtlanticoLang(lang)
-
     // Fetch event details
-    const raw = await fetchJson(`/eventDetails/${eventId}/${normalizedLang}`)
+    const raw = await fetchJson(`/eventDetails/${eventId}/${forcedLang}`)
 
     // Normalize response
     const normalized = normalizeEventDetails(raw, eventId)

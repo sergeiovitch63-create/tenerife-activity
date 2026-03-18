@@ -124,7 +124,7 @@ export function AtlanticoDebugClient() {
 
     try {
       const response = await fetch(
-        `/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=${encodeURIComponent(lang)}`
+        `/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=ENG`
       )
 
       if (!response.ok) {

@@ -399,7 +399,7 @@ export function GroupDetails508LuxLayout({
         eventIds.map(async (eid): Promise<EventOption> => {
           try {
             const [detailsRes, pricesRes] = await Promise.all([
-              fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eid)}&lang=${encodeURIComponent(atlLang)}`),
+              fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eid)}&lang=ENG`),
               fetch(`/api/atlantico/prices?eventId=${encodeURIComponent(eid)}&date=${encodeURIComponent(dateStr)}&lang=${encodeURIComponent(atlLang)}`),
             ])
             const details = detailsRes.ok ? ((await detailsRes.json()) as { name?: string; desc?: string; icons?: string[]; times?: string[]; raw?: Record<string, unknown> }) : null

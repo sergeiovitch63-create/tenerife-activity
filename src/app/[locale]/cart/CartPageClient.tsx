@@ -29,7 +29,7 @@ function useGroupName(tGroup: string, lang: string, fallback: string): string {
       return
     }
     let cancelled = false
-    fetch(`/api/atlantico/group-details/${encodeURIComponent(tGroup)}/${encodeURIComponent(lang)}`)
+    fetch(`/api/atlantico/group-details/${encodeURIComponent(tGroup)}/ENG`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { name?: string } | null) => {
         if (!cancelled && data?.name) setName(decodeTextFromApi(data.name))
@@ -201,7 +201,8 @@ interface CartPageClientProps {
 export function CartPageClient({ groupNames }: CartPageClientProps) {
   const t = useTranslations('cart')
   const locale = useLocale()
-  const lang = mapLocaleToLang(locale)
+  // Force stable Atlantico base language (ENG) regardless of site locale
+  const lang = 'ENG'
   const router = useRouter()
   const { items, removeItem, updateItem, removeExpired, getTotal, getCurrency } = useCartStore()
   const [mounted, setMounted] = useState(false)

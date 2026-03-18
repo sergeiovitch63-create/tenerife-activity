@@ -159,7 +159,7 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
     try {
       // Fetch event details and limits in parallel
       const [eventDetailsRes, limitsRes] = await Promise.all([
-        fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(primaryEventId)}&lang=${encodeURIComponent(atlLang)}`),
+        fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(primaryEventId)}&lang=ENG`),
         (async () => {
           const now = new Date()
           const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
@@ -511,7 +511,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
             const eventIds = parseEventIds(tour.ids as string | number | string[] | number[] | undefined)
             if (eventIds.length > 0) {
               try {
-                const res = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eventIds[0])}&lang=${encodeURIComponent(atlLang)}`)
+                const res = await fetch(`/api/atlantico/event-details?eventId=${encodeURIComponent(eventIds[0])}&lang=ENG`)
                 return res.ok ? await res.json() : null
               } catch {
                 return null
