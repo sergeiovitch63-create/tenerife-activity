@@ -24,7 +24,13 @@ type Tour = {
 }
 
 const REVALIDATE = 60
-const EXCLUDED_CODES = ['222', '551', '492', '514']
+const EXCLUDED_CODES = ['222', '551']
+
+/** Group IDs to inject for specific vibe slugs (e.g. when not in classification list) */
+const EXTRA_GROUP_IDS_BY_SLUG: Record<string, string[]> = {
+  'diving-fishing': ['518', '519'],
+  'vip-tours': ['303', '403', '479', '480', '508', '509', '510', '511', '513', '515', '516'],
+}
 
 export async function GET(
   request: NextRequest,
@@ -140,6 +146,38 @@ export async function GET(
 
     const allExcluded = [...new Set([...EXCLUDED_CODES, ...hiddenGroupIds])]
     tours = tours.filter((t) => !allExcluded.includes(String(t.code ?? t.id ?? '').trim()))
+
+    // Inject extra groups for specific slugs (e.g. diving-fishing: 518, 519)
+    const extraIds = EXTRA_GROUP_IDS_BY_SLUG[slug]
+    if (extraIds?.length) {
+      const existingCodes = new Set(tours.map((t) => String(t.code ?? t.id ?? '').trim()))
+      for (const groupId of extraIds) {
+        if (existingCodes.has(groupId)) continue
+        try {
+          const groupRes = await fetch(
+            `${origin}/api/atlantico/group/${encodeURIComponent(groupId)}/${encodeURIComponent(validatedLang)}`,
+            fetchOpts
+          )
+          if (!groupRes.ok) continue
+          const g: Record<string, unknown> = await groupRes.json()
+          const code = String(g?.Code ?? g?.code ?? g?.id ?? groupId).trim()
+          if (allExcluded.includes(code)) continue
+          tours.push({
+            id: g?.id ?? groupId,
+            code: code || groupId,
+            name: String(g?.name ?? g?.Name ?? g?.title ?? ''),
+            desc: typeof g?.desc === 'string' ? g.desc : String(g?.description ?? g?.Desc ?? ''),
+            image: typeof g?.image === 'string' ? g.image : undefined,
+            price: typeof g?.priceA === 'number' ? g.priceA : typeof (g as any)?.price === 'number' ? (g as any).price : undefined,
+            duration: typeof g?.duration === 'string' ? g.duration : undefined,
+            ids: Array.isArray(g?.ids) ? g.ids : undefined,
+          })
+          existingCodes.add(code)
+        } catch {
+          // skip on fetch error
+        }
+      }
+    }
 
     return NextResponse.json(
       { ok: true, tours, hiddenGroupIds },

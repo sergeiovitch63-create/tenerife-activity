@@ -72,7 +72,16 @@ async function readCatalogCodesFromFile() {
   const raw = await fs.readFile(catalogPath, 'utf8')
   const json = JSON.parse(raw)
   const items = Array.isArray(json) ? json : Array.isArray(json?.items) ? json.items : []
-  const codes = items.map((it) => normalizeCode(it?.code ?? it?.Code ?? it?.id ?? it?.Id)).filter(Boolean)
+  // Use code if valid and !== -1, otherwise use id → 179 identifiants au lieu de 22
+  const codes = items
+    .map((it) => {
+      const codeVal = it?.code ?? it?.Code
+      const idVal = it?.id ?? it?.Id
+      const codeStr = String(codeVal ?? '').trim()
+      const validCode = codeStr && codeStr !== '-1'
+      return (validCode ? codeStr : String(idVal ?? '').trim()) || ''
+    })
+    .filter(Boolean)
   return Array.from(new Set(codes))
 }
 
@@ -239,6 +248,15 @@ async function main() {
       continue
     }
 
+    // DEBUG: vérifier si l'API Atlantico renvoie des données ou des champs vides
+    const rawName = detailsENG?.name ?? detailsENG?.Name
+    const rawDesc = detailsENG?.desc ?? detailsENG?.description ?? detailsENG?.Desc
+    const rawWillDo = detailsENG?.willDo ?? detailsENG?.WillDo
+    console.log(`  [DEBUG fetchGroupDetailsENG] code=${code}`)
+    console.log(`    name: ${rawName === '' || rawName == null ? '(vide)' : JSON.stringify(String(rawName).slice(0, 80))}${rawName != null && String(rawName).length > 80 ? '...' : ''}`)
+    console.log(`    desc: ${rawDesc === '' || rawDesc == null ? '(vide)' : JSON.stringify(String(rawDesc).slice(0, 80))}${rawDesc != null && String(rawDesc).length > 80 ? '...' : ''}`)
+    console.log(`    willDo: ${rawWillDo === '' || rawWillDo == null ? '(vide)' : JSON.stringify(String(rawWillDo).slice(0, 80))}${rawWillDo != null && String(rawWillDo).length > 80 ? '...' : ''}`)
+
     const baseGroupDetails = {
       name: safeString(detailsENG?.name ?? detailsENG?.Name),
       desc: safeString(detailsENG?.desc ?? detailsENG?.description ?? detailsENG?.Desc),
@@ -279,6 +297,8 @@ async function main() {
 
     for (const lang of TARGET_LANGS) {
       console.log(`  Translating to ${lang}...`)
+      console.log('  [DEBUG avant Claude] baseGroupDetails:', JSON.stringify(baseGroupDetails, null, 2))
+      console.log('  [DEBUG avant Claude] eventOptionsENG:', JSON.stringify(eventOptionsENG, null, 2))
       try {
         const [groupDetailsTranslated, eventOptionsTranslated] = await Promise.all([
           claudeTranslateJson({
@@ -295,18 +315,21 @@ async function main() {
           }),
         ])
 
+        console.log('  [DEBUG après Claude] groupDetailsTranslated:', JSON.stringify(groupDetailsTranslated, null, 2))
+        console.log('  [DEBUG après Claude] eventOptionsTranslated:', JSON.stringify(eventOptionsTranslated, null, 2))
+
         out[code][lang] = {
           groupDetails: {
-            name: safeString(groupDetailsTranslated?.name),
-            desc: safeString(groupDetailsTranslated?.desc),
-            willDo: safeString(groupDetailsTranslated?.willDo),
-            faq: safeString(groupDetailsTranslated?.faq),
-            canDesc: safeString(groupDetailsTranslated?.canDesc),
-            childAge: safeString(groupDetailsTranslated?.childAge),
-            infantAge: safeString(groupDetailsTranslated?.infantAge),
+            name: safeString(groupDetailsTranslated?.payload?.name),
+            desc: safeString(groupDetailsTranslated?.payload?.desc),
+            willDo: safeString(groupDetailsTranslated?.payload?.willDo),
+            faq: safeString(groupDetailsTranslated?.payload?.faq),
+            canDesc: safeString(groupDetailsTranslated?.payload?.canDesc),
+            childAge: safeString(groupDetailsTranslated?.payload?.childAge),
+            infantAge: safeString(groupDetailsTranslated?.payload?.infantAge),
           },
-          eventOptions: Array.isArray(eventOptionsTranslated)
-            ? eventOptionsTranslated.map((o) => ({
+          eventOptions: Array.isArray(eventOptionsTranslated?.payload)
+            ? eventOptionsTranslated.payload.map((o) => ({
                 eventId: safeString(o?.eventId),
                 name: safeString(o?.name),
                 desc: safeString(o?.desc),
