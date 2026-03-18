@@ -26,7 +26,8 @@
     "audit2:dump": "tsx scripts/audit2-dump-raw.ts",
     "download:group-details-images": "node scripts/download-group-details-images.mjs",
     "scan:group-images": "node scripts/scan-group-details-folders.mjs",
-    "translate:atlantico": "node ./scripts/generate-atlantico-translations.mjs"
+    "translate:atlantico": "node ./scripts/generate-atlantico-translations.mjs",
+    "translate:all": "node ./scripts/translate-all.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
