@@ -14,8 +14,8 @@ import { GROUP_DETAILS_IMAGES } from '@/data/group-details-images.generated'
 import { getLocalGroupImages } from '@/lib/atlantico/get-local-group-images.server'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
-import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
 import type { Locale } from '@/i18n/request'
+import { getAtlanticoTranslation } from '@/lib/translations/atlantico-full'
 import { GroupDetails508LuxLayout } from '@/app/[locale]/debug/group-details/GroupDetails508LuxLayout.client'
 import { getTranslations } from 'next-intl/server'
 
@@ -199,23 +199,62 @@ export default async function ActiviteGroupDetailsPage({ params, searchParams }:
     const rawWillDo = codeStr !== '340' ? details.willDo : undefined
     const rawFaq = decodeTextFromApi(details.faq)
     const rawCancel = cancellationPolicy
+
     const loc = locale as Locale
+
+    const translatedName = getAtlanticoTranslation(codeStr, loc, 'name', { fallback: rawName })
+    const translatedDesc =
+      rawDesc != null
+        ? getAtlanticoTranslation(codeStr, loc, 'desc', { fallback: rawDesc })
+        : undefined
+    const translatedItinerary =
+      rawItinerary != null
+        ? getAtlanticoTranslation(codeStr, loc, 'desc', { fallback: rawItinerary })
+        : undefined
+    const translatedWillDo =
+      rawWillDo != null
+        ? getAtlanticoTranslation(codeStr, loc, 'willDo', {
+            fallback: String(rawWillDo),
+          })
+        : undefined
+    const translatedFaq =
+      rawFaq != null
+        ? getAtlanticoTranslation(codeStr, loc, 'faq', { fallback: rawFaq })
+        : undefined
+    const translatedCancel =
+      rawCancel != null
+        ? getAtlanticoTranslation(codeStr, loc, 'cancellationPolicy', {
+            fallback: String(rawCancel),
+          })
+        : undefined
+    const translatedChildAge =
+      details.childAge != null
+        ? getAtlanticoTranslation(codeStr, loc, 'childAge', {
+            fallback: decodeTextFromApi(details.childAge),
+          })
+        : undefined
+    const translatedInfantAge =
+      details.infantAge != null
+        ? getAtlanticoTranslation(codeStr, loc, 'infantAge', {
+            fallback: decodeTextFromApi(details.infantAge),
+          })
+        : undefined
 
     return (
       <GroupDetails508LuxLayout
         heroUrl={heroUrl}
         galleryUrls={galleryUrls}
-        name={translateContent(rawName, loc)}
+        name={translatedName}
         code={codeStr}
         duration={details.duration}
         price={details.price}
-        desc={rawDesc ? translateDescriptionByCode(codeStr, rawDesc, loc) : undefined}
-        itinerary={rawItinerary ? translateContent(rawItinerary, loc) : undefined}
-        willDo={rawWillDo ? translateContent(String(rawWillDo), loc) : undefined}
-        faq={rawFaq ? translateContent(rawFaq, loc) : undefined}
-        cancellationPolicy={rawCancel ? translateContent(String(rawCancel), loc) : undefined}
-        childAge={details.childAge ? translateContent(decodeTextFromApi(details.childAge), loc) : undefined}
-        infantAge={details.infantAge ? translateContent(decodeTextFromApi(details.infantAge), loc) : undefined}
+        desc={translatedDesc}
+        itinerary={translatedItinerary}
+        willDo={translatedWillDo}
+        faq={translatedFaq}
+        cancellationPolicy={translatedCancel}
+        childAge={translatedChildAge}
+        infantAge={translatedInfantAge}
         eventIds={eventIds}
         locale={locale}
         lang={lang}

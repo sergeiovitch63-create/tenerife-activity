@@ -31,6 +31,10 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
+// For translate-all, we want to hit Atlantico directly for group details,
+// to avoid depending on local Next.js API routes (which may return 500 when ENG is forced).
+const ATLANTICO_API_BASE_URL =
+  process.env.ATLANTICO_API_BASE_URL || 'https://api.atlanticoexcursiones.com'
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 
 if (!ANTHROPIC_API_KEY) {
@@ -98,7 +102,22 @@ async function fetchGroupCodes() {
 }
 
 async function fetchGroupDetailsENG(code) {
-  return await fetchJson(`${BASE_URL}/api/atlantico/group-details/${encodeURIComponent(code)}/ENG`)
+  const url = `${ATLANTICO_API_BASE_URL}/groupDetails/${encodeURIComponent(code)}/ENG`
+  try {
+    return await fetchJson(url)
+  } catch (e) {
+    // Fallback: some Atlantico codes are only available via /group/{code}/ENG
+    const msg = e instanceof Error ? e.message : String(e)
+    if (msg.includes('HTTP 500') || msg.includes('HTTP 404')) {
+      const fallbackUrl = `${ATLANTICO_API_BASE_URL}/group/${encodeURIComponent(code)}/ENG`
+      console.warn(
+        `  groupDetails ENG failed for code=${code} (${msg}). Trying fallback /group/:`,
+        fallbackUrl
+      )
+      return await fetchJson(fallbackUrl)
+    }
+    throw e
+  }
 }
 
 function extractEventIdsFromGroupDetails(details) {
@@ -120,7 +139,7 @@ function extractEventIdsFromGroupDetails(details) {
 
 async function fetchEventDetailsENG(eventId) {
   return await fetchJson(
-    `${BASE_URL}/api/atlantico/event-details?eventId=${encodeURIComponent(eventId)}&lang=ENG`
+    `${ATLANTICO_API_BASE_URL}/eventDetails/${encodeURIComponent(eventId)}/ENG`
   )
 }
 

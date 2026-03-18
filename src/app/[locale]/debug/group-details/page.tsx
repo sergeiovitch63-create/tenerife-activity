@@ -218,7 +218,6 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
 
   // Use 508 layout for all group details (same form for every group)
   if (details) {
-    const loc = locale as Locale
     const cancellationPolicy =
       (details.canDesc as string) ||
       (details.canTitle as string) ||
@@ -247,8 +246,8 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
         willDo={codeStr !== '340' ? (details.willDo as string | undefined) : undefined}
         faq={decodeTextFromApi(details.faq)}
         cancellationPolicy={cancellationPolicy}
-        childAge={details.childAge ? translateContent(decodeTextFromApi(details.childAge), loc) : undefined}
-        infantAge={details.infantAge ? translateContent(decodeTextFromApi(details.infantAge), loc) : undefined}
+        childAge={details.childAge ? decodeTextFromApi(details.childAge) : undefined}
+        infantAge={details.infantAge ? decodeTextFromApi(details.infantAge) : undefined}
         eventIds={eventIds}
         locale={locale}
         lang={lang}
