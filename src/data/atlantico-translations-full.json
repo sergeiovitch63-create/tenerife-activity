@@ -1,212 +1,142 @@
 {
-  "492": {
-    "fr": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "es": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "ru": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "pl": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "it": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    }
-  },
   "515": {
     "fr": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Profitez d'un accès exclusif pour assister à la transformation du Parc National du Teide au coucher du soleil et soyez émerveillé par le ciel étoilé, l'un des plus purs de la planète.\n\nDans cette expérience VIP, vous explorerez les différents écosystèmes du Parc lors d'une ascension privée et confortable, des paysages ruraux et forêts de lauriers à la haute montagne, habitat d'espèces uniques comme le genêt et le rosalillo de cumbre. En chemin, vous découvrirez des secrets naturels peu connus, tels que les tunnels volcaniques qui abritent des créatures adaptées à l'obscurité et les chauves-souris natives discrètes volant dans la nuit.\n\nÀ la tombée de la nuit, le ciel du Teide devient une scène inégalée : sous une atmosphère cristalline, libre de pollution lumineuse, vous aurez la chance d'admirer 83 des 88 constellations connues, planètes, amas et galaxies lointaines. Le tout accompagné de votre guide Starlight privé, qui vous révélera les mythes, curiosités et mystères du cosmos, tandis que vous profitez d'une attention personnalisée.\n\nL'observation aura lieu dans un lieu unique, la station inférieure du téléphérique, à 2 356 mètres d'altitude, avec des télescopes professionnels longue portée à votre disposition. Les nuits de pleine lune, vous découvrirez en détail la fascinante géographie lunaire, comme si vous marchiez à sa surface.\n\nUn voyage exclusif, intime et sophistiqué qui combine le meilleur de la nature, de l'astronomie et du plaisir de voyager avec style.",
+        "willDo": "Vivez le Teide comme un véritable invité privilégié\n",
+        "faq": "Recommandations :\n\n\n\t\n\tPortez des vêtements confortables et chauds ainsi que des chaussures appropriées.\n\t\n\t\n\tSi vous avez des problèmes de santé, consultez votre médecin avant de commencer l'excursion.\n\t\n\n",
+        "canDesc": "Pour les activités privées, la date peut être modifiée ou l'activité annulée gratuitement jusqu'à 72 heures avant l'activité. Après cette période, l'annulation entraînera une charge de 50 % du montant. Si l'annulation intervient moins de 24 heures à l'avance, 100 % du montant sera retenu. Jusqu'à 3 modifications peuvent être effectuées. Si les conditions météorologiques empêchent le déroulement complet de l'activité, le montant intégral sera remboursé. Si les conditions météorologiques empêchent l'observation astronomique, un remboursement proportionnel sera effectué.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        }
+      ]
     },
     "es": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Disfruta de acceso exclusivo para presenciar la transformación del Parque Nacional del Teide al atardecer y maravíllate con el cielo estrellado, uno de los más puros del planeta.\n\nEn esta experiencia VIP, explorarás los diferentes ecosistemas del Parque en un ascenso privado y confortable, desde paisajes rurales y bosques de laurel hasta la alta montaña, hogar de especies únicas como la retama y el rosalillo de cumbre. En el camino, descubrirás secretos naturales poco conocidos, como túneles volcánicos que albergan criaturas adaptadas a la oscuridad y discretos murciélagos nativos volando en la noche.\n\nCuando cae la noche, el cielo del Teide se convierte en un escenario sin igual: bajo una atmósfera cristalina, libre de contaminación lumínica, tendrás la oportunidad de admirar 83 de las 88 constelaciones conocidas, planetas, cúmulos y galaxias lejanas. Todo acompañado por tu guía privado Starlight, quien revelará mitos, curiosidades y misterios del cosmos, mientras disfrutas de atención personalizada.\n\nLa observación tendrá lugar en una ubicación única, la estación base del teleférico, a 2.356 metros sobre el nivel del mar, con telescopios profesionales de largo alcance a tu disposición. En noches de luna llena, descubrirás en detalle la fascinante geografía lunar, como si caminara sobre su superficie.\n\nUn viaje exclusivo, íntimo y sofisticado que combina lo mejor de la naturaleza, la astronomía y el placer de viajar con estilo.",
+        "willDo": "Vive el Teide como un verdadero huésped privilegiado\n",
+        "faq": "Recomendaciones:\n\n\n\t\n\tUsa ropa cómoda y abrigada y calzado adecuado.\n\t\n\t\n\tSi tienes problemas de salud, consulta con tu médico antes de comenzar la excursión.\n\t\n\n",
+        "canDesc": "Para actividades privadas, la fecha puede cambiarse o la actividad cancelarse sin cargo hasta 72 horas antes de la actividad. Después de este período, la cancelación conllevará un cargo del 50% del importe. Si la cancelación se produce con menos de 24 horas de anticipación, se retendrá el 100% del importe. Se pueden realizar hasta 3 cambios. Si las condiciones meteorológicas impiden que se realice la actividad completa, se reembolsará el importe total. Si las condiciones meteorológicas impiden la observación astronómica, se realizará un reembolso proporcional.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        }
+      ]
     },
     "de": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Genießen Sie exklusiven Zugang, um die Umwandlung des Teide-Nationalparks bei Sonnenuntergang zu erleben und sich vom Sternenhimmel, einem der reinsten auf dem Planeten, verzaubern zu lassen.\n\nIn diesem VIP-Erlebnis erkunden Sie die verschiedenen Ökosysteme des Parks bei einem privaten und komfortablen Aufstieg, von ländlichen Landschaften und Lorbeerwäldern bis zum Hochgebirge, Heimat einzigartiger Arten wie Ginster und Rosalillo de Cumbre. Unterwegs entdecken Sie wenig bekannte Naturgeheimnisse, wie Vulkantunnel, die Kreaturen beherbergen, die an Dunkelheit angepasst sind, und diskrete einheimische Fledermäuse, die durch die Nacht fliegen.\n\nWenn die Nacht hereinbricht, wird der Himmel von Teide zur unvergleichlichen Bühne: Unter einer kristallklaren Atmosphäre, frei von Lichtverschmutzung, haben Sie die Chance, 83 der 88 bekannten Sternbilder, Planeten, Sternhaufen und entfernte Galaxien zu bewundern. Alles begleitet von Ihrem privaten Starlight-Guide, der Ihnen Mythen, Kuriositäten und Geheimnisse des Kosmos offenbaren wird, während Sie personalisierte Aufmerksamkeit genießen.\n\nDie Beobachtung findet an einem einzigartigen Ort statt, der Basisstation der Seilbahn, auf 2.356 Metern über dem Meeresspiegel, mit professionellen Fernrohren zu Ihrer Verfügung. In Vollmondnächten entdecken Sie die faszinierende Mondgeografie im Detail, als würden Sie auf ihrer Oberfläche wandeln.\n\nEine exklusive, intime und raffinierte Reise, die das Beste aus Natur, Astronomie und dem Vergnügen des stilvollen Reisens verbindet.",
+        "willDo": "Erleben Sie Teide wie ein echter privilegierter Gast\n",
+        "faq": "Empfehlungen:\n\n\n\t\n\tTragen Sie bequeme und warme Kleidung sowie geeignetes Schuhwerk.\n\t\n\t\n\tWenn Sie gesundheitliche Probleme haben, konsultieren Sie vor Beginn des Ausflugs Ihren Arzt.\n\t\n\n",
+        "canDesc": "Bei privaten Aktivitäten kann das Datum bis zu 72 Stunden vor der Aktivität kostenlos geändert oder die Aktivität storniert werden. Nach diesem Zeitraum wird eine Stornierung mit 50% des Betrags berechnet. Erfolgt die Stornierung weniger als 24 Stunden im Voraus, wird 100% des Betrags einbehalten. Es können bis zu 3 Änderungen vorgenommen werden. Wenn Wetterbedingungen die vollständige Durchführung der Aktivität verhindern, wird der volle Betrag erstattet. Wenn Wetterbedingungen die astronomische Beobachtung verhindern, wird eine anteilige Rückerstattung vorgenommen.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        }
+      ]
     },
     "ru": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Наслаждайтесь эксклюзивным доступом к наблюдению трансформации национального парка Тейде на закате и восхищайтесь звёздным небом, одним из самых чистых на планете.\n\nВ этом VIP-опыте вы исследуете различные экосистемы парка во время приватного и комфортного подъёма, от сельских пейзажей и лавровых лесов до высокогорья, где обитают уникальные виды, такие как дрок и розалильо де кумбре. По пути вы откроете малоизвестные природные секреты, такие как вулканические туннели, в которых обитают существа, адаптированные к темноте, и скрытные местные летучие мыши, летающие в ночи.\n\nКогда наступает ночь, небо Тейде становится непревзойдённой сценой: под кристально чистой атмосферой, свободной от светового загрязнения, у вас будет возможность увидеть 83 из 88 известных созвездий, планет, звёздных скоплений и далёких галактик. Всё это под руководством вашего приватного гида Starlight, который раскроет мифы, любопытные факты и тайны космоса, пока вы наслаждаетесь персональным вниманием.\n\nНаблюдение будет проводиться в уникальном месте — на базовой станции канатной дороги на высоте 2356 метров над уровнем моря с профессиональными телескопами дальнего действия в вашем распоряжении. В ночи полнолуния вы сможете детально изучить увлекательную географию Луны, как если бы вы ходили по её поверхности.\n\nЭксклюзивное, интимное и изысканное путешествие, которое сочетает лучшее из природы, астрономии и удовольствия путешествовать со стилем.",
+        "willDo": "Ощутите Тейде как истинный привилегированный гость\n",
+        "faq": "Рекомендации:\n\n\n\t\n\tНосите удобную и тёплую одежду и подходящую обувь.\n\t\n\t\n\tЕсли у вас есть проблемы со здоровьем, проконсультируйтесь с врачом перед началом экскурсии.\n\t\n\n",
+        "canDesc": "Для приватных мероприятий дата может быть изменена или мероприятие отменено бесплатно за 72 часа до его проведения. После этого периода отмена будет сопровождаться взиманием 50% суммы. Если отмена происходит менее чем за 24 часа, будет удержана 100% сумма. Допускается до 3 изменений. Если погодные условия препятствуют полному проведению мероприятия, полная сумма будет возвращена. Если погодные условия препятствуют астрономическому наблюдению, будет произведен пропорциональный возврат.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        }
+      ]
     },
     "pl": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Ciesz się wyłącznym dostępem do obserwacji transformacji Parku Narodowego Teide o zachodzie słońca i zachwycaj się gwiazdami, jednym z najczystszych niebios na planecie.\n\nW tym doświadczeniu VIP będziesz eksplorować różne ekosystemy Parku podczas prywatnego i komfortowego wznoszenia się, od wiejskich krajobrazów i lasów laurowych po wysokie góry, dom unikalnych gatunków takich jak żarnowiec i różanecznik szczytowy. Po drodze odkryjesz mało znane tajemnice przyrody, takie jak wulkaniczne tunele, które są domem dla stworzeń przystosowanych do ciemności i dyskretnych rodzimych nietoperzy latających w nocy.\n\nKiedy zapada noc, niebo Teide staje się niezrównaną sceną: pod krystalicznie czystą atmosferą, wolną od zanieczyszczenia światłem, będziesz miał szansę podziwiać 83 z 88 znanych konstelacji, planety, gromady i odległe galaktyki. Wszystko w towarzystwie Twojego prywatnego przewodnika Starlight, który ujawni mity, ciekawostki i tajemnice kosmosu, podczas gdy będziesz cieszyć się spersonalizowaną uwagą.\n\nObserwacja odbędzie się w wyjątkowej lokalizacji, na stacji bazowej kolejki linowej, na wysokości 2356 metrów nad poziomem morza, z profesjonalnymi teleskopami dalekiego zasięgu do Twojej dyspozycji. W noce pełni księżyca odkryjesz szczegółowo fascynującą geografię księżyca, jakbyś spacerował po jego powierzchni.\n\nEkskluzywna, intymna i wyrafinowana podróż, która łączy najlepsze z przyrody, astronomii i przyjemności podróżowania w stylu.",
+        "willDo": "Doświadcz Teide jak prawdziwy uprzywilejowany gość\n",
+        "faq": "Rekomendacje:\n\n\n\t\n\tNoś wygodne i ciepłe ubrania oraz odpowiednie obuwie.\n\t\n\t\n\tJeśli masz problemy zdrowotne, skonsultuj się z lekarzem przed rozpoczęciem wycieczki.\n\t\n\n",
+        "canDesc": "W przypadku prywatnych aktywności, datę można zmienić lub anulować aktywność bezpłatnie do 72 godzin przed aktywnością. Po tym okresie anulowanie będzie wiązać się z opłatą w wysokości 50% kwoty. Jeśli anulowanie nastąpi mniej niż 24 godziny wcześniej, 100% kwoty zostanie zatrzymane. Można dokonać do 3 zmian. Jeśli warunki pogodowe uniemożliwią pełne przeprowadzenie aktywności, pełna kwota zostanie zwrócona. Jeśli warunki pogodowe uniemożliwią obserwację astronomiczną, zostanie dokonany zwrot proporcjonalny.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide de Noche VIP",
+          "desc": ""
+        }
+      ]
     },
     "it": {
       "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
+        "name": "Teide de Noche VIP",
+        "desc": "Goditi l'accesso esclusivo per assistere alla trasformazione del Parco Nazionale del Teide al tramonto e rimani affascinato dal cielo stellato, uno dei più puri del pianeta.\n\nIn questa esperienza VIP, esplorerai i diversi ecosistemi del Parco in una salita privata e confortevole, dai paesaggi rurali e dalle foreste di alloro alla alta montagna, dimora di specie uniche come la ginestra e il rosalillo di cumbre. Durante il percorso, scoprirai segreti naturali poco conosciuti, come i tunnel vulcanici che ospitano creature adattate all'oscurità e discreti pipistrelli nativi che volano nella notte.\n\nCon il calare della notte, il cielo del Teide diventa un palcoscenico senza rivali: sotto un'atmosfera cristallina, libera dall'inquinamento luminoso, avrai la possibilità di ammirare 83 delle 88 costellazioni conosciute, pianeti, ammassi e galassie lontane. Il tutto accompagnato dalla tua guida privata Starlight, che ti rivelerà miti, curiosità e misteri del cosmo, mentre godrai di un'attenzione personalizzata.\n\nL'osservazione avrà luogo in una location unica, la stazione di base della funivia, a 2.356 metri sul livello del mare, con telescopi professionali a lunga portata a tua disposizione. Nelle notti di luna piena, scoprirai nel dettaglio l'affascinante geografia lunare, come se camminassi sulla sua superficie.\n\nUn viaggio esclusivo, intimo e sofisticato che combina il meglio della natura, dell'astronomia e il piacere di viaggiare con stile.",
+        "willDo": "Vivi il Teide come un vero ospite privilegiato\n",
+        "faq": "Raccomandazioni:\n\n\n\t\n\tIndossa abbigliamento comodo e caldo e calzature adatte.\n\t\n\t\n\tSe hai problemi di salute, consulta il tuo medico prima di iniziare l'escursione.\n\t\n\n",
+        "canDesc": "Per le attività private, la data può essere modificata o l'attività cancellata gratuitamente fino a 72 ore prima dell'attività. Dopo questo periodo, la cancellazione comporterà una commissione del 50% dell'importo. Se la cancellazione avviene meno di 24 ore prima, il 100% dell'importo sarà trattenuto. Sono consentiti fino a 3 cambiamenti. Se le condizioni meteorologiche impediscono lo svolgimento completo dell'attività, l'importo intero sarà rimborsato. Se le condizioni meteorologiche impediscono l'osservazione astronomica, sarà effettuato un rimborso proporzionale.",
+        "childAge": "8 - 13 ",
+        "infantAge": "0 - 7"
       },
-      "eventOptions": []
-    }
-  },
-  "516": {
-    "fr": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "es": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "de": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "ru": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "pl": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
-    },
-    "it": {
-      "groupDetails": {
-        "name": "",
-        "desc": "",
-        "willDo": "",
-        "faq": "",
-        "canDesc": "",
-        "childAge": "",
-        "infantAge": ""
-      },
-      "eventOptions": []
+      "eventOptions": [
+        {
+          "eventId": "1831",
+          "name": "Teide di Notte VIP",
+          "desc": ""
+        },
+        {
+          "eventId": "1832",
+          "name": "Teide di Notte VIP",
+          "desc": ""
+        }
+      ]
     }
   }
 }
