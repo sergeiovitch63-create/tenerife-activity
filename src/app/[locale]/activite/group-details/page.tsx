@@ -213,8 +213,8 @@ export default async function ActiviteGroupDetailsPage({ params, searchParams }:
         willDo={rawWillDo ? translateContent(String(rawWillDo), loc) : undefined}
         faq={rawFaq ? translateContent(rawFaq, loc) : undefined}
         cancellationPolicy={rawCancel ? translateContent(String(rawCancel), loc) : undefined}
-        childAge={decodeTextFromApi(details.childAge)}
-        infantAge={decodeTextFromApi(details.infantAge)}
+        childAge={details.childAge ? translateContent(decodeTextFromApi(details.childAge), loc) : undefined}
+        infantAge={details.infantAge ? translateContent(decodeTextFromApi(details.infantAge), loc) : undefined}
         eventIds={eventIds}
         locale={locale}
         lang={lang}

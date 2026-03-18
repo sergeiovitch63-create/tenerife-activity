@@ -19,6 +19,8 @@ import { YouMightAlsoLike } from '@/components/atlantico/YouMightAlsoLike.client
 import { isCombinationEvent } from '@/config/combination-tours'
 import { isDateRangeGroup } from '@/config/date-range-tours'
 import { useTranslations } from 'next-intl'
+import type { Locale } from '@/i18n/request'
+import { translateContent } from '@/lib/translations/atlantico-content'
 type EventOption = {
   eventId: string
   name: string
@@ -402,9 +404,9 @@ export function GroupDetails508LuxLayout({
             ])
             const details = detailsRes.ok ? ((await detailsRes.json()) as { name?: string; desc?: string; icons?: string[]; times?: string[]; raw?: Record<string, unknown> }) : null
             const pricesJson = pricesRes.ok ? ((await pricesRes.json()) as { type?: string; adult?: number; child?: number; infant?: number; raw?: Record<string, unknown>; tiers?: Array<{ days: number; price: number }> }) : null
-
-            const eventName = decodeTextFromApi(details?.name) || `Option ${eid}`
-            const eventDesc = decodeTextFromApi(details?.desc) || ''
+            const loc = locale as Locale
+            const eventName = translateContent(decodeTextFromApi(details?.name) || `Option ${eid}`, loc)
+            const eventDesc = translateContent(decodeTextFromApi(details?.desc) || '', loc)
             let priceVal: number | null = null
             let childPriceVal: number | null = null
             let infantPriceVal: number | null = null

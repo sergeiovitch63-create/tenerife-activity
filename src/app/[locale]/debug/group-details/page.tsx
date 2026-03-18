@@ -21,6 +21,8 @@ import { FaqSections } from '@/components/atlantico/FaqSections'
 import { GroupDetails508LuxLayout } from './GroupDetails508LuxLayout.client'
 import { GroupDetailsHeroCarousel } from './GroupDetailsHeroCarousel.client'
 import { getTranslations } from 'next-intl/server'
+import { translateContent } from '@/lib/translations/atlantico-content'
+import type { Locale } from '@/i18n/request'
 
 interface PageParams {
   params: Promise<{ locale: string }>
@@ -215,6 +217,7 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
 
   // Use 508 layout for all group details (same form for every group)
   if (details) {
+    const loc = locale as Locale
     const cancellationPolicy =
       (details.canDesc as string) ||
       (details.canTitle as string) ||
@@ -243,8 +246,8 @@ export default async function GroupDetailsDebugPage({ params, searchParams }: Pa
         willDo={codeStr !== '340' ? (details.willDo as string | undefined) : undefined}
         faq={decodeTextFromApi(details.faq)}
         cancellationPolicy={cancellationPolicy}
-        childAge={decodeTextFromApi(details.childAge)}
-        infantAge={decodeTextFromApi(details.infantAge)}
+        childAge={details.childAge ? translateContent(decodeTextFromApi(details.childAge), loc) : undefined}
+        infantAge={details.infantAge ? translateContent(decodeTextFromApi(details.infantAge), loc) : undefined}
         eventIds={eventIds}
         locale={locale}
         lang={lang}
