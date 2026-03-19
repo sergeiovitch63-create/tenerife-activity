@@ -497,6 +497,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
   const isVipTour = isVipTourGroup(tour.code)
   const isActivity508 = tour.code === '508'
   const atlLang = mapLocaleToAtlanticoLang(locale)
+  const localCover = `/images/tours-list/${tour.code}/cover.png`
   
   // Activity 508: Use exact same image as hero (simplified - same logic as PremiumActivityPage)
   useEffect(() => {
@@ -704,15 +705,19 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
     if (isVipTour && vipTourImage) {
       return vipTourImage
     }
-    // Fallback to tour.image or apiImage
+    // Fallback to API-provided images first
     if (tour.image) {
       return buildAtlanticoImageUrl(tour.image)
     }
     if (apiImage) {
       return apiImage
     }
+    // Final fallback for vibe cards: local curated cover in public/images/tours-list/{code}/cover.png
+    if (localCover) {
+      return localCover
+    }
     return null
-  }, [isActivity508, heroImage, isVipTour, vipTourImage, tour.image, apiImage])
+  }, [isActivity508, heroImage, isVipTour, vipTourImage, localCover, tour.image, apiImage])
 
     return (
     <Link
@@ -732,6 +737,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
+            fallbackSrc="/images/hero-poster.jpg"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm bg-glass-50">

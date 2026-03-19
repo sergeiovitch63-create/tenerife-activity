@@ -5,11 +5,7 @@ import { useTranslations } from 'next-intl'
 
 // Include '' for "cover" (no ext) and ' .png' for "cover .png" (Windows naming)
 const EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '', ' .png']
-const KNOWN_MISSING_IMAGE_CODES = new Set([
-  '3', '14', '27', '31', '32', '43', '54', '66', '69', '74', '155', '168',
-  '281', '284', '308', '340', '347', '390', '439', '456', '476', '507',
-  '514', '522', '533', '552', '553',
-])
+const KNOWN_MISSING_IMAGE_CODES = new Set<string>()
 
 interface ToursListCardImageProps {
   code: string

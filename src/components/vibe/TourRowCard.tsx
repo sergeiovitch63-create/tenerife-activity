@@ -93,6 +93,9 @@ export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
       availabilityLabel = availabilityPreview.availableWeekdays.join(', ')
     }
   }
+  const imageSrc = tour.image
+    ? buildAtlanticoImageUrl(tour.image)
+    : `/images/tours-list/${tour.code}/cover.png`
 
   return (
     <Link
@@ -103,10 +106,10 @@ export function TourRowCard({ tour, availabilityPreview }: TourRowCardProps) {
       )}
     >
       {/* Left: Image */}
-      {tour.image && (
+      {imageSrc && (
         <div className="w-[360px] h-[200px] flex-shrink-0 overflow-hidden rounded-l-xl relative">
           <Image
-            src={buildAtlanticoImageUrl(tour.image)}
+            src={imageSrc}
             alt={tour.name}
             fill
             className="object-cover"
