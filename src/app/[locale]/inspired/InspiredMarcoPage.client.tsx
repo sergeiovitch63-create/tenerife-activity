@@ -10,6 +10,7 @@ import {
   type GetInspiredAnswers,
 } from '@/lib/recommendations/get-inspired'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import { formatDurationLabel } from '@/lib/duration'
 
 type StepId = 'group' | 'mood' | 'time' | 'budget' | 'extras'
 
@@ -372,7 +373,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
                           <span>
-                            {activity.duration ? `⏱ ${activity.duration} h` : '\u00A0'}
+                            {activity.duration ? `⏱ ${formatDurationLabel(activity.duration)}` : '\u00A0'}
                           </span>
                           <span className="text-right">
                             {activity.priceFrom

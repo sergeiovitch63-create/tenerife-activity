@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const translatedTitle = vibe ? getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title) : slug
 
   return {
-    title: `${translatedTitle} – ${locale}`,
+    title: `${translatedTitle} | Tenerife Activity`,
   }
 }
 

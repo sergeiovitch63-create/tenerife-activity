@@ -1030,7 +1030,8 @@
       "headerAdults": "Взрослые",
       "headerChildren": "Дети ({childAge})",
       "headerInfants": "Младенцы ({infantAge})",
-      "loading": "Загрузка цен..."
+      "loading": "Загрузка цен...",
+      "contactForPricing": "Свяжитесь с нами для уточнения цен."
     },
     "options": {
       "title": "Выберите из {count} варианта",

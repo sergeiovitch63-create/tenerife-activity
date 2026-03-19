@@ -3,6 +3,7 @@
 import { Link } from '@/navigation'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
+import { formatDurationLabel } from '@/lib/duration'
 
 interface SearchResultCardProps {
   code: string
@@ -52,7 +53,7 @@ export function SearchResultCard({
           )}
           <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
             <span>
-              {duration ? `⏱ ${duration} h` : '\u00A0'}
+              {duration ? `⏱ ${formatDurationLabel(duration)}` : '\u00A0'}
             </span>
             {price !== undefined && !Number.isNaN(price) && price > 0 ? (
               <span className="text-right">

@@ -181,7 +181,7 @@
   },
   "common": {
     "activityFallback": "Activity {code}",
-    "noImage": "No image",
+    "noImage": "Geen afbeelding",
     "priceOnRequest": "Price on request",
     "smallGroup": "Small group",
     "pickupService": "Pickup service",
@@ -322,7 +322,7 @@
     "meetingPoint": "Meeting Point",
     "cancellationPolicy": "Cancellation Policy",
     "checkAvailability": "Check availability",
-    "startingFrom": "From",
+    "startingFrom": "Vanaf",
     "priceFrom": "From",
     "viewExperience": "View experience",
     "reviewsCount": "{count} review",
@@ -948,7 +948,7 @@
     "labels": {
       "duration": "Duration",
       "hours": "hours",
-      "startingFrom": "From",
+      "startingFrom": "Vanaf",
       "childShort": "Child",
       "childAge": "Child age"
     },
@@ -987,7 +987,7 @@
       "headerChildren": "Children ({childAge})",
       "headerInfants": "Infants ({infantAge})",
       "loading": "Loading prices...",
-      "contactForPricing": "Contact us for pricing"
+      "contactForPricing": "Neem contact met ons op voor prijzen."
     },
     "options": {
       "title": "Choose from {count} option",
@@ -1039,13 +1039,13 @@
     "backToActivities": "← Back to activities",
     "noToursAvailable": "No tours available for this activity.",
     "noDescription": "No description.",
-    "startingFrom": "From",
+    "startingFrom": "Vanaf",
     "priceNotAvailable": "Price not available",
     "loadError": "Unable to load tour details.",
     "backToHome": "← Back to Home",
     "missingCode": "Missing tour code.",
     "home": "Home",
-    "noImage": "No image",
+    "noImage": "Geen afbeelding",
     "hours": "h"
   },
   "terms": {

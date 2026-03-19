@@ -74,7 +74,7 @@ export function HeroVideoBackground({
             controls={false}
             disablePictureInPicture
             poster={poster}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+            className="absolute inset-0 w-full h-full object-cover object-[center_28%] md:object-center transition-opacity duration-500"
             style={{
               position: 'absolute',
               top: 0,
@@ -84,6 +84,7 @@ export function HeroVideoBackground({
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              objectPosition: 'center 28%',
               zIndex: -1,
               opacity: 1,
               display: 'block',
@@ -104,7 +105,7 @@ export function HeroVideoBackground({
         ) : (
           poster && (
             <div
-              className="absolute inset-0 w-full h-full bg-cover bg-center"
+              className="absolute inset-0 w-full h-full bg-cover bg-[center_28%] md:bg-center"
               style={{
                 backgroundImage: `url(${poster})`,
               }}

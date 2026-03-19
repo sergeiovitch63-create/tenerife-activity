@@ -15,6 +15,7 @@ import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { getTranslations } from 'next-intl/server'
 import { ToursListCardImage } from './ToursListCardImage.client'
+import { formatDurationLabel } from '@/lib/duration'
 
 interface PageParams {
   params: Promise<{ locale: string }>
@@ -240,7 +241,7 @@ export default async function ToursListDebugPage({ params, searchParams }: PageP
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
                           <span>
-                            {t.duration ? `⏱ ${t.duration} h` : '\u00A0'}
+                            {t.duration ? `⏱ ${formatDurationLabel(t.duration)}` : '\u00A0'}
                           </span>
                           {t.price !== undefined && !Number.isNaN(t.price) ? (
                             <span className="text-right">

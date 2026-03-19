@@ -17,9 +17,10 @@
  * - ANTHROPIC_API_KEY   (Anthropic API key)
  *
  * Optional ENV:
- * - LIMIT               (number of group codes to process, for testing)
- * - START_FROM          (code to start from; skips until this code encountered)
- * - SLEEP_MS            (pause between Anthropic calls; default 800ms)
+ * - CODES                (comma-separated list of group codes; if set, use only these instead of catalog)
+ * - LIMIT                (number of group codes to process, for testing)
+ * - START_FROM           (code to start from; skips until this code encountered)
+ * - SLEEP_MS             (pause between Anthropic calls; default 800ms)
  */
 
 import fs from 'node:fs/promises'
@@ -85,7 +86,21 @@ async function readCatalogCodesFromFile() {
   return Array.from(new Set(codes))
 }
 
+function getCodesFromEnv() {
+  const raw = process.env.CODES
+  if (!raw || typeof raw !== 'string') return null
+  const codes = raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+  return codes.length > 0 ? codes : null
+}
+
 async function fetchGroupCodes() {
+  // If CODES env is set, use only those codes (skip catalog file and API)
+  const envCodes = getCodesFromEnv()
+  if (envCodes) return envCodes
+
   // Prefer local catalog file (most complete and stable)
   try {
     const codes = await readCatalogCodesFromFile()
@@ -220,7 +235,7 @@ async function main() {
   console.log(`BASE_URL=${BASE_URL}`)
   console.log('Fetching group codes...')
   let codes = await fetchGroupCodes()
-  console.log(`Found ${codes.length} group codes`)
+  console.log(`Found ${codes.length} group codes${getCodesFromEnv() ? ' (from CODES env)' : ''}`)
 
   const startFrom = normalizeCode(process.env.START_FROM)
   if (startFrom) {
@@ -235,7 +250,20 @@ async function main() {
     console.log(`LIMIT=${limit} → processing ${codes.length} codes`)
   }
 
-  const out = {} // { [code]: { [lang]: { groupDetails, eventOptions } } }
+  const outPath = path.join(__dirname, '..', 'src', 'data', 'atlantico-translations-full.json')
+  let out = {}
+  try {
+    const existing = await fs.readFile(outPath, 'utf8')
+    const parsed = JSON.parse(existing)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      out = parsed
+      console.log(`Loaded existing file: ${Object.keys(out).length} codes already translated`)
+    }
+  } catch (e) {
+    if ((e?.code !== 'ENOENT') && (e?.message || '').indexOf('Unexpected') === -1) {
+      console.warn('Could not load existing translations file:', e?.message || e)
+    }
+  }
 
   for (const code of codes) {
     console.log(`\nProcessing group code=${code}...`)
@@ -342,10 +370,11 @@ async function main() {
 
       await sleep(SLEEP_MS)
     }
+    // Sauvegarde après chaque groupe pour ne pas perdre les traductions si le script est interrompu
+    await fs.writeFile(outPath, JSON.stringify(out, null, 2), 'utf8')
+    console.log(`  Saved (${Object.keys(out).length} codes in file)`)
   }
 
-  const outPath = path.join(__dirname, '..', 'src', 'data', 'atlantico-translations-full.json')
-  await fs.writeFile(outPath, JSON.stringify(out, null, 2), 'utf8')
   console.log(`\nDone. Wrote translations to ${outPath}`)
 }
 

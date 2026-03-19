@@ -1030,7 +1030,8 @@
       "headerAdults": "Adultes",
       "headerChildren": "Enfants ({childAge})",
       "headerInfants": "Bébés ({infantAge})",
-      "loading": "Chargement des prix..."
+      "loading": "Chargement des prix...",
+      "contactForPricing": "Contactez-nous pour les tarifs"
     },
     "options": {
       "title": "Choisissez parmi {count} option",

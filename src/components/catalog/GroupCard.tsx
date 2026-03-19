@@ -88,8 +88,10 @@ export function GroupCard({ group, details, groupKey, locale, eventIdsCount }: G
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-ocean-300 text-sm font-medium">{t('noImage')}</div>
+          <div className="w-full h-full bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400">
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="h-10 w-10 rounded-lg bg-white/40 border border-white/50" />
+            </div>
           </div>
         )}
       </div>

@@ -6,6 +6,7 @@ import { buildMetadata } from '@/lib/seo'
 import { type Locale } from '@/i18n/request'
 import { experienceRepository } from '@/config/repositories'
 import type { Activity } from '@/core/entities/activity'
+import { MockExperienceRepository } from '@/data/mock/mock-experience.repository'
 
 const VIBE_TO_TAGS: Record<string, string[]> = {
   'vip-tours':             ['luxury', 'chill', 'couple'],
@@ -31,18 +32,27 @@ function priceToBudgetTag(price: number): string {
 
 function mapExperienceToActivity(experience: any): Activity {
   const vibeTags = (experience.vibeId && VIBE_TO_TAGS[experience.vibeId]) ?? []
-  const budgetTag = typeof experience.price === 'number'
-    ? priceToBudgetTag(experience.price)
+  const rawPrice =
+    typeof experience.priceFrom === 'number'
+      ? experience.priceFrom
+      : typeof experience.price === 'number'
+        ? experience.price
+        : 0
+  const budgetTag = rawPrice > 0
+    ? priceToBudgetTag(rawPrice)
     : 'budget-2'
   const firstImage =
     (Array.isArray(experience.imageUrls) && experience.imageUrls[0]) ||
     experience.imageUrl ||
     '/logo.png'
+  const id = String(experience.id ?? experience.code ?? experience.slug ?? Math.random())
+  const slug = String(experience.slug ?? experience.code ?? id)
+  const title = String(experience.title ?? experience.name ?? `Experience ${id}`)
   return {
-    id: experience.id,
-    slug: experience.slug,
-    title: experience.title,
-    priceFrom: typeof experience.price === 'number' ? experience.price : 0,
+    id,
+    slug,
+    title,
+    priceFrom: rawPrice,
     duration: experience.duration ?? '',
     location: experience.location ?? 'Tenerife',
     media: { type: 'image', src: firstImage },
@@ -79,7 +89,10 @@ export default async function GetInspiredPage({
     const experiences = await experienceRepository.findAll()
     activities = experiences.map(mapExperienceToActivity)
   } catch {
-    // activities stays empty; quiz will show fallback
+    // Fallback to mock data so quiz results are never empty.
+    const mockRepo = new MockExperienceRepository()
+    const mockExperiences = await mockRepo.findAll()
+    activities = mockExperiences.map(mapExperienceToActivity)
   }
 
   return (

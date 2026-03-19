@@ -55,6 +55,7 @@ interface GroupDetails508LuxLayoutProps {
 }
 
 const DESCRIPTION_TRUNCATE = 180
+const CONTACT_FOR_PRICING_CODES = new Set(['53', '127', '165', '166', '189', '306'])
 
 /** Parse hicon: "0_hicon-drinks" -> { included: false, key: "drinks" }, "1_hicon-free_bus" -> { included: true, key: "free_bus" } */
 function parseHiconIcons(icons: string[]): { included: string[]; notIncluded: string[] } {
@@ -159,11 +160,46 @@ function stripHtml(html: string): string {
   return decoded.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
+function translateAgeLabels(text: string, locale: string): string {
+  const lang = (locale || 'en').toLowerCase().slice(0, 2)
+  const yearsByLocale: Record<string, string> = {
+    en: 'years',
+    fr: 'ans',
+    de: 'Jahre',
+    es: 'años',
+    it: 'anni',
+  }
+  const childrenByLocale: Record<string, string> = {
+    en: 'children',
+    fr: 'enfants',
+    de: 'Kinder',
+    es: 'niños',
+    it: 'bambini',
+  }
+  const adultsByLocale: Record<string, string> = {
+    en: 'adults',
+    fr: 'adultes',
+    de: 'Erwachsene',
+    es: 'adultos',
+    it: 'adulti',
+  }
+
+  const years = yearsByLocale[lang] || yearsByLocale.en
+  const children = childrenByLocale[lang] || childrenByLocale.en
+  const adults = adultsByLocale[lang] || adultsByLocale.en
+
+  return decodeTextFromApi(text)
+    .replace(/\b(?:Niñ|Nin)(?:o|os)\b/gi, children)
+    .replace(/\bAdult(?:o|os)\b/gi, adults)
+    .replace(/\baños?\b/gi, years)
+}
+
 function OptionCard({
   option,
   isSelected,
   onSelect,
   groupCode,
+  locale,
   tOptions,
   tLabels,
   tCta,
@@ -174,6 +210,7 @@ function OptionCard({
   isSelected: boolean
   onSelect: () => void
   groupCode?: string
+  locale: string
   tOptions: (key: string) => string
   tLabels: (key: string) => string
   tCta: (key: string) => string
@@ -181,7 +218,7 @@ function OptionCard({
   tFerry: () => string
 }) {
   const [expanded, setExpanded] = useState(false)
-  const desc = stripHtml(option.desc || '')
+  const desc = translateAgeLabels(stripHtml(option.desc || ''), locale)
   const truncated = desc.length > DESCRIPTION_TRUNCATE && !expanded
   const displayDesc = truncated ? desc.slice(0, DESCRIPTION_TRUNCATE) + '...' : desc
 
@@ -191,7 +228,7 @@ function OptionCard({
         isSelected ? 'border-ocean-500 ring-2 ring-ocean-200 bg-ocean-50/30' : 'border-glass-200 bg-white'
       }`}
     >
-      <h3 className="text-lg sm:text-xl font-bold text-glass-900 mb-2 sm:mb-3">{decodeTextFromApi(option.name)}</h3>
+      <h3 className="text-lg sm:text-xl font-bold text-glass-900 mb-2 sm:mb-3">{translateAgeLabels(option.name, locale)}</h3>
       <div className="text-glass-700 text-sm sm:text-base leading-relaxed mb-3 sm:mb-4">
         {displayDesc}
         {truncated && (
@@ -755,7 +792,7 @@ export function GroupDetails508LuxLayout({
               {desc && (
                 <div className="prose prose-sm sm:prose-base max-w-none">
                   {(() => {
-                    const plainDesc = stripHtml(desc)
+                    const plainDesc = translateAgeLabels(stripHtml(desc), locale)
                     const sentences = plainDesc.split('. ').filter(Boolean)
                     const highlights = sentences.slice(0, 2)
                     return highlights.map((s, i) => (
@@ -773,7 +810,7 @@ export function GroupDetails508LuxLayout({
             </div>
 
             {desc && (() => {
-              const plainDesc = stripHtml(desc)
+              const plainDesc = translateAgeLabels(stripHtml(desc), locale)
               const sentences = plainDesc.split('. ').filter(Boolean)
               const rest = sentences.slice(2).join('. ')
               return rest ? (
@@ -823,7 +860,21 @@ export function GroupDetails508LuxLayout({
 
             {(() => {
               const priceTableOptions = (eventOptions.length > 0 ? eventOptions : eventIds.map((eid) => ({ eventId: eid, name: `Option ${eid}`, desc: '', price: null as number | null, childPrice: null as number | null, infantPrice: null as number | null, features: [] }))).filter((opt) => isDateRangeGroup(code) ? opt.price != null : (opt.price == null || opt.price <= 200))
-              if (priceTableOptions.length === 0) return null
+              if (priceTableOptions.length === 0) {
+                if (!CONTACT_FOR_PRICING_CODES.has(String(code).trim())) return null
+                return (
+                  <Accordion
+                    id="section-prices"
+                    title={tPrices('title')}
+                    isOpen={isAccordionOpen('prices')}
+                    onToggle={() => toggleAccordion('prices')}
+                  >
+                    <p className="text-glass-700 text-sm sm:text-base">
+                      {tPrices('contactForPricing')}
+                    </p>
+                  </Accordion>
+                )
+              }
               const isPerDay = isDateRangeGroup(code)
               return (
             <Accordion
@@ -860,7 +911,7 @@ export function GroupDetails508LuxLayout({
                             <svg className="w-4 h-4 text-ocean-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
-                            {decodeTextFromApi(opt.name)}
+                            {translateAgeLabels(opt.name, locale)}
                           </span>
                         </td>
                         {isPerDay ? (
@@ -935,6 +986,7 @@ export function GroupDetails508LuxLayout({
                         isSelected={selectedEventId === opt.eventId}
                         onSelect={() => handleSelectOption(opt.eventId)}
                         groupCode={code}
+                        locale={locale}
                         tOptions={tOptions}
                         tLabels={tLabels}
                         tCta={tCta}

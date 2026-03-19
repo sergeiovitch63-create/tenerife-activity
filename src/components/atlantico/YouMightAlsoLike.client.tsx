@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import { formatDurationLabel } from '@/lib/duration'
 
 type Tour = {
   id: string | number
@@ -112,7 +113,7 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
                   )}
                   {t.duration != null && (
                     <span className="bg-glass-100 px-1.5 py-0.5 rounded text-[10px] text-glass-700">
-                      {t.duration}h
+                      {formatDurationLabel(t.duration)}
                     </span>
                   )}
                 </div>

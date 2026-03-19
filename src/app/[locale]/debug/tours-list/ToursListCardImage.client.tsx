@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl'
 
 // Include '' for "cover" (no ext) and ' .png' for "cover .png" (Windows naming)
 const EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '', ' .png']
+const KNOWN_MISSING_IMAGE_CODES = new Set([
+  '3', '14', '27', '31', '32', '43', '54', '66', '69', '74', '155', '168',
+  '281', '284', '308', '340', '347', '390', '439', '456', '476', '507',
+  '514', '522', '533', '552', '553',
+])
 
 interface ToursListCardImageProps {
   code: string
@@ -17,6 +22,7 @@ export function ToursListCardImage({ code, alt, className }: ToursListCardImageP
   const basePath = `/images/tours-list/${code}/cover`
   const [srcIndex, setSrcIndex] = useState(0)
   const [failed, setFailed] = useState(false)
+  const shouldForceFallback = KNOWN_MISSING_IMAGE_CODES.has(String(code).trim())
 
   const handleError = useCallback(() => {
     if (srcIndex < EXTENSIONS.length - 1) {
@@ -26,10 +32,13 @@ export function ToursListCardImage({ code, alt, className }: ToursListCardImageP
     }
   }, [srcIndex])
 
-  if (failed) {
+  if (failed || shouldForceFallback) {
     return (
-      <div className={`w-full h-full flex items-center justify-center text-glass-400 text-sm bg-glass-100 ${className || ''}`}>
-        {t('noImage')}
+      <div className={`w-full h-full bg-glass-100 flex items-center justify-center ${className || ''}`}>
+        <div className="flex flex-col items-center justify-center gap-1 text-gray-500">
+          <span className="text-lg" aria-hidden="true">🏝️</span>
+          <span className="text-xs">{t('noImage')}</span>
+        </div>
       </div>
     )
   }

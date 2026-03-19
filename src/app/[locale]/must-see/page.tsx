@@ -13,6 +13,7 @@ import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCar
 import { getTranslations } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo'
 import type { Locale } from '@/i18n/request'
+import { formatDurationLabel } from '@/lib/duration'
 
 type Tour = {
   id: string
@@ -48,6 +49,7 @@ export default async function MustSeePage({
   const { locale } = await params
   const t = await getTranslations('mustSee')
   const tCommon = await getTranslations('common')
+  const tActivite = await getTranslations('activite')
   const lang = mapLocaleToLang(locale)
 
   let tours: Tour[] = []
@@ -83,7 +85,7 @@ export default async function MustSeePage({
           <div className="glass-panel p-6 md:p-8">
             <div className="space-y-2">
               <Link href="/" className="text-xs text-ocean-700 hover:underline">
-                ← Accueil
+                ← {tActivite('home')}
               </Link>
               <h1 className="text-3xl md:text-4xl font-bold text-glass-900">
                 {t('title')}
@@ -149,7 +151,7 @@ export default async function MustSeePage({
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
                           <span>
-                            {t.duration ? `⏱ ${t.duration} h` : '\u00A0'}
+                            {t.duration ? `⏱ ${formatDurationLabel(t.duration)}` : '\u00A0'}
                           </span>
                           {t.price !== undefined &&
                           !Number.isNaN(t.price) &&

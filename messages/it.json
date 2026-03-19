@@ -322,7 +322,7 @@
     "meetingPoint": "Punto di incontro",
     "cancellationPolicy": "Politica di cancellazione",
     "checkAvailability": "Controlla disponibilità",
-    "startingFrom": "A partire da",
+    "startingFrom": "Da",
     "priceFrom": "Da",
     "viewExperience": "Vedi esperienza",
     "reviewsCount": "{count} recensione",
@@ -992,7 +992,7 @@
     "labels": {
       "duration": "Durata",
       "hours": "ore",
-      "startingFrom": "A partire da",
+      "startingFrom": "Da",
       "childShort": "Bambino",
       "childAge": "Età del bambino"
     },
@@ -1030,7 +1030,8 @@
       "headerAdults": "Adulti",
       "headerChildren": "Bambini ({childAge})",
       "headerInfants": "Neonati ({infantAge})",
-      "loading": "Caricamento prezzi..."
+      "loading": "Caricamento prezzi...",
+      "contactForPricing": "Contattateci per i prezzi"
     },
     "options": {
       "title": "Scegli tra {count} opzione",
@@ -1082,7 +1083,7 @@
     "backToActivities": "← Torna alle attività",
     "noToursAvailable": "Nessun tour disponibile per questa attività.",
     "noDescription": "Nessuna descrizione.",
-    "startingFrom": "A partire da",
+    "startingFrom": "Da",
     "priceNotAvailable": "Prezzo non disponibile",
     "loadError": "Impossibile caricare i dettagli del tour.",
     "backToHome": "← Torna alla home",

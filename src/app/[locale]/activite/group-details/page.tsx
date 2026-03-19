@@ -49,10 +49,47 @@ const REVALIDATE = 300
 export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const { locale } = await params
   const query = (await searchParams) || {}
-  const code = query.code || 'tour'
+  const code = String(query.code || '').trim()
+  const fallbackName = code ? `Tour ${code}` : 'Tour'
+  let cleanName = fallbackName
+
+  if (code) {
+    try {
+      const envBase = process.env.NEXT_PUBLIC_BASE_URL || process.env.APP_URL || ''
+      const headersList = await import('next/headers').then((m) => m.headers)
+      const hdrs = headersList()
+      const host = hdrs.get('host') || 'localhost:3000'
+      const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+      const origin = envBase || `${protocol}://${host}`
+
+      const res = await fetch(
+        `${origin}/api/atlantico/group-details/${encodeURIComponent(code)}/ENG`,
+        { next: { revalidate: REVALIDATE } }
+      )
+
+      if (res.ok) {
+        const details = (await res.json()) as GroupDetails & { title?: string }
+        const apiName = decodeTextFromApi(details.name || details.title || '')
+        const translatedName = getAtlanticoTranslation(code, locale as Locale, 'name', {
+          fallback: apiName || fallbackName,
+        })
+        cleanName = decodeTextFromApi(translatedName) || apiName || fallbackName
+      } else {
+        const translatedName = getAtlanticoTranslation(code, locale as Locale, 'name', {
+          fallback: fallbackName,
+        })
+        cleanName = decodeTextFromApi(translatedName) || fallbackName
+      }
+    } catch {
+      const translatedName = getAtlanticoTranslation(code, locale as Locale, 'name', {
+        fallback: fallbackName,
+      })
+      cleanName = decodeTextFromApi(translatedName) || fallbackName
+    }
+  }
 
   return {
-    title: `Tour – ${code} – ${locale}`,
+    title: `${cleanName} | Tenerife Activity`,
   }
 }
 
