@@ -11,6 +11,8 @@ type PageProps = {
   params: Promise<{ locale: string; code: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 const cleanText = (text: string): string =>
   text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 

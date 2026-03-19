@@ -5,6 +5,7 @@ type PageProps = {
   params: Promise<{ locale: string; category: string }>
 }
 
+export const dynamic = 'force-dynamic'
 export const revalidate = 1800
 
 export default async function V2CategoryPage({ params }: PageProps) {

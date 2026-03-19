@@ -7,11 +7,13 @@ type PageProps = {
   params: Promise<{ locale: string }>
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function V2HomePage({ params }: PageProps) {
   const { locale } = await params
   const [classifications, tours] = await Promise.all([
-    getClassifications(locale),
-    getTours(locale),
+    getClassifications(locale).catch(() => []),
+    getTours(locale).catch(() => []),
   ])
 
   const mustSee = tours.slice(0, 6)
