@@ -11,10 +11,12 @@ export const dynamic = 'force-dynamic'
 
 export default async function V2HomePage({ params }: PageProps) {
   const { locale } = await params
-  const [classifications, tours] = await Promise.all([
+  const [rawClassifications, rawTours] = await Promise.all([
     getClassifications(locale).catch(() => []),
     getTours(locale).catch(() => []),
   ])
+  const classifications = Array.isArray(rawClassifications) ? rawClassifications : []
+  const tours = Array.isArray(rawTours) ? rawTours : []
 
   const mustSee = tours.slice(0, 6)
 

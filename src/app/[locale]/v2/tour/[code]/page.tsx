@@ -41,7 +41,8 @@ export default async function V2TourDetailPage({ params }: PageProps) {
 
   const eventIds = (detail.ids || '').split(',').map((id) => id.trim()).filter(Boolean)
   const firstEvent = eventIds[0] ? await getEventDetail(eventIds[0], locale).catch(() => null) : null
-  const categoryTours = await getTours(locale, detail.category).catch(() => [])
+  const categoryToursRaw = await getTours(locale, detail.category).catch(() => [])
+  const categoryTours = Array.isArray(categoryToursRaw) ? categoryToursRaw : []
   const related = categoryTours.filter((tour) => tour.code !== detail.code).slice(0, 3)
 
   const gallery = (detail.image || '').includes(',')

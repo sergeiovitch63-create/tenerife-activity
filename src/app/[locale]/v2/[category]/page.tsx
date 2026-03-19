@@ -10,7 +10,8 @@ export const revalidate = 1800
 
 export default async function V2CategoryPage({ params }: PageProps) {
   const { locale, category } = await params
-  const tours = await getTours(locale, decodeURIComponent(category)).catch(() => [])
+  const rawTours = await getTours(locale, decodeURIComponent(category)).catch(() => [])
+  const tours = Array.isArray(rawTours) ? rawTours : []
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

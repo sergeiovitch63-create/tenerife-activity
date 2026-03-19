@@ -7,7 +7,7 @@ import type {
   ApiTourDetail,
 } from '@/lib/atlantico.types'
 
-const BASE = process.env.ATLANTICO_API_URL ?? 'https://api.atlanticoexcursiones.com'
+const BASE = process.env.ATLANTICO_API_URL?.trim() || 'https://api.atlanticoexcursiones.com'
 
 const ensureOk = async (res: Response, context: string): Promise<void> => {
   if (!res.ok) {
@@ -37,12 +37,17 @@ const toObject = <T>(payload: unknown): T | null => {
 }
 
 export async function getClassifications(locale: string): Promise<ApiClassification[]> {
-  const res = await fetch(`${BASE}/clasificationList/${toApiLang(locale)}`, {
-    next: { revalidate: 3600 },
-  })
-  await ensureOk(res, 'getClassifications')
-  const data = (await res.json()) as unknown
-  return toArray<ApiClassification>(data)
+  try {
+    const res = await fetch(`${BASE}/clasificationList/${toApiLang(locale)}`, {
+      next: { revalidate: 3600 },
+    })
+    await ensureOk(res, 'getClassifications')
+    const data = (await res.json()) as unknown
+    const items = toArray<ApiClassification>(data)
+    return Array.isArray(items) ? items : []
+  } catch {
+    return []
+  }
 }
 
 export async function getTours(
@@ -50,14 +55,19 @@ export async function getTours(
   classCode?: string,
   page = -1
 ): Promise<ApiTour[]> {
-  const encodedClass = classCode ? encodeURIComponent(classCode) : ''
-  const res = await fetch(
-    `${BASE}/groupsList/${toApiLang(locale)}/${page}/${encodedClass}`,
-    { next: { revalidate: 1800 } }
-  )
-  await ensureOk(res, 'getTours')
-  const data = (await res.json()) as unknown
-  return toArray<ApiTour>(data)
+  try {
+    const encodedClass = classCode ? encodeURIComponent(classCode) : ''
+    const res = await fetch(
+      `${BASE}/groupsList/${toApiLang(locale)}/${page}/${encodedClass}`,
+      { next: { revalidate: 1800 } }
+    )
+    await ensureOk(res, 'getTours')
+    const data = (await res.json()) as unknown
+    const items = toArray<ApiTour>(data)
+    return Array.isArray(items) ? items : []
+  } catch {
+    return []
+  }
 }
 
 export async function getTourDetail(code: string, locale: string): Promise<ApiTourDetail> {
