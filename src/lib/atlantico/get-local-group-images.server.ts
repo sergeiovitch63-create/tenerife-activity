@@ -23,7 +23,7 @@ function listImagesInDir(dir: string, basePath: string): string[] {
         if (numA !== numB) return numA - numB
         return a.localeCompare(b)
       })
-    return files.map((f) => `${basePath}/${f}`)
+    return files.map((f) => `${basePath}/${encodeURIComponent(f)}`)
   } catch {
     return []
   }
