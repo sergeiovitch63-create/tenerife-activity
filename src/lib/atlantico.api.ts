@@ -1,5 +1,5 @@
 import { toApiLang } from '@/lib/atlantico'
-import { atlanticoGet } from '@/lib/atlantico/client'
+import { atlanticoGet, getBaseUrl } from '@/lib/atlantico/client'
 import type {
   ApiClassification,
   ApiEvent,
@@ -43,9 +43,9 @@ const toObject = <T>(payload: unknown): T | null => {
 export async function getClassifications(locale: string): Promise<ApiClassification[]> {
   try {
     // Match existing app route: /clasificationList/{lang}/{collaborator}
-    const data = (await atlanticoGet(
-      `/clasificationList/${toApiLang(locale)}/${getCollaborator()}`
-    )) as unknown
+    const path = `/clasificationList/${toApiLang(locale)}/${getCollaborator()}`
+    console.log('Fetching:', `${getBaseUrl()}${path}`)
+    const data = (await atlanticoGet(path)) as unknown
     const items = toArray<ApiClassification>(data)
     return Array.isArray(items) ? items : []
   } catch {
@@ -64,6 +64,7 @@ export async function getTours(
     const path = encodedClass
       ? `/groupsList/${toApiLang(locale)}/${page}/${encodedClass}`
       : `/groupsList/${toApiLang(locale)}/${page}`
+    console.log('Fetching:', `${getBaseUrl()}${path}`)
     const data = (await atlanticoGet(path)) as unknown
     const items = toArray<ApiTour>(data)
     return Array.isArray(items) ? items : []
@@ -73,9 +74,9 @@ export async function getTours(
 }
 
 export async function getTourDetail(code: string, locale: string): Promise<ApiTourDetail> {
-  const data = (await atlanticoGet(
-    `/groupDetails/${encodeURIComponent(code)}/${toApiLang(locale)}`
-  )) as unknown
+  const path = `/groupDetails/${encodeURIComponent(code)}/${toApiLang(locale)}`
+  console.log('Fetching:', `${getBaseUrl()}${path}`)
+  const data = (await atlanticoGet(path)) as unknown
   const detail = toObject<ApiTourDetail>(data)
   if (!detail) {
     throw new Error('getTourDetail returned invalid payload')
@@ -84,9 +85,9 @@ export async function getTourDetail(code: string, locale: string): Promise<ApiTo
 }
 
 export async function getEventDetail(code: string, locale: string): Promise<ApiEvent> {
-  const data = (await atlanticoGet(
-    `/eventDetails/${encodeURIComponent(code)}/${toApiLang(locale)}`
-  )) as unknown
+  const path = `/eventDetails/${encodeURIComponent(code)}/${toApiLang(locale)}`
+  console.log('Fetching:', `${getBaseUrl()}${path}`)
+  const data = (await atlanticoGet(path)) as unknown
   const detail = toObject<ApiEvent>(data)
   if (!detail) {
     throw new Error('getEventDetail returned invalid payload')
@@ -99,9 +100,9 @@ export async function getLimits(
   locale: string,
   date: string
 ): Promise<ApiLimits> {
-  const data = (await atlanticoGet(
-    `/loadLimits/${encodeURIComponent(eventCode)}/${toApiLang(locale)}/${encodeURIComponent(date)}`
-  )) as unknown
+  const path = `/loadLimits/${encodeURIComponent(eventCode)}/${toApiLang(locale)}/${encodeURIComponent(date)}`
+  console.log('Fetching:', `${getBaseUrl()}${path}`)
+  const data = (await atlanticoGet(path)) as unknown
   const limits = toObject<ApiLimits>(data)
   if (!limits) {
     throw new Error('getLimits returned invalid payload')
