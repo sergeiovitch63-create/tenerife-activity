@@ -9,6 +9,79 @@
 import { getAtlanticoConfig } from './atlantico/config'
 import { fetchAtlantico } from './atlantico/fetch'
 
+const BASE = process.env.ATLANTICO_API_URL ?? 'https://api.atlanticoexcursiones.com'
+
+export const toApiLang = (locale: string): string =>
+  (
+    {
+      en: 'ENG',
+      fr: 'FRA',
+      de: 'ALE',
+      it: 'ITA',
+      es: 'CAS',
+    } as const
+  )[locale as 'en' | 'fr' | 'de' | 'it' | 'es'] ?? 'ENG'
+
+export const toImageUrl = (image: string | null | undefined): string => {
+  if (!image) return '/placeholder-activity.jpg'
+  if (image.startsWith('http')) return image
+  return `${BASE}/images/${image}`
+}
+
+export const translateLabel = (text: string, locale: string): string => {
+  if (locale === 'es') return text
+
+  const map: Record<string, Record<string, string>> = {
+    años: { en: 'years', fr: 'ans', de: 'Jahre', it: 'anni' },
+    niños: { en: 'children', fr: 'enfants', de: 'Kinder', it: 'bambini' },
+    adultos: { en: 'adults', fr: 'adultes', de: 'Erwachsene', it: 'adulti' },
+    Niños: { en: 'Children', fr: 'Enfants', de: 'Kinder', it: 'Bambini' },
+    Adultos: { en: 'Adults', fr: 'Adultes', de: 'Erwachsene', it: 'Adulti' },
+    'Bebés': { en: 'Infants', fr: 'Bébés', de: 'Kleinkinder', it: 'Neonati' },
+  }
+
+  return Object.entries(map).reduce((translated, [es, tr]) => {
+    return translated.replaceAll(es, tr[locale] ?? es)
+  }, text)
+}
+
+export type ParsedPrice =
+  | { type: 'person'; adult: number; child: number; infant: number }
+  | { type: 'day'; tiers: { days: number; price: number }[] }
+  | { type: 'unique'; price: number }
+
+export const parsePrices = (raw: string, pProd: string): ParsedPrice => {
+  const parts = raw.split('|').map(Number)
+
+  if (pProd === '2') {
+    const tiers: { days: number; price: number }[] = []
+    for (let i = 0; i < parts.length; i += 3) {
+      tiers.push({ days: parts[i], price: parts[i + 1] })
+    }
+    return { type: 'day', tiers }
+  }
+
+  if (pProd === '3') {
+    return { type: 'unique', price: parts[0] }
+  }
+
+  return { type: 'person', adult: parts[0], child: parts[1], infant: parts[2] }
+}
+
+export const formatDuration = (duration: string): string => {
+  const raw = duration.trim().toLowerCase()
+  const num = parseFloat(raw)
+
+  if (Number.isNaN(num)) return duration
+
+  const hours = Math.floor(num)
+  const minutes = Math.round((num - hours) * 60)
+
+  if (hours === 0) return `${minutes} min`
+  if (minutes === 0) return `${hours}h`
+  return `${hours}h${String(minutes).padStart(2, '0')}`
+}
+
 /**
  * Group details response from /groupDetails/{tourId}/{lang}
  */

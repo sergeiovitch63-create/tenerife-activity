@@ -177,17 +177,18 @@ function parsePerPersonFromJson(raw: any): PricesPerPersonResponse | null {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl
+    const eventCode = searchParams.get('eventCode')
     const eventId = searchParams.get('eventId')
     const date = searchParams.get('date')
     const office = searchParams.get('office')
     const lang = searchParams.get('lang') || 'ENG'
     const pProdParam = searchParams.get('pProd')
 
-    if (!eventId || !date) {
+    if (!date || (!eventId && !eventCode)) {
       return NextResponse.json(
         {
           error: 'Missing parameters',
-          message: 'eventId and date are required',
+          message: 'eventId/eventCode and date are required',
         },
         { status: 400 }
       )
@@ -204,6 +205,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const effectiveEventId = eventId ?? eventCode ?? ''
+
     // Normalize language - use proper mapping (CAS/ENG/FRA/RUS/ALE/ITA)
     // If lang is already in correct format, use it; otherwise map from locale
     const normalizedLang = lang.length === 3 && ['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA'].includes(lang.toUpperCase())
@@ -211,15 +214,27 @@ export async function GET(request: NextRequest) {
       : mapLocaleToAtlanticoLang(lang)
 
     // Get pProd
-    const pProd = await getPProd(eventId, normalizedLang, pProdParam)
+    const pProd = await getPProd(effectiveEventId, normalizedLang, pProdParam)
 
     // Build endpoint
     const endpoint = office
-      ? `/loadPrices/${eventId}/${date}/${office}`
-      : `/loadPrices/${eventId}/${date}`
+      ? `/loadPrices/${effectiveEventId}/${date}/${office}`
+      : `/loadPrices/${effectiveEventId}/${date}`
 
     // Fetch prices (always as text first, then parse)
     const text = await fetchText(endpoint)
+
+    // New v2 mode: return raw + pProd exactly as requested.
+    if (eventCode) {
+      return NextResponse.json(
+        { raw: text.trim(), pProd: pProd ?? '0' },
+        {
+          headers: {
+            'Cache-Control': 'no-store',
+          },
+        }
+      )
+    }
 
     // Try to parse as JSON first
     let raw: any = text
