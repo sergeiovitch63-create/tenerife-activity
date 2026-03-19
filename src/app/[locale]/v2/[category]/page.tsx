@@ -10,7 +10,7 @@ export const revalidate = 1800
 
 export default async function V2CategoryPage({ params }: PageProps) {
   const { locale, category } = await params
-  const tours = await getTours(locale, decodeURIComponent(category))
+  const tours = await getTours(locale, decodeURIComponent(category)).catch(() => [])
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -20,6 +20,11 @@ export default async function V2CategoryPage({ params }: PageProps) {
           <TourCard key={tour.code} tour={tour} locale={locale} />
         ))}
       </div>
+      {tours.length === 0 && (
+        <div className="mt-6 rounded-2xl border border-glass-200 bg-white/90 p-6 text-glass-600 shadow-lg">
+          No tours available for this category right now.
+        </div>
+      )}
     </main>
   )
 }

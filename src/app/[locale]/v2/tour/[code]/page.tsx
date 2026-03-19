@@ -27,14 +27,25 @@ const splitFaq = (faq: string): Array<{ q: string; a: string }> => {
 
 export default async function V2TourDetailPage({ params }: PageProps) {
   const { locale, code } = await params
-  const detail = await getTourDetail(code, locale)
-  const eventIds = detail.ids.split(',').map((id) => id.trim()).filter(Boolean)
+  const detail = await getTourDetail(code, locale).catch(() => null)
+  if (!detail) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <div className="rounded-2xl border border-glass-200 bg-white/90 p-8 text-center shadow-lg">
+          <h1 className="text-2xl font-semibold text-glass-900">Tour unavailable</h1>
+          <p className="mt-2 text-glass-600">This tour could not be loaded at the moment.</p>
+        </div>
+      </main>
+    )
+  }
+
+  const eventIds = (detail.ids || '').split(',').map((id) => id.trim()).filter(Boolean)
   const firstEvent = eventIds[0] ? await getEventDetail(eventIds[0], locale).catch(() => null) : null
   const categoryTours = await getTours(locale, detail.category).catch(() => [])
   const related = categoryTours.filter((tour) => tour.code !== detail.code).slice(0, 3)
 
-  const gallery = detail.image.includes(',')
-    ? detail.image.split(',').map((x) => x.trim()).filter(Boolean)
+  const gallery = (detail.image || '').includes(',')
+    ? (detail.image || '').split(',').map((x) => x.trim()).filter(Boolean)
     : [detail.image].filter(Boolean)
   const faqItems = splitFaq(detail.faq || '')
 
