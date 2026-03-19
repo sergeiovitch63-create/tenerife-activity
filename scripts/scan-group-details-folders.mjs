@@ -32,24 +32,38 @@ function main() {
     if (!code) continue
 
     const dir = path.join(baseDir, code)
-    const files = fs.readdirSync(dir)
-      .filter((f) => IMAGE_EXT.test(f))
-      .sort((a, b) => {
-        const numA = parseInt(a.match(/(\d+)/)?.[1] ?? '0', 10)
-        const numB = parseInt(b.match(/(\d+)/)?.[1] ?? '0', 10)
-        if (numA !== numB) return numA - numB
-        return a.localeCompare(b)
-      })
+    const files = listImages(dir).map((f) => ({ file: f, base: `/images/pictures/tours-vip/${code}` }))
+    const subDirs = ['group-details', 'groups-details']
+    for (const sub of subDirs) {
+      const subDir = path.join(dir, sub)
+      const subFiles = listImages(subDir).map((f) => ({
+        file: f,
+        base: `/images/pictures/tours-vip/${code}/${sub}`,
+      }))
+      files.push(...subFiles)
+    }
 
     if (files.length === 0) continue
 
-    const paths = files.map((f) => `/images/pictures/tours-vip/${code}/${f}`)
+    const paths = files.map((f) => `${f.base}/${encodeURIComponent(f.file)}`)
     manifest[code] = paths
     console.log(`  ${code}: ${paths.length} image(s)`)
   }
 
   writeManifest(manifest)
   console.log(`\nDone. ${Object.keys(manifest).length} group(s) with hero images.`)
+}
+
+function listImages(dir) {
+  if (!fs.existsSync(dir)) return []
+  return fs.readdirSync(dir)
+    .filter((f) => IMAGE_EXT.test(f))
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/(\d+)/)?.[1] ?? '0', 10)
+      const numB = parseInt(b.match(/(\d+)/)?.[1] ?? '0', 10)
+      if (numA !== numB) return numA - numB
+      return a.localeCompare(b)
+    })
 }
 
 function writeManifest(manifest) {
