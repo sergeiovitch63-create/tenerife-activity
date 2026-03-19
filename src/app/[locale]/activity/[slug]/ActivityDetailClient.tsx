@@ -197,6 +197,8 @@ export function ActivityDetailClient({
   const mobileGalleryTouchStart = useRef<number>(0)
   // All images from API (for gallery)
   const [allImages, setAllImages] = useState<string[]>([])
+  // Local curated images from /public/images/pictures/tours-vip/{code}
+  const [localGroupImages, setLocalGroupImages] = useState<string[]>([])
   
   // Debug log for activity 508
   useEffect(() => {
@@ -369,6 +371,7 @@ export function ActivityDetailClient({
   // Fetch groupDetails immediately (always available)
   useEffect(() => {
     setGroupDetailsError(false)
+    setLocalGroupImages([])
     // SPECIAL CASE: Event 303 - Use local images
     if (item.groupCode === '303') {
       setGroupImageUrl('/images/events/303/A.webp')
@@ -401,6 +404,13 @@ export function ActivityDetailClient({
       .then(async (data) => {
         if (data) {
           setGroupDetails(data)
+          const localImages = await fetch(`/api/atlantico/local-group-images/${encodeURIComponent(item.groupCode)}`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((payload: { images?: string[] } | null) => payload?.images ?? [])
+            .catch(() => [])
+          if (localImages.length > 0) {
+            setLocalGroupImages(localImages)
+          }
           
           // Collect ALL images from groupDetails - resolve filenames to URLs
           const images: string[] = []
@@ -479,11 +489,19 @@ export function ActivityDetailClient({
               images.push(img)
             }
           }
+
+          // Prepend local curated photos when available.
+          const combinedWithLocal = [...localImages, ...images].filter(
+            (img, idx, arr) => Boolean(img) && arr.indexOf(img) === idx
+          )
+          if (localImages.length > 0) {
+            setGroupImageUrl((prev) => prev || localImages[0])
+          }
           
           // Store all collected images
-          if (images.length > 0) {
+          if (combinedWithLocal.length > 0) {
             setAllImages(prev => {
-              const combined = [...images]
+              const combined = [...combinedWithLocal]
               // Add any existing images that aren't in the new list (preserve event images)
               for (const img of prev) {
                 if (!combined.includes(img)) {
@@ -509,9 +527,12 @@ export function ActivityDetailClient({
       // Reset allImages to only group images when no event is selected
       if (groupDetails) {
         const groupImages = extractImageUrls(groupDetails)
-        setAllImages(groupImages)
+        const mergedGroupImages = [...localGroupImages, ...groupImages].filter(
+          (img, idx, arr) => Boolean(img) && arr.indexOf(img) === idx
+        )
+        setAllImages(mergedGroupImages)
       } else {
-        setAllImages([])
+        setAllImages(localGroupImages)
       }
       return
     }
@@ -719,7 +740,7 @@ export function ActivityDetailClient({
         if (data) setLimitsInfo(data)
       })
       .catch(() => setLimitsError(true))
-  }, [selectedEventId, lang, currentMonth])
+  }, [selectedEventId, lang, currentMonth, groupDetails, localGroupImages])
 
   // Check if there are valid times for selected date
   const hasValidTimes = useMemo(() => {

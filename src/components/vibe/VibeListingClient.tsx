@@ -467,12 +467,13 @@ export function VibeListingClient({ initialTours, locale, classificationName }: 
         </div>
       ) : (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {filteredAndSortedTours.map((tour) => (
+          {filteredAndSortedTours.map((tour, index) => (
             <TourCard
               key={`${tour.id}-${tour.code}`}
               tour={tour}
               locale={locale}
               availabilityPreview={availabilityPreviews[`${tour.id}-${tour.code}`]}
+              index={index}
             />
           ))}
         </div>
@@ -486,9 +487,10 @@ interface TourCardProps {
   tour: Tour
   locale: string
   availabilityPreview?: AvailabilityPreview
+  index: number
 }
 
-function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
+function TourCard({ tour, locale, availabilityPreview, index }: TourCardProps) {
   const t = useTranslations('vibeListing')
   const [heroImage, setHeroImage] = useState<string | null>(null) // For activity 508: exact hero image
   const [vipTourImage, setVipTourImage] = useState<string | null>(null)
@@ -705,16 +707,17 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
     if (isVipTour && vipTourImage) {
       return vipTourImage
     }
-    // Fallback to API-provided images first
+    // For mobile perceived performance, prefer local static covers first.
+    // They are served by our own domain and usually appear instantly.
+    if (localCover) {
+      return localCover
+    }
+    // Then fallback to API-provided images.
     if (tour.image) {
       return buildAtlanticoImageUrl(tour.image)
     }
     if (apiImage) {
       return apiImage
-    }
-    // Final fallback for vibe cards: local curated cover in public/images/tours-list/{code}/cover.png
-    if (localCover) {
-      return localCover
     }
     return null
   }, [isActivity508, heroImage, isVipTour, vipTourImage, localCover, tour.image, apiImage])
@@ -738,6 +741,7 @@ function TourCard({ tour, locale, availabilityPreview }: TourCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
             fallbackSrc="/images/hero-poster.jpg"
+            loading={index < 2 ? 'eager' : 'lazy'}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm bg-glass-50">
