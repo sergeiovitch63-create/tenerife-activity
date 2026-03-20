@@ -74,22 +74,77 @@ export function InspiredPageClient({
       .filter((vibe): vibe is Vibe => vibe !== undefined)
       .slice(0, 6)
 
-    // Get experiences from recommended vibes
-    const vibeIds = new Set(vibes.map((vibe) => vibe.id))
-    const experiences = allExperiences
-      .filter((exp) => vibeIds.has(exp.vibeId))
-      .slice(0, 12)
+    // Source-of-truth: we always bucket experiences by vibeId (for diversity).
+    // But we prioritize buckets whose vibeId is among the recommended vibes.
+    const recommendedVibeIds = new Set(vibes.map((vibe) => vibe.id))
 
-    // Remove duplicates by ID
     const uniqueExperiences = Array.from(
-      new Map(experiences.map((exp) => [exp.id, exp])).values()
+      new Map(allExperiences.map((exp) => [exp.id, exp])).values()
     )
+
+    const DESIRED_COUNT = 12
+
+    const buckets = new Map<string, Experience[]>()
+    const bucketMinPrice = new Map<string, number>()
+
+    for (const exp of uniqueExperiences) {
+      const key = String(exp.vibeId ?? 'unknown').trim() || 'unknown'
+      const arr = buckets.get(key) ?? []
+      arr.push(exp)
+      buckets.set(key, arr)
+
+      const currentMin = bucketMinPrice.get(key)
+      const nextMin = currentMin == null ? exp.price : Math.min(currentMin, exp.price)
+      bucketMinPrice.set(key, nextMin)
+    }
+
+    const bucketKeys = Array.from(buckets.keys()).sort((a, b) => {
+      const aInRecommended = recommendedVibeIds.has(a)
+      const bInRecommended = recommendedVibeIds.has(b)
+      if (aInRecommended !== bInRecommended) return aInRecommended ? -1 : 1
+
+      return (bucketMinPrice.get(a) ?? 0) - (bucketMinPrice.get(b) ?? 0)
+    })
+
+    // Sort each bucket deterministically (cheapest first)
+    for (const key of bucketKeys) {
+      const arr = buckets.get(key)
+      if (!arr) continue
+      arr.sort((x, y) => x.price - y.price)
+    }
+
+    // Round-robin selection across all vibe buckets to guarantee pool diversity.
+    const pickedIds = new Set<string>()
+    const selectedExperiences: Experience[] = []
+    let round = 0
+
+    while (selectedExperiences.length < DESIRED_COUNT) {
+      let pickedThisRound = false
+
+      for (const key of bucketKeys) {
+        const arr = buckets.get(key) ?? []
+        const pick = arr[round]
+        if (!pick) continue
+        if (pickedIds.has(pick.id)) continue
+
+        selectedExperiences.push(pick)
+        pickedIds.add(pick.id)
+        pickedThisRound = true
+
+        if (selectedExperiences.length >= DESIRED_COUNT) break
+      }
+
+      if (!pickedThisRound) break
+      round++
+    }
 
     // Remove experiences without image from the grid, except for known exceptions.
     // If everything is missing, keep the original list so the UI still shows results.
-    const filteredExperiences = uniqueExperiences.filter((exp) => !isExperienceMissingImage(exp))
+    const filteredExperiences = selectedExperiences.filter(
+      (exp) => !isExperienceMissingImage(exp)
+    )
     const safeFilteredExperiences =
-      filteredExperiences.length > 0 ? filteredExperiences : uniqueExperiences
+      filteredExperiences.length > 0 ? filteredExperiences : selectedExperiences
 
     return {
       recommendedVibes: vibes,

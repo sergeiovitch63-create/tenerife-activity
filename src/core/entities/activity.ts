@@ -14,6 +14,11 @@ export type Activity = {
   description?: string;
   media: ActivityMedia;
   tags: string[];
+  /**
+   * Source-of-truth for recommendations diversity.
+   * Optional because some legacy mappings don't provide vibeId.
+   */
+  vibeId?: string;
 };
 
 

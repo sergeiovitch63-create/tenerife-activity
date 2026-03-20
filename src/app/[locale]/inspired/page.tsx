@@ -56,6 +56,7 @@ function mapTourToActivity(tour: any): Activity {
     slug: String(tour.code ?? tour.id),
     title: tour.title,
     description: tour.excerpt || '',
+    vibeId: tour.vibeId != null ? String(tour.vibeId) : undefined,
     priceFrom: price,
     duration:
       typeof tour.durationHours === 'number' && tour.durationHours > 0

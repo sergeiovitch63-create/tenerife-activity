@@ -52,6 +52,7 @@ function mapExperienceToActivity(experience: any): Activity {
     id,
     slug,
     title,
+    vibeId: experience.vibeId != null ? String(experience.vibeId) : undefined,
     priceFrom: rawPrice,
     duration: experience.duration ?? '',
     location: experience.location ?? 'Tenerife',

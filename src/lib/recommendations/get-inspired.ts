@@ -137,28 +137,76 @@ export function getInspiredRecommendations(
     return []
   }
 
+  const DESIRED_COUNT = 12
+
+  type Scored = { activity: Activity; score: number }
+
   // Score all activities
-  const scoredActivities = activities.map((activity) => ({
+  const scoredActivities: Scored[] = activities.map((activity) => ({
     activity,
     score: scoreActivity(activity, userTags),
   }))
 
-  // Filter out activities with 0 score
-  const matchingActivities = scoredActivities.filter((item) => item.score > 0)
-
-  // Sort by score (descending), then by price (ascending) as tiebreaker
-  matchingActivities.sort((a, b) => {
-    if (a.score !== b.score) {
-      return b.score - a.score
-    }
+  // Sort by score desc, then by price asc (stable tie-breaker)
+  scoredActivities.sort((a, b) => {
+    if (a.score !== b.score) return b.score - a.score
     return a.activity.priceFrom - b.activity.priceFrom
   })
 
-  // Extract activities in sorted order.
-  // We intentionally return all matches so the UI
-  // can display the full set of relevant activities.
-  const recommended = matchingActivities.map((item) => item.activity)
+  // Bucket by vibeId (source of truth). This lets us round-robin across vibes
+  // while still prioritizing "more relevant" vibe buckets first.
+  const buckets = new Map<string, Scored[]>()
+  const bucketMaxScore = new Map<string, number>()
 
-  return recommended
+  for (const item of scoredActivities) {
+    const key = String(item.activity.vibeId ?? 'unknown').trim() || 'unknown'
+    const arr = buckets.get(key) ?? []
+    arr.push(item)
+    buckets.set(key, arr)
+    bucketMaxScore.set(key, Math.max(bucketMaxScore.get(key) ?? 0, item.score))
+  }
+
+  // Order buckets: highest max-score first (pertinent vibes first),
+  // but since we still round-robin across buckets, the final list is diversified.
+  const bucketKeys = Array.from(buckets.keys()).sort((a, b) => {
+    return (bucketMaxScore.get(b) ?? 0) - (bucketMaxScore.get(a) ?? 0)
+  })
+
+  // Ensure each bucket is internally ordered by the same relevance.
+  for (const key of bucketKeys) {
+    const arr = buckets.get(key)
+    if (!arr) continue
+    arr.sort((a, b) => {
+      if (a.score !== b.score) return b.score - a.score
+      return a.activity.priceFrom - b.activity.priceFrom
+    })
+  }
+
+  // Round-robin pick: first from each vibe bucket, then second, etc.
+  const pickedIds = new Set<string>()
+  const result: Activity[] = []
+
+  let round = 0
+  while (result.length < DESIRED_COUNT) {
+    let pickedThisRound = false
+
+    for (const key of bucketKeys) {
+      const arr = buckets.get(key) ?? []
+      const pick = arr[round]
+      if (!pick) continue
+      if (pickedIds.has(pick.activity.id)) continue
+
+      result.push(pick.activity)
+      pickedIds.add(pick.activity.id)
+      pickedThisRound = true
+
+      if (result.length >= DESIRED_COUNT) break
+    }
+
+    if (!pickedThisRound) break
+    round++
+  }
+
+  return result
 }
 
