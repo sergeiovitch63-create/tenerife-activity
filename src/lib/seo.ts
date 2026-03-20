@@ -16,7 +16,7 @@ export function getCanonical(locale: Locale, pathname: string): string {
   // Ensure pathname starts with /
   const cleanPath = pathname.startsWith('/') ? pathname : `/${pathname}`
   // Remove locale prefix if present (we'll add it back)
-  const pathWithoutLocale = cleanPath.replace(/^\/(en|es|de|fr|it|ru|pl|nl|pt)/, '')
+  const pathWithoutLocale = cleanPath.replace(/^\/(en|es|de|fr|it|ru|pl)/, '')
   // Ensure it starts with /
   const finalPath = pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`
   return `${siteUrl}/${locale}${finalPath}`
@@ -34,7 +34,7 @@ export function getAlternates(locale: Locale, pathname: string): {
 
   // Remove locale prefix if present
   const cleanPath = pathname.startsWith('/') ? pathname : `/${pathname}`
-  const pathWithoutLocale = cleanPath.replace(/^\/(en|es|de|fr|it|ru|pl|nl|pt)/, '')
+  const pathWithoutLocale = cleanPath.replace(/^\/(en|es|de|fr|it|ru|pl)/, '')
   const finalPath = pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`
 
   // Generate URLs for all locales
