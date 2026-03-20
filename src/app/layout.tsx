@@ -2,6 +2,9 @@ import '../ui/styles/globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
+  verification: {
+    google: 's4-smfixKn_o8Q1XIVxlYmsE9JobKnxXGakJNq-NXTo',
+  },
   // Optimize font loading
   other: {
     'font-display': 'swap',
