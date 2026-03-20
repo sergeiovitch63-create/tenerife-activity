@@ -11,6 +11,8 @@ import { getClassificationNameForVibe } from '@/lib/vibes/vibe-classification-ma
 import { enrichGroupsWithImages } from '@/lib/vibe/enrich-groups-with-images.server'
 import { VibeListingClient } from '@/components/vibe/VibeListingClient'
 
+const EXCLUDED_GROUPDETAIL_CODES = new Set(['476', '514', '552', '553'])
+
 // Mark page as dynamic (uses headers())
 export const dynamic = 'force-dynamic'
 
@@ -173,6 +175,11 @@ export default async function VibePage({ params, searchParams }: VibePageProps &
         console.warn('[VIBE] Outer error (non-blocking):', outerError)
       }
     }
+  }
+
+  // Business rule: these groupDetails must not appear in vibe cards.
+  if (groups.length > 0) {
+    groups = groups.filter((group) => !EXCLUDED_GROUPDETAIL_CODES.has(String(group.code ?? '').trim()))
   }
 
   // DISABLED: All experience fetching logic (keeping for reference)
