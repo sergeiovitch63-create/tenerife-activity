@@ -6,7 +6,8 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import type { Activity } from '@/core/entities/activity'
 import {
-  getInspiredRecommendations,
+  answersToTags,
+  scoreActivity,
   type GetInspiredAnswers,
 } from '@/lib/recommendations/get-inspired'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
@@ -138,28 +139,20 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
           : (null as GetInspiredAnswers['intensity']),
     }
 
-    const scored = getInspiredRecommendations(marcoPoolActivities, payload)
-    if (scored.length > 0) return scored
+    const userTags = answersToTags(payload)
+    const scored = marcoPoolActivities
+      .map((activity) => ({
+        activity,
+        score: scoreActivity(activity, userTags),
+      }))
+      .sort((a, b) => {
+        if (a.score !== b.score) return b.score - a.score
+        return a.activity.priceFrom - b.activity.priceFrom
+      })
+      .map((x) => x.activity)
 
-    // Fallback: propose a generic selection (UI will filter no-image cards)
-    const allWithImages = marcoPoolActivities.filter((activity) => activity.media && activity.media.src)
-    if (allWithImages.length > 0) {
-      return allWithImages.slice(0, Math.min(12, allWithImages.length))
-    }
-
-    return marcoPoolActivities.slice(0, Math.min(12, marcoPoolActivities.length))
+    return scored.slice(0, Math.min(12, scored.length))
   }, [marcoPoolActivities, answers, hasFinished])
-
-  const NO_IMAGE_ACTIVITY_EXCEPTIONS = new Set(['476', '514', '552', '553'])
-  const shouldRenderRecommendedActivity = (activity: Activity) => {
-    const codeStr = String(activity.slug || activity.id || '').trim()
-    const src = (activity.media?.src ?? '').trim()
-    const isNoImage = !src || src === '/logo.png'
-    if (!isNoImage) return true
-    return NO_IMAGE_ACTIVITY_EXCEPTIONS.has(codeStr)
-  }
-
-  const visibleRecommendedActivities = recommendedActivities.filter(shouldRenderRecommendedActivity)
 
   const handleSelect = (value: string) => {
     const stepId = currentStep.id
@@ -344,19 +337,19 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
         </section>
       </main>
 
-      {hasFinished && visibleRecommendedActivities.length > 0 && (
+      {hasFinished && recommendedActivities.length > 0 && (
         <section className="relative z-10 bg-transparent py-10 lg:py-14">
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold">Nos idées pour toi</h2>
                 <p className="text-sm text-white/70">
-                  {t('results.subtitle', { count: visibleRecommendedActivities.length })}
+                  {t('results.subtitle', { count: recommendedActivities.length })}
                 </p>
               </div>
             </header>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleRecommendedActivities.map((activity) => {
+              {recommendedActivities.map((activity) => {
                 const codeStr = String(activity.slug || activity.id || '').trim()
 
                 return (
