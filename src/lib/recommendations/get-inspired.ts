@@ -141,6 +141,21 @@ export function getInspiredRecommendations(
 
   type Scored = { activity: Activity; score: number }
 
+  const NO_IMAGE_CODES_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+
+  const isNoPhoto = (activity: Activity) => {
+    const src = (activity.media?.src ?? '').trim()
+    return !src || src === '/logo.png'
+  }
+
+  const getActivityCode = (activity: Activity) => String(activity.slug ?? activity.id ?? '').trim()
+
+  const isAllowedForSuggestions = (activity: Activity) => {
+    const code = getActivityCode(activity)
+    if (!isNoPhoto(activity)) return true
+    return NO_IMAGE_CODES_EXCEPTIONS.has(code)
+  }
+
   // Score all activities
   const scoredActivities: Scored[] = activities.map((activity) => ({
     activity,
@@ -153,12 +168,16 @@ export function getInspiredRecommendations(
     return a.activity.priceFrom - b.activity.priceFrom
   })
 
+  // Filter out "no image" activities from the suggestion pool.
+  // Except the known exceptions we allow to be displayed.
+  const allowedScoredActivities = scoredActivities.filter((s) => isAllowedForSuggestions(s.activity))
+
   // Bucket by vibeId (source of truth). This lets us round-robin across vibes
   // while still prioritizing "more relevant" vibe buckets first.
   const buckets = new Map<string, Scored[]>()
   const bucketMaxScore = new Map<string, number>()
 
-  for (const item of scoredActivities) {
+  for (const item of allowedScoredActivities) {
     const key = String(item.activity.vibeId ?? 'unknown').trim() || 'unknown'
     const arr = buckets.get(key) ?? []
     arr.push(item)

@@ -137,8 +137,6 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
   }
 
   const visibleRecommendedActivities = recommendedActivities.filter(shouldRenderRecommendedActivity)
-  const safeVisibleRecommendedActivities =
-    visibleRecommendedActivities.length > 0 ? visibleRecommendedActivities : recommendedActivities
 
   const handleSelect = (value: string) => {
     const stepId = currentStep.id
@@ -323,19 +321,19 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
         </section>
       </main>
 
-      {hasFinished && safeVisibleRecommendedActivities.length > 0 && (
+      {hasFinished && visibleRecommendedActivities.length > 0 && (
         <section className="relative z-10 bg-transparent py-10 lg:py-14">
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold">Nos idées pour toi</h2>
                 <p className="text-sm text-white/70">
-                  {t('results.subtitle', { count: safeVisibleRecommendedActivities.length })}
+                  {t('results.subtitle', { count: visibleRecommendedActivities.length })}
                 </p>
               </div>
             </header>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {safeVisibleRecommendedActivities.map((activity) => {
+              {visibleRecommendedActivities.map((activity) => {
                 const codeStr = String(activity.slug || activity.id || '').trim()
 
                 return (
