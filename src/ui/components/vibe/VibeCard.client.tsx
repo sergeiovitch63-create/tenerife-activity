@@ -79,7 +79,11 @@ export function VibeCard({ vibe }: VibeCardProps) {
     // Only initialize once per component mount
     if (!initializedRef.current && hasVideo && !hasErroredRef.current) {
       initializedRef.current = true
-      if (thumbnailPaths.webp) {
+      // Prefer curated local thumbnail when available.
+      if (vibeThumbnail) {
+        setThumbnailSrc(vibeThumbnail)
+        triedFormatsRef.current.add(vibeThumbnail)
+      } else if (thumbnailPaths.webp) {
         setThumbnailSrc(thumbnailPaths.webp)
         triedFormatsRef.current.add(thumbnailPaths.webp)
       } else if (thumbnailPaths.jpg) {
@@ -90,7 +94,7 @@ export function VibeCard({ vibe }: VibeCardProps) {
         hasErroredRef.current = true
       }
     }
-  }, [hasVideo, thumbnailPaths.webp, thumbnailPaths.jpg])
+  }, [hasVideo, thumbnailPaths.webp, thumbnailPaths.jpg, vibeThumbnail])
 
   // Handle thumbnail load error - try jpg fallback ONCE
   const handleThumbnailError = useCallback(() => {

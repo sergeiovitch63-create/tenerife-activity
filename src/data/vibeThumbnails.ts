@@ -5,11 +5,11 @@
 export const vibeThumbnails: Record<string, string> = {
   'vip-tours': '/videos/thumbnails/VIP-Tours.png',
   'theme-parks': '/videos/thumbnails/vibe-theme-parks.png',
-  'tickets-attractions': '/videos/thumbnails/tickets-attractions.png',
+  'tickets-attractions': '/images/Tickets%20%26%20Attractions.jpg',
   'bus-excursions': '/videos/thumbnails/bus-excursions.png',
   'boat-trips-cruises': '/videos/thumbnails/boat-trips-cruises.png',
   'shows-entertainment': '/videos/thumbnails/shows-entertainment.png',
-  'water-sports': '/videos/thumbnails/water-sports.png',
+  'water-sports': '/images/Water%20Sports.png',
   'cable-car-observatory': '/videos/thumbnails/cable-car-observatory.png',
   'diving-fishing': '/videos/thumbnails/diving-fishing.png',
   'adventure-nature': '/videos/thumbnails/adventure-nature.png',
