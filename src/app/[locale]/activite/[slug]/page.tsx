@@ -36,6 +36,7 @@ type Tour = {
 }
 
 const REVALIDATE = 60
+const EXCLUDED_GROUPDETAIL_CODES = new Set(['476', '514', '552', '553'])
 
 export async function generateStaticParams() {
   const vibes = await vibeRepository.findAll()
@@ -116,6 +117,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
   const tVibes = await getTranslations({ locale, namespace: 'vibes' })
   const translatedTitle = getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title)
   const translatedTagline = getTranslatedVibeTagline(vibe.slug, locale, vibe.tagline || '')
+  const visibleTours = tours.filter((t) => !EXCLUDED_GROUPDETAIL_CODES.has(String(t.code ?? t.id ?? '').trim()))
 
   return (
     <>
@@ -150,15 +152,15 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
             </div>
           )}
 
-          {tours.length === 0 && !error && (
+          {visibleTours.length === 0 && !error && (
             <div className="glass-panel p-6 text-center text-sm text-glass-600">
               {tActivite('noToursAvailable')}
             </div>
           )}
 
-          {tours.length > 0 && (
+          {visibleTours.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tours.map((t) => {
+              {visibleTours.map((t) => {
                 const codeStr = String(t.code ?? t.id ?? '').trim()
                 return (
                   <Link
