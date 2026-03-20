@@ -50,14 +50,14 @@ export function InspiredPageClient({
     { id: 'seniors', label: t('groups.seniors') },
   ]
 
-  const NO_IMAGE_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+  const BLOCKED_GROUPDETAIL_CODES = new Set(['476', '514', '552', '553'])
 
   const isExperienceMissingImage = (experience: Experience) => {
     const code = String(experience.slug ?? experience.id ?? '').trim()
+    if (BLOCKED_GROUPDETAIL_CODES.has(code)) return true
     const imageUrl = experience.imageUrls?.[0] ?? experience.imageUrl
     const isNoImage = !imageUrl || imageUrl === '/logo.png'
-    if (!isNoImage) return false
-    return !NO_IMAGE_EXCEPTIONS.has(code)
+    return isNoImage
   }
 
   // Compute recommendations based on selections

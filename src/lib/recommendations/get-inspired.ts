@@ -141,7 +141,7 @@ export function getInspiredRecommendations(
 
   type Scored = { activity: Activity; score: number }
 
-  const NO_IMAGE_CODES_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+  const BLOCKED_GROUPDETAIL_CODES = new Set(['476', '514', '552', '553'])
 
   const isNoPhoto = (activity: Activity) => {
     const src = (activity.media?.src ?? '').trim()
@@ -152,8 +152,9 @@ export function getInspiredRecommendations(
 
   const isAllowedForSuggestions = (activity: Activity) => {
     const code = getActivityCode(activity)
+    if (BLOCKED_GROUPDETAIL_CODES.has(code)) return false
     if (!isNoPhoto(activity)) return true
-    return NO_IMAGE_CODES_EXCEPTIONS.has(code)
+    return false
   }
 
   // Score all activities
@@ -168,8 +169,7 @@ export function getInspiredRecommendations(
     return a.activity.priceFrom - b.activity.priceFrom
   })
 
-  // Filter out "no image" activities from the suggestion pool.
-  // Except the known exceptions we allow to be displayed.
+  // Filter out blocked codes and no-image activities from the suggestion pool.
   const allowedScoredActivities = scoredActivities.filter((s) => isAllowedForSuggestions(s.activity))
 
   // Bucket by vibeId (source of truth). This lets us round-robin across vibes
