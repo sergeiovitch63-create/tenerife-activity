@@ -25,6 +25,22 @@ type InspiredMarcoPageProps = {
   activities: Activity[]
 }
 
+// Source of truth provided for Marco quiz final suggestions.
+// Only these groupDetails codes are allowed in the recommendations pool.
+const MARCO_ALLOWED_GROUPDETAIL_CODES = new Set([
+  '11', '12', '13', '14', '16', '22', '23', '26', '27', '28', '31', '32', '33', '34', '35', '36',
+  '41', '42', '43', '46', '50', '53', '54', '55', '58', '66', '67', '69', '70', '72', '74', '78',
+  '90', '92', '97', '98', '101', '102', '103', '111', '113', '115', '116', '127', '131', '134',
+  '137', '139', '140', '155', '165', '166', '167', '168', '169', '175', '180', '186', '189', '200',
+  '208', '210', '213', '214', '215', '216', '230', '234', '240', '245', '264', '270', '273', '281',
+  '283', '284', '301', '303', '306', '308', '310', '314', '319', '321', '322', '323', '326', '327',
+  '328', '330', '340', '346', '347', '359', '362', '366', '374', '381', '382', '390', '402', '403',
+  '416', '417', '427', '432', '435', '438', '439', '440', '452', '453', '456', '457', '459', '463',
+  '464', '469', '472', '475', '476', '477', '478', '479', '480', '481', '492', '505', '506', '507',
+  '508', '509', '510', '511', '512', '513', '514', '515', '516', '517', '520', '521', '522', '533',
+  '549', '550', '552', '553',
+])
+
 export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
   const t = useTranslations('inspiredMarco')
 
@@ -101,6 +117,13 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
 
   const currentStep = steps[currentStepIndex]
 
+  const marcoPoolActivities = useMemo(() => {
+    return activities.filter((activity) => {
+      const code = String(activity.slug ?? activity.id ?? '').trim()
+      return MARCO_ALLOWED_GROUPDETAIL_CODES.has(code)
+    })
+  }, [activities])
+
   const recommendedActivities: Activity[] = useMemo(() => {
     if (!hasFinished) return []
 
@@ -115,17 +138,17 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
           : (null as GetInspiredAnswers['intensity']),
     }
 
-    const scored = getInspiredRecommendations(activities, payload)
+    const scored = getInspiredRecommendations(marcoPoolActivities, payload)
     if (scored.length > 0) return scored
 
     // Fallback: propose a generic selection (UI will filter no-image cards)
-    const allWithImages = activities.filter((activity) => activity.media && activity.media.src)
+    const allWithImages = marcoPoolActivities.filter((activity) => activity.media && activity.media.src)
     if (allWithImages.length > 0) {
       return allWithImages.slice(0, Math.min(12, allWithImages.length))
     }
 
-    return activities.slice(0, Math.min(12, activities.length))
-  }, [activities, answers, hasFinished])
+    return marcoPoolActivities.slice(0, Math.min(12, marcoPoolActivities.length))
+  }, [marcoPoolActivities, answers, hasFinished])
 
   const NO_IMAGE_ACTIVITY_EXCEPTIONS = new Set(['476', '514', '552', '553'])
   const shouldRenderRecommendedActivity = (activity: Activity) => {

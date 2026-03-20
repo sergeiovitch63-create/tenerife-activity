@@ -276,30 +276,24 @@ async function main() {
       continue
     }
 
-    // DEBUG: vérifier si l'API Atlantico renvoie des données ou des champs vides
-    const rawName = detailsENG?.name ?? detailsENG?.Name
-    const rawDesc = detailsENG?.desc ?? detailsENG?.description ?? detailsENG?.Desc
-    const rawWillDo = detailsENG?.willDo ?? detailsENG?.WillDo
+    // DEBUG: Atlántico fields are expected at root (exact keys)
+    const rawName = detailsENG?.name
+    const rawDesc = detailsENG?.desc
+    const rawWillDo = detailsENG?.willDo
     console.log(`  [DEBUG fetchGroupDetailsENG] code=${code}`)
     console.log(`    name: ${rawName === '' || rawName == null ? '(vide)' : JSON.stringify(String(rawName).slice(0, 80))}${rawName != null && String(rawName).length > 80 ? '...' : ''}`)
     console.log(`    desc: ${rawDesc === '' || rawDesc == null ? '(vide)' : JSON.stringify(String(rawDesc).slice(0, 80))}${rawDesc != null && String(rawDesc).length > 80 ? '...' : ''}`)
     console.log(`    willDo: ${rawWillDo === '' || rawWillDo == null ? '(vide)' : JSON.stringify(String(rawWillDo).slice(0, 80))}${rawWillDo != null && String(rawWillDo).length > 80 ? '...' : ''}`)
 
     const baseGroupDetails = {
-      name: safeString(detailsENG?.name ?? detailsENG?.Name),
-      desc: safeString(detailsENG?.desc ?? detailsENG?.description ?? detailsENG?.Desc),
-      willDo: safeString(detailsENG?.willDo ?? detailsENG?.WillDo),
-      faq: safeString(detailsENG?.faq ?? detailsENG?.Faq),
-      canDesc: safeString(
-        detailsENG?.canDesc ??
-          detailsENG?.canTitle ??
-          detailsENG?.cancellationPolicy ??
-          detailsENG?.cancellation_policy ??
-          detailsENG?.cancellation ??
-          ''
-      ),
-      childAge: safeString(detailsENG?.childAge ?? detailsENG?.ChildAge),
-      infantAge: safeString(detailsENG?.infantAge ?? detailsENG?.InfantAge),
+      // Read only direct root fields returned by Atlantico API.
+      name: safeString(detailsENG?.name),
+      desc: safeString(detailsENG?.desc),
+      willDo: safeString(detailsENG?.willDo),
+      faq: safeString(detailsENG?.faq),
+      canDesc: safeString(detailsENG?.canDesc),
+      childAge: safeString(detailsENG?.childAge),
+      infantAge: safeString(detailsENG?.infantAge),
     }
 
     const eventIds = extractEventIdsFromGroupDetails(detailsENG)
