@@ -342,7 +342,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-semibold">Nos idées pour toi</h2>
+                <h2 className="text-2xl font-semibold">{t('results.title')}</h2>
                 <p className="text-sm text-white/70">
                   {t('results.subtitle', { count: recommendedActivities.length })}
                 </p>

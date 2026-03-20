@@ -3,7 +3,7 @@ import { vibeRepository } from '@/config/repositories'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { getTranslatedVibeTitle } from '@/ui/components/vibe/vibe-translations'
+import { getTranslatedVibeTitle, getTranslatedVibeTagline } from '@/ui/components/vibe/vibe-translations'
 import { buildMetadata } from '@/lib/seo'
 import { type Locale } from '@/i18n/request'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
@@ -35,12 +35,13 @@ export async function generateMetadata({
   }
 
   const translatedTitle = getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title)
+  const translatedTagline = getTranslatedVibeTagline(vibe.slug, locale, vibe.tagline || '')
 
   return buildMetadata({
     locale: locale as Locale,
     pathname: `/vibe/${slug}`,
     title: tSeo('vibe.titleTemplate', { vibe: translatedTitle }),
-    description: vibe.tagline || vibe.description || tSeo('vibe.descriptionTemplate', { vibe: translatedTitle }),
+    description: translatedTagline || vibe.description || tSeo('vibe.descriptionTemplate', { vibe: translatedTitle }),
   })
 }
 
@@ -270,6 +271,7 @@ async function VipToursPage({ locale, vibe }: { locale: string; vibe: any }) {
   // Get translated vibe title
   const tVibes = await getTranslations({ locale, namespace: 'vibes' })
   const translatedTitle = getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title)
+  const translatedTagline = getTranslatedVibeTagline(vibe.slug, locale, vibe.tagline || '')
 
   // DISABLED: All tour fetching and rendering
   const connectedTours: any[] = []
@@ -285,9 +287,9 @@ async function VipToursPage({ locale, vibe }: { locale: string; vibe: any }) {
                 <h1 className="text-4xl md:text-5xl font-bold text-glass-900">
                   {translatedTitle}
                 </h1>
-                {vibe.tagline && (
+                {translatedTagline && (
                   <p className="text-xl text-glass-600 leading-relaxed max-w-2xl">
-                    {vibe.tagline}
+                    {translatedTagline}
                   </p>
                 )}
               </div>

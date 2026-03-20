@@ -14,7 +14,7 @@ import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { getClassificationIdForVibe, getClassificationNameForVibe } from '@/lib/vibes/vibe-classification-mapping'
 import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { getTranslations } from 'next-intl/server'
-import { getTranslatedVibeTitle } from '@/ui/components/vibe/vibe-translations'
+import { getTranslatedVibeTitle, getTranslatedVibeTagline } from '@/ui/components/vibe/vibe-translations'
 import { vibeRepository } from '@/config/repositories'
 import { locales, type Locale } from '@/i18n/request'
 import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
@@ -115,6 +115,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
 
   const tVibes = await getTranslations({ locale, namespace: 'vibes' })
   const translatedTitle = getTranslatedVibeTitle(vibe.slug, tVibes, vibe.title)
+  const translatedTagline = getTranslatedVibeTagline(vibe.slug, locale, vibe.tagline || '')
 
   return (
     <>
@@ -128,9 +129,9 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
               <h1 className="text-3xl md:text-4xl font-bold text-glass-900">
                 {translatedTitle}
               </h1>
-              {vibe.tagline && (
+              {translatedTagline && (
                 <p className="text-lg text-glass-600 max-w-2xl">
-                  {vibe.tagline}
+                  {translatedTagline}
                 </p>
               )}
             </div>

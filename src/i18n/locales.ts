@@ -12,8 +12,6 @@ export const LOCALES: LocaleInfo[] = [
   { code: 'it', label: 'IT', flag: '🇮🇹' },
   { code: 'ru', label: 'RU', flag: '🇷🇺' },
   { code: 'pl', label: 'PL', flag: '🇵🇱' },
-  { code: 'nl', label: 'NL', flag: '🇳🇱' },
-  { code: 'pt', label: 'PT', flag: '🇵🇹' },
 ] as const
 
 export const DEFAULT_LOCALE = 'en'

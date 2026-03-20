@@ -59,6 +59,15 @@ function safeString(v) {
   return String(v)
 }
 
+function chunkArray(arr, size) {
+  const chunkSize = Math.max(1, Number(size) || 1)
+  const chunks = []
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    chunks.push(arr.slice(i, i + chunkSize))
+  }
+  return chunks
+}
+
 async function fetchJson(url) {
   const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) {
@@ -276,6 +285,13 @@ async function main() {
       continue
     }
 
+    if (String(code).trim() === '3') {
+      console.log('  [DEBUG code=3] Raw fetchGroupDetailsENG response:')
+      console.log(JSON.stringify(detailsENG, null, 2))
+      console.log(`  [DEBUG code=3] detailsENG.name defined: ${detailsENG?.name != null}`)
+      console.log(`  [DEBUG code=3] detailsENG.desc defined: ${detailsENG?.desc != null}`)
+    }
+
     // DEBUG: Atlántico fields are expected at root (exact keys)
     const rawName = detailsENG?.name
     const rawDesc = detailsENG?.desc
@@ -322,20 +338,32 @@ async function main() {
       console.log('  [DEBUG avant Claude] baseGroupDetails:', JSON.stringify(baseGroupDetails, null, 2))
       console.log('  [DEBUG avant Claude] eventOptionsENG:', JSON.stringify(eventOptionsENG, null, 2))
       try {
-        const [groupDetailsTranslated, eventOptionsTranslated] = await Promise.all([
-          claudeTranslateJson({
+        const groupDetailsTranslated = await claudeTranslateJson({
+          targetLang: lang,
+          payload: baseGroupDetails,
+          schemaHint:
+            'Translate the values. Keep keys exactly: name, desc, willDo, faq, canDesc, childAge, infantAge.',
+        })
+
+        const eventOptionsChunks = chunkArray(eventOptionsENG, 8)
+        const eventOptionsTranslatedChunks = []
+
+        for (let i = 0; i < eventOptionsChunks.length; i++) {
+          const chunk = eventOptionsChunks[i]
+          console.log(
+            `  Translating eventOptions chunk ${i + 1}/${eventOptionsChunks.length} (size=${chunk.length}) for ${lang}...`
+          )
+          const translatedChunk = await claudeTranslateJson({
             targetLang: lang,
-            payload: baseGroupDetails,
-            schemaHint:
-              'Translate the values. Keep keys exactly: name, desc, willDo, faq, canDesc, childAge, infantAge.',
-          }),
-          claudeTranslateJson({
-            targetLang: lang,
-            payload: eventOptionsENG,
+            payload: chunk,
             schemaHint:
               'Input is an array of options. Keep the array length and order. Keep keys exactly: eventId, name, desc.',
-          }),
-        ])
+          })
+          const normalizedChunk = Array.isArray(translatedChunk?.payload) ? translatedChunk.payload : []
+          eventOptionsTranslatedChunks.push(...normalizedChunk)
+        }
+
+        const eventOptionsTranslated = { payload: eventOptionsTranslatedChunks }
 
         console.log('  [DEBUG après Claude] groupDetailsTranslated:', JSON.stringify(groupDetailsTranslated, null, 2))
         console.log('  [DEBUG après Claude] eventOptionsTranslated:', JSON.stringify(eventOptionsTranslated, null, 2))
