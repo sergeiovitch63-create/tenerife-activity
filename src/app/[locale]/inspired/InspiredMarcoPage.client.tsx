@@ -140,6 +140,17 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
     return activities.slice(0, Math.min(6, activities.length))
   }, [activities, answers, hasFinished])
 
+  const NO_IMAGE_ACTIVITY_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+  const shouldRenderRecommendedActivity = (activity: Activity) => {
+    const codeStr = String(activity.slug || activity.id || '').trim()
+    const src = (activity.media?.src ?? '').trim()
+    const isNoImage = !src || src === '/logo.png'
+    if (!isNoImage) return true
+    return NO_IMAGE_ACTIVITY_EXCEPTIONS.has(codeStr)
+  }
+
+  const visibleRecommendedActivities = recommendedActivities.filter(shouldRenderRecommendedActivity)
+
   const handleSelect = (value: string) => {
     const stepId = currentStep.id
     setAnswers((prev) => ({ ...prev, [stepId]: value }))
@@ -323,19 +334,19 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
         </section>
       </main>
 
-      {hasFinished && recommendedActivities.length > 0 && (
+      {hasFinished && visibleRecommendedActivities.length > 0 && (
         <section className="relative z-10 bg-transparent py-10 lg:py-14">
           <div className="mx-auto max-w-6xl px-4">
             <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold">Nos idées pour toi</h2>
                 <p className="text-sm text-white/70">
-                  {t('results.subtitle', { count: recommendedActivities.length })}
+                  {t('results.subtitle', { count: visibleRecommendedActivities.length })}
                 </p>
               </div>
             </header>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendedActivities.map((activity) => {
+              {visibleRecommendedActivities.map((activity) => {
                 const codeStr = String(activity.slug || activity.id || '').trim()
 
                 return (

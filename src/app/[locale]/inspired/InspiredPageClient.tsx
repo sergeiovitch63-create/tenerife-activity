@@ -50,6 +50,16 @@ export function InspiredPageClient({
     { id: 'seniors', label: t('groups.seniors') },
   ]
 
+  const NO_IMAGE_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+
+  const isExperienceMissingImage = (experience: Experience) => {
+    const code = String(experience.slug ?? experience.id ?? '').trim()
+    const imageUrl = experience.imageUrls?.[0] ?? experience.imageUrl
+    const isNoImage = !imageUrl || imageUrl === '/logo.png'
+    if (!isNoImage) return false
+    return !NO_IMAGE_EXCEPTIONS.has(code)
+  }
+
   // Compute recommendations based on selections
   const { recommendedVibes, recommendedExperiences } = useMemo(() => {
     const vibeSlugs = getRecommendedVibes(selectedMood, selectedTime, selectedGroup)
@@ -75,9 +85,12 @@ export function InspiredPageClient({
       new Map(experiences.map((exp) => [exp.id, exp])).values()
     )
 
+    // Remove experiences without image from the grid, except for known exceptions.
+    const filteredExperiences = uniqueExperiences.filter((exp) => !isExperienceMissingImage(exp))
+
     return {
       recommendedVibes: vibes,
-      recommendedExperiences: uniqueExperiences,
+      recommendedExperiences: filteredExperiences,
     }
   }, [selectedMood, selectedTime, selectedGroup, allVibes, allExperiences])
 
