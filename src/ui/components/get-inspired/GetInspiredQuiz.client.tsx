@@ -235,6 +235,18 @@ export function GetInspiredQuiz({ activities }: { activities: Activity[] }) {
   const currentQuestion = questions[currentStep - 1] || questions[0] || null
   const currentAnswer = currentQuestion ? answers[currentQuestion.id as keyof QuizAnswers] : null
 
+  const NO_IMAGE_CODES_EXCEPTIONS = new Set(['476', '514', '552', '553'])
+
+  const shouldShowVibeSuggestionChips = (item: Activity) => {
+    const code = String(item.slug ?? item.id ?? '').trim()
+    const src = (item.media?.src ?? '').trim()
+
+    // In mapping, missing photos fall back to the generic logo.
+    const isNoPhoto = !src || src === '/logo.png'
+    if (!isNoPhoto) return true
+    return NO_IMAGE_CODES_EXCEPTIONS.has(code)
+  }
+
   if (!currentQuestion && !isComplete) {
     return (
       <div className="w-full max-w-3xl mx-auto px-4 py-8 md:py-12">
@@ -263,7 +275,7 @@ export function GetInspiredQuiz({ activities }: { activities: Activity[] }) {
             <p className="text-white/85 mb-4 leading-relaxed">
               {description || t('results.noDescription')}
             </p>
-            {Array.isArray(item.tags) && item.tags.length > 0 && (
+            {shouldShowVibeSuggestionChips(item) && Array.isArray(item.tags) && item.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {item.tags.map((tag: string, idx: number) => {
                   if (!tag) return null
