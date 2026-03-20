@@ -86,11 +86,14 @@ export function InspiredPageClient({
     )
 
     // Remove experiences without image from the grid, except for known exceptions.
+    // If everything is missing, keep the original list so the UI still shows results.
     const filteredExperiences = uniqueExperiences.filter((exp) => !isExperienceMissingImage(exp))
+    const safeFilteredExperiences =
+      filteredExperiences.length > 0 ? filteredExperiences : uniqueExperiences
 
     return {
       recommendedVibes: vibes,
-      recommendedExperiences: filteredExperiences,
+      recommendedExperiences: safeFilteredExperiences,
     }
   }, [selectedMood, selectedTime, selectedGroup, allVibes, allExperiences])
 
