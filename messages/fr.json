@@ -971,7 +971,8 @@
       "cartEmpty": "Votre panier est vide",
       "multiItemNotSupported": "Une seule activité peut être réservée à la fois. Veuillez retirer les autres articles de votre panier.",
       "paymentFailed": "L'initiation du paiement a échoué. Veuillez réessayer.",
-      "meetingPointsLoadFailed": "Impossible de charger les points de rendez-vous. Vous pouvez en saisir un manuellement ci-dessous."
+      "meetingPointsLoadFailed": "Impossible de charger les points de rendez-vous. Vous pouvez en saisir un manuellement ci-dessous.",
+      "invalidTime": "Cette réservation n'a pas d'heure de session valide. Retournez sur l'activité, choisissez une date et une heure si nécessaire, puis réessayez."
     },
     "success": {
       "title": "Paiement réussi",

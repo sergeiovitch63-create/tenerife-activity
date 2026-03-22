@@ -971,7 +971,8 @@
       "cartEmpty": "Ihr Warenkorb ist leer",
       "multiItemNotSupported": "Es kann nur eine Aktivität gleichzeitig gebucht werden. Bitte entfernen Sie andere Artikel aus Ihrem Warenkorb.",
       "paymentFailed": "Zahlungsinitiierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "meetingPointsLoadFailed": "Treffpunkte konnten nicht geladen werden. Sie können unten einen manuell eingeben."
+      "meetingPointsLoadFailed": "Treffpunkte konnten nicht geladen werden. Sie können unten einen manuell eingeben.",
+      "invalidTime": "Für diese Buchung fehlt eine gültige Sitzungszeit. Gehen Sie zurück zur Aktivität, wählen Sie bei Bedarf Datum und Uhrzeit, und versuchen Sie es erneut."
     },
     "success": {
       "title": "Zahlung erfolgreich",

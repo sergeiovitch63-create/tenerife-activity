@@ -971,7 +971,8 @@
       "cartEmpty": "Il tuo carrello è vuoto",
       "multiItemNotSupported": "Solo un'attività può essere prenotata alla volta. Rimuovi altri articoli dal carrello.",
       "paymentFailed": "Inizializzazione del pagamento fallita. Riprova.",
-      "meetingPointsLoadFailed": "Impossibile caricare i punti di incontro. Puoi inserirne uno manualmente qui sotto."
+      "meetingPointsLoadFailed": "Impossibile caricare i punti di incontro. Puoi inserirne uno manualmente qui sotto.",
+      "invalidTime": "Questa prenotazione non ha un orario di sessione valido. Torna all'attività, scegli data e ora se necessario, poi riprova."
     },
     "success": {
       "title": "Pagamento riuscito",

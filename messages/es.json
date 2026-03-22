@@ -971,7 +971,8 @@
       "cartEmpty": "Su carrito está vacío",
       "multiItemNotSupported": "Solo se puede reservar una actividad a la vez. Por favor elimine otros artículos de su carrito.",
       "paymentFailed": "Error al iniciar el pago. Por favor intente de nuevo.",
-      "meetingPointsLoadFailed": "No se han podido cargar los puntos de encuentro. Puede introducir uno manualmente a continuación."
+      "meetingPointsLoadFailed": "No se han podido cargar los puntos de encuentro. Puede introducir uno manualmente a continuación.",
+      "invalidTime": "Esta reserva no tiene una hora de sesión válida. Vuelva a la actividad, elija fecha y hora si es necesario, e inténtelo de nuevo."
     },
     "success": {
       "title": "Pago exitoso",

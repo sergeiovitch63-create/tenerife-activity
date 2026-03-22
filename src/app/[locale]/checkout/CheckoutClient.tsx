@@ -16,6 +16,34 @@ import { cn } from '@/ui/lib/cn'
 import type { MeetingPoint } from '@/app/api/atlantico/event-details/route'
 import { getMeetingPointName } from '@/components/booking/MeetingPointsDisplay'
 
+/** Normalize "9:30" → "09:30"; null if empty or invalid */
+function normalizeSesTimeHHmm(raw: string | null | undefined): string | null {
+  if (raw == null) return null
+  const s = String(raw).trim()
+  if (s === '') return null
+  const m = s.match(/^(\d{1,2}):(\d{2})$/)
+  if (!m) return null
+  const h = parseInt(m[1], 10)
+  const mm = m[2]
+  if (h < 0 || h > 23 || !/^\d{2}$/.test(mm)) return null
+  return `${String(h).padStart(2, '0')}:${mm}`
+}
+
+/** Booking panel uses 00:00 when there is no session clock; Atlantico accepts that with a date. */
+function isSesTimeOkForCheckout(item: CartItem): boolean {
+  if (item.calendarMode === 'none') return true
+
+  const n = normalizeSesTimeHHmm(item.sesTime ?? undefined)
+
+  if (n == null) return false
+
+  if (n === '00:00') {
+    return item.tourDate != null && String(item.tourDate).trim() !== ''
+  }
+
+  return true
+}
+
 /** Revalidation result from API (server returns looser type than client CartItem) */
 type RevalidationResultProp = {
   items: Array<Record<string, unknown> & { itemKey: string; priceChanged?: boolean; priceDiff?: number; available?: boolean; newPriceSnapshot?: unknown }>
@@ -220,10 +248,9 @@ export function CheckoutClient({
       return
     }
 
-    // CRITICAL: Validate sesTime before proceeding
     const item = validItems[0]
-    if (!item.sesTime || item.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(item.sesTime)) {
-      alert(t('errors.invalidTime') || 'No valid time available for this booking. Please remove this item and select a different date.')
+    if (!isSesTimeOkForCheckout(item)) {
+      alert(t('errors.invalidTime'))
       return
     }
 
@@ -233,13 +260,18 @@ export function CheckoutClient({
       const priceSnapshot = revalidationResult?.items[0]?.newPriceSnapshot || item.priceSnapshot
 
       // Build payment payload
+      const sesTimeForApi =
+        item.calendarMode === 'none'
+          ? item.sesTime
+          : normalizeSesTimeHHmm(item.sesTime ?? undefined) ?? item.sesTime
+
       const payload = {
         userId: process.env.NEXT_PUBLIC_ATLANTICO_USER_ID || '', // Will be overridden server-side
         t_id: item.t_id,
         t_group: item.t_group,
         language: item.language,
         tourDate: item.tourDate,
-        sesTime: item.sesTime,
+        sesTime: sesTimeForApi,
         adults: item.adults,
         childs: item.childs || 0,
         infants: item.infants || 0,

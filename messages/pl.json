@@ -971,7 +971,8 @@
       "cartEmpty": "Twój koszyk jest pusty",
       "multiItemNotSupported": "Tylko jedna aktywność może być zarezerwowana jednocześnie. Usuń inne przedmioty z koszyka.",
       "paymentFailed": "Inicjacja płatności nie powiodła się. Spróbuj ponownie.",
-      "meetingPointsLoadFailed": "Nie udało się załadować punktów spotkania. Możesz wpisać go ręcznie poniżej."
+      "meetingPointsLoadFailed": "Nie udało się załadować punktów spotkania. Możesz wpisać go ręcznie poniżej.",
+      "invalidTime": "Ta rezerwacja nie ma prawidłowego czasu sesji. Wróć do aktywności, wybierz datę i godzinę w razie potrzeby, spróbuj ponownie."
     },
     "success": {
       "title": "Płatność zakończona powodzeniem",

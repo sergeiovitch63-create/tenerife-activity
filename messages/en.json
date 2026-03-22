@@ -927,7 +927,8 @@
       "cartEmpty": "Your cart is empty",
       "multiItemNotSupported": "Only one activity can be booked at a time. Please remove other items from your cart.",
       "paymentFailed": "Payment initiation failed. Please try again.",
-      "meetingPointsLoadFailed": "Unable to load meeting points. You can enter one manually below."
+      "meetingPointsLoadFailed": "Unable to load meeting points. You can enter one manually below.",
+      "invalidTime": "This booking has no valid session time. Go back to the activity, choose a date and time if required, then try again."
     },
     "success": {
       "title": "Payment Successful",
