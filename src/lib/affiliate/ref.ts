@@ -3,8 +3,6 @@
  * Server routes that record sales should read the same cookie name.
  */
 
-import type { NextResponse } from 'next/server'
-
 export const AFFILIATE_REF_COOKIE_NAME = 'ta_affiliate_ref'
 
 /** Max length for stored code (URL segment–style). */
@@ -25,13 +23,14 @@ export function parseAffiliateRef(raw: string | null | undefined): string | null
 
 export const AFFILIATE_REF_COOKIE_MAX_AGE_S = 60 * 60 * 24 * 30 // 30 days
 
-/** Attach HttpOnly cookie when ?ref= is valid (call from middleware). */
-export function setAffiliateRefCookie(response: NextResponse, code: string) {
-  response.cookies.set(AFFILIATE_REF_COOKIE_NAME, code, {
-    path: '/',
-    maxAge: AFFILIATE_REF_COOKIE_MAX_AGE_S,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-  })
+/**
+ * Set affiliate cookie on the middleware response.
+ * Uses Set-Cookie via headers.append — on Vercel Edge, ResponseCookies.set alone
+ * can fail to emit alongside next-intl’s cookies in some cases.
+ */
+export function setAffiliateRefCookie(response: Response, code: string) {
+  const secure = process.env.NODE_ENV === 'production'
+  const value = encodeURIComponent(code)
+  const line = `${AFFILIATE_REF_COOKIE_NAME}=${value}; Path=/; Max-Age=${AFFILIATE_REF_COOKIE_MAX_AGE_S}; HttpOnly; SameSite=Lax${secure ? '; Secure' : ''}`
+  response.headers.append('Set-Cookie', line)
 }
