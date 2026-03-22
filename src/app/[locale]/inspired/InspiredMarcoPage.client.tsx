@@ -10,7 +10,10 @@ import {
   scoreActivity,
   type GetInspiredAnswers,
 } from '@/lib/recommendations/get-inspired'
-import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import {
+  ToursListCardImage,
+  TOURS_LIST_IMAGE_PRIORITY_COUNT,
+} from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { formatDurationLabel } from '@/lib/duration'
 
 type StepId = 'group' | 'mood' | 'time' | 'budget' | 'extras'
@@ -349,7 +352,7 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
               </div>
             </header>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendedActivities.map((activity) => {
+              {recommendedActivities.map((activity, index) => {
                 const codeStr = String(activity.slug || activity.id || '').trim()
 
                 return (
@@ -367,12 +370,14 @@ export function InspiredMarcoPage({ activities }: InspiredMarcoPageProps) {
                             fill
                             className="w-full h-full object-cover"
                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                           />
                         ) : (
                           <ToursListCardImage
                             code={codeStr}
                             alt={activity.title}
                             className="w-full h-full object-cover"
+                            priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                           />
                         )}
                       </div>

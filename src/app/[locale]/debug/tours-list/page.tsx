@@ -14,7 +14,7 @@ import { Section, Container, Stack } from '@/ui/components/layout'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { getTranslations } from 'next-intl/server'
-import { ToursListCardImage } from './ToursListCardImage.client'
+import { ToursListCardImage, TOURS_LIST_IMAGE_PRIORITY_COUNT } from './ToursListCardImage.client'
 import { formatDurationLabel } from '@/lib/duration'
 
 interface PageParams {
@@ -197,7 +197,7 @@ export default async function ToursListDebugPage({ params, searchParams }: PageP
 
           {toursWithImage.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {toursWithImage.map((t) => {
+              {toursWithImage.map((t, index) => {
                 const codeStr = String(t.code ?? t.id ?? '').trim()
 
                 return (
@@ -216,6 +216,7 @@ export default async function ToursListDebugPage({ params, searchParams }: PageP
                             code={codeStr}
                             alt={t.name}
                             className="w-full h-full object-cover"
+                            priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">

@@ -22,7 +22,6 @@ const TITLE_TO_SUBTITLE: Record<string, string> = {
   'Shogun Boat': 'boatTour',
   'Aqualand': 'waterPark',
   'Buggy': 'adventure',
-  'La Palma con Almuerzo': 'islandTour',
   'Poema del Mar Gran Canaria': 'aquarium',
   'Scandal Dinner Show': 'nightShow',
   'Teide by Night': 'stargazing',
@@ -41,7 +40,6 @@ const STATIC_IMAGE_FALLBACK: Record<string, string> = {
   'Shogun Boat': '/images/home/must-see/Shogun-Boat.jpg',
   'Aqualand': '/images/home/must-see/Aqualand.png',
   'Buggy': '/images/home/must-see/buggy.jpg',
-  'La Palma con Almuerzo': '/images/home/must-see/la-palma-con-almuerzo.jpg',
   'Poema del Mar Gran Canaria': '/images/home/must-see/poema-del-mar-gran-canaria.jpg',
   'Scandal Dinner Show': '/images/home/must-see/scandal-dinner-show.jpg',
   'Teide by Night': '/images/home/must-see/teide-by-night.jpg',
@@ -98,7 +96,7 @@ export async function fetchMustSeeItemsWithImages(
   origin: string
 ): Promise<{ row1: MustSeeItem[]; row2: MustSeeItem[] }> {
   const row1Codes = MUST_SEE_ORDERED.slice(0, 7)   // first 7 = row1
-  const row2Codes = MUST_SEE_ORDERED.slice(7, 16)  // next 8 = row2
+  const row2Codes = MUST_SEE_ORDERED.slice(7)       // remaining = row2
 
   const toMustSeeItem = (item: { title: string; code: string }): MustSeeItem => {
     const image = STATIC_IMAGE_FALLBACK[item.title] ?? ''

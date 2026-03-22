@@ -7,13 +7,22 @@ import { useTranslations } from 'next-intl'
 const EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '', ' .png']
 const KNOWN_MISSING_IMAGE_CODES = new Set<string>()
 
+/** How many grid cards load eagerly (above-the-fold); avoids native lazy-load bugs on some browsers. */
+export const TOURS_LIST_IMAGE_PRIORITY_COUNT = 12
+
 interface ToursListCardImageProps {
   code: string
   alt: string
   className?: string
+  /**
+   * When true: `loading="eager"` + higher fetch priority. Native `loading="lazy"` can fail to start
+   * for images already in the viewport at first paint (IntersectionObserver / layout timing on
+   * desktop Safari, some mobile Chrome builds).
+   */
+  priority?: boolean
 }
 
-export function ToursListCardImage({ code, alt, className }: ToursListCardImageProps) {
+export function ToursListCardImage({ code, alt, className, priority = false }: ToursListCardImageProps) {
   const t = useTranslations('common')
   const basePath = `/images/tours-list/${code}/cover`
   const [srcIndex, setSrcIndex] = useState(0)
@@ -46,7 +55,9 @@ export function ToursListCardImage({ code, alt, className }: ToursListCardImageP
       src={src}
       alt={alt}
       className={className}
-      loading="lazy"
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchPriority={priority ? 'high' : 'auto'}
       onError={handleError}
     />
   )

@@ -13,6 +13,7 @@ import { siteName } from '@/config/site'
 import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { SearchResultCard } from './SearchResultCard'
+import { TOURS_LIST_IMAGE_PRIORITY_COUNT } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>
@@ -141,7 +142,7 @@ export default async function SearchPage({
                 found
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {groups.map((g) => (
+                {groups.map((g, index) => (
                   <SearchResultCard
                     key={g.code}
                     code={g.code}
@@ -149,6 +150,7 @@ export default async function SearchPage({
                     desc={g.desc}
                     price={g.price}
                     duration={g.duration}
+                    priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                   />
                 ))}
               </div>

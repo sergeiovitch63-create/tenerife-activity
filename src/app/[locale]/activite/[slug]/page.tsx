@@ -12,7 +12,10 @@ import { Section, Container } from '@/ui/components/layout'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
 import { getClassificationIdForVibe, getClassificationNameForVibe } from '@/lib/vibes/vibe-classification-mapping'
-import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import {
+  ToursListCardImage,
+  TOURS_LIST_IMAGE_PRIORITY_COUNT,
+} from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { getTranslations } from 'next-intl/server'
 import { getTranslatedVibeTitle, getTranslatedVibeTagline } from '@/ui/components/vibe/vibe-translations'
 import { vibeRepository } from '@/config/repositories'
@@ -160,7 +163,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
 
           {visibleTours.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleTours.map((t) => {
+              {visibleTours.map((t, index) => {
                 const codeStr = String(t.code ?? t.id ?? '').trim()
                 return (
                   <Link
@@ -175,6 +178,7 @@ export default async function ActiviteSlugPage({ params }: PageParams) {
                             code={codeStr}
                             alt={translateContent(t.name, locale as Locale)}
                             className="w-full h-full object-cover"
+                            priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">

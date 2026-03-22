@@ -15,7 +15,6 @@ export const MUST_SEE_GROUP_MAP: Record<string, string | null> = {
   'Aqualand': '22',
   // Row 2
   'Buggy': '507',
-  'La Palma con Almuerzo': '514',
   'Poema del Mar Gran Canaria': '417',
   'Scandal Dinner Show': '284',
   'Teide by Night': '515',
@@ -42,7 +41,6 @@ export const MUST_SEE_ORDERED: Array<{ title: string; code: string }> = [
   { title: 'Shogun Boat', code: '70' },
   { title: 'Aqualand', code: '22' },
   { title: 'Buggy', code: '507' },
-  { title: 'La Palma con Almuerzo', code: '514' },
   { title: 'Poema del Mar Gran Canaria', code: '417' },
   { title: 'Scandal Dinner Show', code: '284' },
   { title: 'Teide by Night', code: '515' },

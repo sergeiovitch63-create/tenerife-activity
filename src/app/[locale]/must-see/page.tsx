@@ -9,7 +9,10 @@ import { mapLocaleToLang } from '@/lib/atlantico/locale'
 import { Section, Container } from '@/ui/components/layout'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
-import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import {
+  ToursListCardImage,
+  TOURS_LIST_IMAGE_PRIORITY_COUNT,
+} from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { getTranslations } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo'
 import type { Locale } from '@/i18n/request'
@@ -48,9 +51,9 @@ export default async function MustSeePage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const t = await getTranslations('mustSee')
-  const tCommon = await getTranslations('common')
-  const tActivite = await getTranslations('activite')
+  const t = await getTranslations({ locale, namespace: 'mustSee' })
+  const tCommon = await getTranslations({ locale, namespace: 'common' })
+  const tActivite = await getTranslations({ locale, namespace: 'activite' })
   const lang = mapLocaleToLang(locale)
 
   let tours: Tour[] = []
@@ -115,7 +118,7 @@ export default async function MustSeePage({
 
           {tours.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tours.map((tour) => {
+              {tours.map((tour, index) => {
                 const codeStr = String(tour.code ?? tour.id ?? '').trim()
                 const displayName = translateContent(tour.name, locale as Locale)
                 const rawDesc = tour.desc ? decodeTextFromApi(tour.desc) : ''
@@ -135,6 +138,7 @@ export default async function MustSeePage({
                             code={codeStr}
                             alt={displayName}
                             className="w-full h-full object-cover"
+                            priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-glass-400 text-sm">

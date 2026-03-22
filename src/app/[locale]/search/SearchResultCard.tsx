@@ -11,6 +11,8 @@ interface SearchResultCardProps {
   desc?: string
   price?: number
   duration?: string
+  /** Eager-load cover image (first rows in grid) */
+  priority?: boolean
 }
 
 /**
@@ -22,6 +24,7 @@ export function SearchResultCard({
   desc,
   price,
   duration,
+  priority = false,
 }: SearchResultCardProps) {
   const href = `/activite/group-details?code=${encodeURIComponent(code)}`
 
@@ -36,6 +39,7 @@ export function SearchResultCard({
             code={code}
             alt={name}
             className="w-full h-full object-cover"
+            priority={priority}
           />
         </div>
         <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">

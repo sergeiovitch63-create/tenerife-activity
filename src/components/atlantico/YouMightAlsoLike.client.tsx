@@ -9,7 +9,10 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/navigation'
 import { decodeTextFromApi } from '@/lib/atlantico/htmlAssets'
-import { ToursListCardImage } from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
+import {
+  ToursListCardImage,
+  TOURS_LIST_IMAGE_PRIORITY_COUNT,
+} from '@/app/[locale]/debug/tours-list/ToursListCardImage.client'
 import { formatDurationLabel } from '@/lib/duration'
 
 type Tour = {
@@ -80,7 +83,7 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
     <div className="mt-12 pt-8 border-t border-glass-200">
       <h2 className="text-xl font-bold text-glass-900 mb-4">{t('title')}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {tours.map((t) => (
+        {tours.map((t, index) => (
             <Link
               key={`${t.id}-${t.code}`}
               href={`/activite/group-details?code=${encodeURIComponent(String(t.code))}`}
@@ -92,6 +95,7 @@ export function YouMightAlsoLike({ code, lang, locale }: YouMightAlsoLikeProps) 
                     code={t.code}
                     alt={t.name || 'Tour'}
                     className="w-full h-full object-cover"
+                    priority={index < TOURS_LIST_IMAGE_PRIORITY_COUNT}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-glass-400 text-xs">

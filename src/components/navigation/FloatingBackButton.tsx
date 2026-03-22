@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from '@/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 /**
@@ -11,6 +12,7 @@ import { useEffect, useState } from 'react'
 export function FloatingBackButton() {
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations('common')
   const [headerHeight, setHeaderHeight] = useState(80) // Default mobile height
 
   // Get header height dynamically
@@ -79,7 +81,7 @@ export function FloatingBackButton() {
       style={{
         top: `${headerHeight + 12}px`,
       }}
-      aria-label="Go back"
+      aria-label={t('back')}
       type="button"
     >
       {/* Arrow icon */}
@@ -98,7 +100,7 @@ export function FloatingBackButton() {
       
       {/* Text label - visible on all screen sizes */}
       <span className="text-sm font-medium text-glass-700">
-        Back
+        {t('back')}
       </span>
     </button>
   )

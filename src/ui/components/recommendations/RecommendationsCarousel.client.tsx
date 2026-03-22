@@ -48,7 +48,6 @@ const mustSeeRow1: MustSeeItem[] = [
 // Row 2 - Files located in /public/images/home/must-see/
 const mustSeeRow2: MustSeeItem[] = [
   { title: 'Buggy', subtitleKey: 'adventure', image: '/images/home/must-see/buggy.jpg' },
-  { title: 'La Palma con Almuerzo', subtitleKey: 'islandTour', image: '/images/home/must-see/la-palma-con-almuerzo.jpg' },
   { title: 'Poema del Mar Gran Canaria', subtitleKey: 'aquarium', image: '/images/home/must-see/poema-del-mar-gran-canaria.jpg' },
   { title: 'Scandal Dinner Show', subtitleKey: 'nightShow', image: '/images/home/must-see/scandal-dinner-show.jpg' },
   { title: 'Teide by Night', subtitleKey: 'stargazing', image: '/images/home/must-see/teide-by-night.jpg' },
