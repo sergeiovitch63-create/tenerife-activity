@@ -16,6 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { recordAffiliateSaleFromRequest } from '@/lib/affiliate/sales'
 import { getBaseUrl } from '@/lib/atlantico/client'
 import { loadLimits } from '@/lib/atlantico/client-wrapper'
 
@@ -1318,6 +1319,12 @@ export async function POST(request: NextRequest) {
           path: paymentEndpoint,
           reference: trimmed,
         })
+      }
+      const affiliateSale = await recordAffiliateSaleFromRequest(request, {
+        bookingReference: trimmed,
+      })
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[ATL_PAYMENT_AFFILIATE]', affiliateSale)
       }
       return NextResponse.json({ ok: true, reference: trimmed })
     }
