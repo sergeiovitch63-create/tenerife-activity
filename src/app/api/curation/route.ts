@@ -2,7 +2,7 @@
  * GET /api/curation
  * POST /api/curation
  * 
- * Local JSON storage for curation data (replaces Supabase).
+ * Local JSON storage for curation data.
  * Protected by ADMIN_PASSWORD header.
  */
 

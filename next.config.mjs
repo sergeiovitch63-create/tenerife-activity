@@ -100,43 +100,12 @@ const nextConfig = {
           '**/node_modules/@types/**',
           '**/node_modules/.pnpm/**/@types/**',
         ],
-        // Exclude Supabase from routes that don't use it (most routes)
-        // Only keep Supabase for routes that explicitly need it
-        '**/api/atlantico/**': [
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          '**/src/lib/supabase/**',
-        ],
-        '**/api/catalog/**': [
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          '**/src/lib/supabase/**',
-        ],
-        '**/api/backoffice/**': [
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          '**/src/lib/supabase/**',
-        ],
-        '**/api/debug/**': [
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          '**/src/lib/supabase/**',
-        ],
-        '**/api/curation/**': [
-          '**/node_modules/@supabase/**',
-          '**/node_modules/.pnpm/**/@supabase/**',
-          '**/src/lib/supabase/**',
-        ],
-        // Routes that NEED Supabase - don't exclude it
-        // (admin/curation/*, debug/supabase, debug/env)
-        // These routes will include Supabase but still exclude React/dev deps
       },
       // Optimize package imports (tree shaking)
       optimizePackageImports: [
         'next-intl',
         'react',
         'react-dom',
-        '@supabase/supabase-js',
       ],
     },
   }),

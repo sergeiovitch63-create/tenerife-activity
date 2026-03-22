@@ -22,6 +22,8 @@ CREATE INDEX IF NOT EXISTS idx_curated_experiences_enabled ON curated_experience
 -- Index for sorting (featured + priority)
 CREATE INDEX IF NOT EXISTS idx_curated_experiences_featured_priority ON curated_experiences(featured DESC, priority DESC);
 
+-- Affiliates: canonical script is db/affiliate.sql (Neon / Postgres). Not used by the app until wired.
+
 
 
 

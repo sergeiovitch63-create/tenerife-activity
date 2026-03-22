@@ -388,7 +388,6 @@ export async function GET(
           enabledCount,
         }
       } catch (err) {
-        // Silently fail if Supabase is not configured
         curationStats = {
           total: normalized.length,
           curatedCount: 0,

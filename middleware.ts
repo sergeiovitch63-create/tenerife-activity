@@ -1,6 +1,7 @@
 import createMiddleware from 'next-intl/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { parseAffiliateRef, setAffiliateRefCookie } from './src/lib/affiliate/ref'
 import { routing } from './src/i18n/routing'
 
 // Locale codes for regex matching
@@ -47,6 +48,7 @@ const intlMiddleware = createMiddleware(routing)
 
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+  const affiliateRef = parseAffiliateRef(request.nextUrl.searchParams.get('ref'))
 
   // Block debug routes in production
   if (process.env.NODE_ENV === 'production') {
@@ -109,6 +111,9 @@ export default function middleware(request: NextRequest) {
     // Create permanent redirect (308) to canonical path
     // Using 308 instead of 301 to preserve POST method if needed
     const response = NextResponse.redirect(url, 308)
+    if (affiliateRef) {
+      setAffiliateRefCookie(response, affiliateRef)
+    }
     response.headers.set('x-mw-hit', '1')
     response.headers.set('x-mw-redirect', canonicalPath)
     return response
@@ -117,6 +122,9 @@ export default function middleware(request: NextRequest) {
   // Otherwise, use next-intl middleware for normal locale handling
   const response = intlMiddleware(request)
   if (response instanceof NextResponse) {
+    if (affiliateRef) {
+      setAffiliateRefCookie(response, affiliateRef)
+    }
     response.headers.set('x-mw-hit', '1')
   }
   return response

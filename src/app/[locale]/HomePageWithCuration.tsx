@@ -19,16 +19,7 @@ async function CurationLoader({
   allExperiences,
   t,
 }: HomePageWithCurationProps) {
-  // Load curation from database (if available)
-  let curatedRows: Record<string, any> = {}
-  try {
-    curatedRows = await loadCuration()
-  } catch (err) {
-    // Silently fail if Supabase is not configured (dev mode)
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[HOME] Curation not available:', err instanceof Error ? err.message : 'Unknown error')
-    }
-  }
+  const curatedRows = await loadCuration()
 
   // Enrich Must See carousel with images from groupDetails (server-side)
   let mustSeeItems: { row1: Array<{ title: string; subtitleKey: string; image: string }>; row2: Array<{ title: string; subtitleKey: string; image: string }> } | null = null
@@ -72,4 +63,3 @@ export function HomePageWithCuration(props: HomePageWithCurationProps) {
     </Suspense>
   )
 }
-
