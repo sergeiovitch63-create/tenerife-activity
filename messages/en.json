@@ -214,6 +214,7 @@
   "mustSee": {
     "title": "Must-See Experiences in Tenerife",
     "subtitle": "The essential experiences recommended by locals.",
+    "noActivities": "No activities available at the moment.",
     "introduction": "These experiences are selected based on quality, popularity, and operator reliability. If you only do a few things in Tenerife, start here.",
     "categories": {
       "teideNature": "🌋 Teide & Nature",

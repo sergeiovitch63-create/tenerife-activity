@@ -1,26 +1,23 @@
 /**
- * Locale to Atlántico Language Mapping
- * 
- * Maps Next.js locale codes to Atlántico API language codes
- * Atlántico uses lowercase 2-letter codes: "en", "fr", "es", "de", "ru", "uk", "pl", "it"
+ * Locale → Atlántico language (3-letter uppercase).
+ * Delegates to `mapLocaleToLang` in `./locale` (single source of truth).
  */
 
-/**
- * Map Next.js locale to Atlántico language code.
- * Always returns ENG: same data logic for all locales (translations later).
- */
-export function mapLocaleToAtlanticoLang(_locale: string): "CAS"|"ENG"|"FRA"|"RUS"|"ALE"|"ITA" {
-  return "ENG"
-}
+import { mapLocaleToLang } from './locale'
+
+export type AtlanticoLang3 = 'ENG' | 'CAS' | 'FRA' | 'ALE' | 'ITA' | 'RUS' | 'POL'
+
+const ATL_LANG3 = new Set<string>(['ENG', 'CAS', 'FRA', 'ALE', 'ITA', 'RUS', 'POL'])
 
 /**
- * Map Next.js locale to Atlántico language code (uppercase).
- * Always returns ENG: same data logic for all locales (translations later).
+ * Same codes as groupDetails / loadLimits paths (uppercase).
  */
-export function mapLocaleToAtlanticoLangUpper(_locale: string): string {
+export function mapLocaleToAtlanticoLang(locale: string): AtlanticoLang3 {
+  const code = mapLocaleToLang(locale)
+  if (ATL_LANG3.has(code)) return code as AtlanticoLang3
   return 'ENG'
 }
 
-
-
-
+export function mapLocaleToAtlanticoLangUpper(locale: string): string {
+  return mapLocaleToLang(locale)
+}

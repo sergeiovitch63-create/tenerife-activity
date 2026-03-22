@@ -639,7 +639,7 @@ export async function normalizeLimits(
   const normalizedMonth = normalizeMonth(month)
   
   // Normalize language
-  const normalizedLang = language.length === 3 && ['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA'].includes(language.toUpperCase())
+  const normalizedLang = language.length === 3 && ['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA', 'POL'].includes(language.toUpperCase())
     ? language.toUpperCase()
     : mapLocaleToAtlanticoLang(language)
 

@@ -22,7 +22,8 @@ export async function GET(
 ) {
   try {
     const { code, lang } = await params
-    const forcedLang = 'ENG'
+    const langParam = (lang || 'ENG').toUpperCase()
+    const effectiveLang = /^[A-Z]{3}$/.test(langParam) ? langParam : 'ENG'
     const config = getAtlanticoConfig()
 
     if (!config.isValid) {
@@ -47,7 +48,7 @@ export async function GET(
 
     // Fetch group details
     const response = await fetchAtlantico(
-      `/groupDetails/${code}/${forcedLang}`,
+      `/groupDetails/${code}/${effectiveLang}`,
       { revalidate: 3600 } // Cache 1 hour
     )
 
@@ -68,7 +69,7 @@ export async function GET(
       console.log('[GROUP_DETAILS]', {
         code,
         lang,
-        forcedLang,
+        effectiveLang,
         hasData: !!data,
         hasIds: !!(data as any)?.ids,
       })
@@ -94,11 +95,13 @@ export async function GET(
       }
 
       const { code: errorCode, lang: errorLang } = await params
+      const errLang = (errorLang || 'ENG').toUpperCase()
+      const errEffectiveLang = /^[A-Z]{3}$/.test(errLang) ? errLang : 'ENG'
       return NextResponse.json(
         {
           error: 'Failed to fetch group details',
           message: error.message,
-          endpoint: `/groupDetails/${errorCode}/ENG`,
+          endpoint: `/groupDetails/${errorCode}/${errEffectiveLang}`,
           requestedLang: errorLang,
         },
         { status: 500 }

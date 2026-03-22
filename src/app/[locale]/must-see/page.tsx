@@ -14,6 +14,7 @@ import { getTranslations } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo'
 import type { Locale } from '@/i18n/request'
 import { formatDurationLabel } from '@/lib/duration'
+import { translateContent, translateDescriptionByCode } from '@/lib/translations/atlantico-content'
 
 type Tour = {
   id: string
@@ -108,17 +109,22 @@ export default async function MustSeePage({
 
           {tours.length === 0 && !error && (
             <div className="glass-panel p-6 text-center text-sm text-glass-600">
-              Aucune activité disponible.
+              {t('noActivities')}
             </div>
           )}
 
           {tours.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tours.map((t) => {
-                const codeStr = String(t.code ?? t.id ?? '').trim()
+              {tours.map((tour) => {
+                const codeStr = String(tour.code ?? tour.id ?? '').trim()
+                const displayName = translateContent(tour.name, locale as Locale)
+                const rawDesc = tour.desc ? decodeTextFromApi(tour.desc) : ''
+                const displayDesc = rawDesc
+                  ? translateDescriptionByCode(codeStr, rawDesc, locale as Locale)
+                  : ''
                 return (
                   <Link
-                    key={`${t.id}-${t.code}`}
+                    key={`${tour.id}-${tour.code}`}
                     href={`/activite/group-details?code=${encodeURIComponent(codeStr)}`}
                     className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-500 focus-visible:ring-offset-2 rounded-2xl"
                   >
@@ -127,7 +133,7 @@ export default async function MustSeePage({
                         {codeStr ? (
                           <ToursListCardImage
                             code={codeStr}
-                            alt={t.name}
+                            alt={displayName}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -138,30 +144,30 @@ export default async function MustSeePage({
                       </div>
                       <div className="p-4 md:p-5 space-y-3 flex-1 flex flex-col">
                         <h2 className="text-lg font-semibold text-glass-900 line-clamp-2">
-                          {t.name}
+                          {displayName}
                         </h2>
-                        {t.desc ? (
+                        {displayDesc ? (
                           <p className="text-sm text-glass-700 leading-relaxed line-clamp-4">
-                            {decodeTextFromApi(t.desc)}
+                            {displayDesc}
                           </p>
                         ) : (
                           <p className="text-sm text-glass-400 italic">
-                            Aucune description.
+                            {tActivite('noDescription')}
                           </p>
                         )}
                         <div className="mt-auto flex items-center justify-between gap-4 text-base font-semibold text-glass-900">
                           <span>
-                            {t.duration ? `⏱ ${formatDurationLabel(t.duration)}` : '\u00A0'}
+                            {tour.duration ? `⏱ ${formatDurationLabel(tour.duration)}` : '\u00A0'}
                           </span>
-                          {t.price !== undefined &&
-                          !Number.isNaN(t.price) &&
-                          t.price > 0 ? (
+                          {tour.price !== undefined &&
+                          !Number.isNaN(tour.price) &&
+                          tour.price > 0 ? (
                             <span className="text-right">
-                              À partir de {Number(t.price).toFixed(2)} €
+                              {tActivite('startingFrom')} {Number(tour.price).toFixed(2)} €
                             </span>
                           ) : (
                             <span className="text-right italic text-glass-400 font-normal">
-                              Prix non disponible
+                              {tActivite('priceNotAvailable')}
                             </span>
                           )}
                         </div>
