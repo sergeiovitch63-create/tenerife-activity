@@ -46,6 +46,17 @@ function isAssetPath(pathname: string): boolean {
 // Create next-intl middleware
 const intlMiddleware = createMiddleware(routing)
 
+/**
+ * next-intl returns NextResponse, but on the Edge runtime `instanceof NextResponse`
+ * can be false when class identity differs across bundles — cookies would never attach.
+ */
+function asNextResponseWithCookies(response: Response): NextResponse | null {
+  if (response instanceof NextResponse) return response
+  const r = response as unknown as NextResponse
+  if (r.cookies && typeof r.cookies.set === 'function') return r
+  return null
+}
+
 export default function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const affiliateRef = parseAffiliateRef(request.nextUrl.searchParams.get('ref'))
@@ -121,11 +132,12 @@ export default function middleware(request: NextRequest) {
 
   // Otherwise, use next-intl middleware for normal locale handling
   const response = intlMiddleware(request)
-  if (response instanceof NextResponse) {
+  const res = asNextResponseWithCookies(response)
+  if (res) {
     if (affiliateRef) {
-      setAffiliateRefCookie(response, affiliateRef)
+      setAffiliateRefCookie(res, affiliateRef)
     }
-    response.headers.set('x-mw-hit', '1')
+    res.headers.set('x-mw-hit', '1')
   }
   return response
 }
