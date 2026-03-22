@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { Header } from '@/ui/components/navigation'
 import { Footer } from '@/ui/components/navigation'
+import { AffiliateRefCapture } from '../AffiliateRefCapture'
 import { AttributionCapture } from '../AttributionCapture'
 import { FloatingBackButton } from '@/components/navigation/FloatingBackButton'
 import { PrefetchLinks } from './PrefetchLinks'
@@ -91,6 +92,9 @@ export default async function LocaleLayout({
       <link rel="preload" href="/logo.png" as="image" fetchPriority="high" />
       <link rel="preload" href="/images/hero-poster.jpg" as="image" fetchPriority="high" />
       
+      <Suspense fallback={null}>
+        <AffiliateRefCapture />
+      </Suspense>
       <Suspense fallback={null}>
         <AttributionCapture />
       </Suspense>
