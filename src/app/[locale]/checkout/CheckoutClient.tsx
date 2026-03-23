@@ -327,6 +327,9 @@ export function CheckoutClient({
   const revalidatedItem = revalidationResult?.items[0]
   const priceSnapshot = ((revalidatedItem?.newPriceSnapshot as { total: number } | undefined) || item.priceSnapshot) as { total: number }
   const priceChanged = revalidatedItem?.priceChanged || false
+  const firstItemTotal = priceSnapshot.total
+  const originalFirstItemTotal = item.priceSnapshot.total
+  const cartTotal = validItems.reduce((sum, ci) => sum + ci.priceSnapshot.total, 0) - originalFirstItemTotal + firstItemTotal
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -359,27 +362,48 @@ export function CheckoutClient({
         </div>
       )}
 
+      {validItems.length > 1 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+          <p className="text-amber-800 font-semibold">{t('availabilityIssue')}</p>
+          <p className="text-amber-700 text-sm">{t('errors.multiItemNotSupported')}</p>
+        </div>
+      )}
+
       {/* Cart Summary */}
       <div className="bg-white border border-glass-200 rounded-lg p-6 mb-8">
         <h2 className="text-2xl font-semibold text-glass-900 mb-4">{t('orderSummary')}</h2>
-        <div className="space-y-2 text-sm">
-          <p>
-            <strong>{t('activity')}:</strong> {item.t_group} - {item.t_id}
-          </p>
-          <p>
-            <strong>{t('date')}:</strong> {item.tourDate}
-          </p>
-          {item.sesTime && item.sesTime !== '00:00' && (
-            <p>
-              <strong>{t('time')}:</strong> {item.sesTime}
-            </p>
-          )}
-          <p>
+        <div className="space-y-4 text-sm">
+          {validItems.map((cartItem, idx) => {
+            const itemTotal = idx === 0 ? firstItemTotal : cartItem.priceSnapshot.total
+            return (
+              <div key={cartItem.itemKey} className="rounded-md border border-glass-100 p-3">
+                <p>
+                  <strong>{t('activity')}:</strong> {cartItem.t_group} - {cartItem.t_id}
+                </p>
+                <p>
+                  <strong>{t('date')}:</strong> {cartItem.tourDate}
+                </p>
+                {cartItem.sesTime && cartItem.sesTime !== '00:00' && (
+                  <p>
+                    <strong>{t('time')}:</strong> {cartItem.sesTime}
+                  </p>
+                )}
+                <p>
+                  <strong>{t('total')}:</strong>{' '}
+                  {new Intl.NumberFormat(locale, {
+                    style: 'currency',
+                    currency: cartItem.currency,
+                  }).format(itemTotal)}
+                </p>
+              </div>
+            )
+          })}
+          <p className="pt-2 border-t border-glass-200">
             <strong>{t('total')}:</strong>{' '}
             {new Intl.NumberFormat(locale, {
               style: 'currency',
               currency: item.currency,
-            }).format(priceSnapshot.total)}
+            }).format(cartTotal)}
           </p>
         </div>
       </div>
