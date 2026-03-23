@@ -112,6 +112,7 @@ export function CheckoutClient({
   )
   const [loadingMeetingPoints, setLoadingMeetingPoints] = useState(!hasInitialMeetingPoints)
   const [meetingPointsError, setMeetingPointsError] = useState(false)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
 
   const validItems = mounted ? items.filter((item) => !isCartItemExpired(item)) : []
 
@@ -242,12 +243,6 @@ export function CheckoutClient({
       return
     }
 
-    // Block multi-item checkout (as per requirements)
-    if (validItems.length > 1) {
-      alert(t('errors.multiItemNotSupported'))
-      return
-    }
-
     const item = validItems[0]
     if (!isSesTimeOkForCheckout(item)) {
       alert(t('errors.invalidTime'))
@@ -330,10 +325,47 @@ export function CheckoutClient({
   const firstItemTotal = priceSnapshot.total
   const originalFirstItemTotal = item.priceSnapshot.total
   const cartTotal = validItems.reduce((sum, ci) => sum + ci.priceSnapshot.total, 0) - originalFirstItemTotal + firstItemTotal
+  const canSubmitPayment = !submitting && !revalidating && !(revalidationResult?.hasAvailabilityIssues ?? false)
 
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-4xl font-bold text-glass-900 mb-8">{t('title')}</h1>
+
+      {/* 3-step flow inspired by Atlantico basket */}
+      <div className="mb-6 grid grid-cols-3 gap-2 rounded-lg border border-glass-200 bg-white p-2">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(1)}
+          className={cn(
+            'rounded-md px-3 py-2 text-sm font-medium',
+            currentStep === 1 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
+          )}
+        >
+          1. Order Summary
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentStep(2)}
+          className={cn(
+            'rounded-md px-3 py-2 text-sm font-medium',
+            currentStep === 2 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
+          )}
+        >
+          2. Booking Details
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (validateForm()) setCurrentStep(3)
+          }}
+          className={cn(
+            'rounded-md px-3 py-2 text-sm font-medium',
+            currentStep === 3 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
+          )}
+        >
+          3. Payment Methods
+        </button>
+      </div>
 
       {/* Revalidation Status */}
       {revalidating && (
@@ -362,14 +394,8 @@ export function CheckoutClient({
         </div>
       )}
 
-      {validItems.length > 1 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-          <p className="text-amber-800 font-semibold">{t('availabilityIssue')}</p>
-          <p className="text-amber-700 text-sm">{t('errors.multiItemNotSupported')}</p>
-        </div>
-      )}
-
-      {/* Cart Summary */}
+      {/* Cart Summary (Step 1, also shown on Step 3) */}
+      {(currentStep === 1 || currentStep === 3) && (
       <div className="bg-white border border-glass-200 rounded-lg p-6 mb-8">
         <h2 className="text-2xl font-semibold text-glass-900 mb-4">{t('orderSummary')}</h2>
         <div className="space-y-4 text-sm">
@@ -407,9 +433,11 @@ export function CheckoutClient({
           </p>
         </div>
       </div>
+      )}
 
       {/* Customer Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {currentStep === 2 && (
         <div className="bg-white border border-glass-200 rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-glass-900 mb-6">{t('customerInfo')}</h2>
 
@@ -622,17 +650,51 @@ export function CheckoutClient({
             )}
           </div>
         </div>
+        )}
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          disabled={submitting || revalidating || (revalidationResult?.hasAvailabilityIssues ?? false)}
-        >
-          {submitting ? t('processing') : t('pay')}
-        </Button>
+        {currentStep === 3 && (
+          <div className="bg-white border border-glass-200 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold text-glass-900 mb-4">Payment methods</h2>
+            <p className="text-sm text-glass-600 mb-4">
+              Credit card payment. You will be redirected to the secure payment gateway.
+            </p>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              disabled={!canSubmitPayment}
+            >
+              {submitting ? t('processing') : t('pay')}
+            </Button>
+          </div>
+        )}
+
+        {/* Navigation buttons between steps */}
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setCurrentStep((prev) => (prev === 1 ? 1 : ((prev - 1) as 1 | 2 | 3)))}
+          >
+            Back
+          </Button>
+          {currentStep < 3 ? (
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => {
+                if (currentStep === 2 && !validateForm()) return
+                setCurrentStep((prev) => (prev === 3 ? 3 : ((prev + 1) as 1 | 2 | 3)))
+              }}
+              disabled={revalidating}
+            >
+              Continue
+            </Button>
+          ) : (
+            <div />
+          )}
+        </div>
       </form>
     </div>
   )
