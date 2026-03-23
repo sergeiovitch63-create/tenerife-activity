@@ -326,6 +326,21 @@ export function CheckoutClient({
   const originalFirstItemTotal = item.priceSnapshot.total
   const cartTotal = validItems.reduce((sum, ci) => sum + ci.priceSnapshot.total, 0) - originalFirstItemTotal + firstItemTotal
   const canSubmitPayment = !submitting && !revalidating && !(revalidationResult?.hasAvailabilityIssues ?? false)
+  const mergedMeetingPoints: MeetingPoint[] = (() => {
+    const seen = new Set<string>()
+    const result: MeetingPoint[] = []
+    for (const ci of validItems) {
+      const arr = meetingPoints[ci.itemKey] || []
+      for (const point of arr) {
+        const key = typeof point === 'string' ? point : JSON.stringify(point)
+        if (!seen.has(key)) {
+          seen.add(key)
+          result.push(point)
+        }
+      }
+    }
+    return result
+  })()
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -584,10 +599,8 @@ export function CheckoutClient({
                     />
                   </>
                 ) : (() => {
-                  // Get meeting points from first cart item (or combine all unique)
-                  const firstItem = validItems[0]
-                  const availablePoints = firstItem ? (meetingPoints[firstItem.itemKey] || []) : []
-                  
+                  const availablePoints = mergedMeetingPoints
+
                   if (availablePoints.length > 0) {
                     return (
                       <select

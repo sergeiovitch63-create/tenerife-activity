@@ -54,9 +54,19 @@ function normalizeEventDetails(raw: any, eventId: string): EventDetailsResponse 
   
   // Normalize meetingPoints - can be array of strings or objects
   let meetingPoints: MeetingPoint[] | undefined = undefined
-  if (raw.meetingPoints !== undefined && raw.meetingPoints !== null) {
-    if (Array.isArray(raw.meetingPoints)) {
-      meetingPoints = raw.meetingPoints.map((point: any) => {
+  const meetingPointsRaw =
+    raw.meetingPoints ??
+    raw.mpoints ??
+    raw.mpoint ??
+    raw.pickupPoints ??
+    raw.pickupPoint ??
+    raw.meeting_point ??
+    raw.puntosEncuentro ??
+    raw.puntos_encuentro
+
+  if (meetingPointsRaw !== undefined && meetingPointsRaw !== null) {
+    if (Array.isArray(meetingPointsRaw)) {
+      meetingPoints = meetingPointsRaw.map((point: any) => {
         if (typeof point === 'string') {
           return point
         }
@@ -72,8 +82,17 @@ function normalizeEventDetails(raw: any, eventId: string): EventDetailsResponse 
         }
         return String(point)
       })
-    } else if (typeof raw.meetingPoints === 'string') {
-      meetingPoints = [raw.meetingPoints]
+    } else if (typeof meetingPointsRaw === 'string') {
+      // Supports single value or pipe/comma-separated list
+      const cleaned = meetingPointsRaw.trim()
+      if (cleaned.includes('|') || cleaned.includes(',')) {
+        meetingPoints = cleaned
+          .split(/[|,]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      } else if (cleaned) {
+        meetingPoints = [cleaned]
+      }
     }
   }
 
@@ -95,8 +114,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl
     const eventId = searchParams.get('eventId')
-    // Force stable base language (ENG) regardless of site locale
-    const forcedLang = 'ENG'
+    // Prefer requested language, fallback to ENG
+    const requestedLang = (searchParams.get('lang') || 'ENG').toUpperCase()
+    const allowedLangs = new Set(['CAS', 'ENG', 'FRA', 'RUS', 'ALE', 'ITA'])
+    const lang = allowedLangs.has(requestedLang) ? requestedLang : 'ENG'
 
     if (!eventId) {
       return NextResponse.json(
@@ -109,7 +130,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch event details
-    const raw = await fetchJson(`/eventDetails/${eventId}/${forcedLang}`)
+    const raw = await fetchJson(`/eventDetails/${eventId}/${lang}`)
 
     // Normalize response
     const normalized = normalizeEventDetails(raw, eventId)
