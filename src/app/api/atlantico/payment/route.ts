@@ -54,9 +54,13 @@ async function checkSessionAvailability(
   try {
     const limits = await loadLimits(eventCode, language, tourDate)
     
-    // CRITICAL: Reject '00:00' - must have valid session time
-    if (sesTime === '00:00' || !sesTime || !/^\d{2}:\d{2}$/.test(sesTime)) {
-      return { available: false, error: 'Invalid or missing session time (00:00 not allowed)' }
+    // If no explicit session time, keep flow permissive and let Atlantico validate.
+    // This supports tours that use date-only booking with "00:00".
+    if (!sesTime || sesTime === '00:00') {
+      return { available: true }
+    }
+    if (!/^\d{2}:\d{2}$/.test(sesTime)) {
+      return { available: false, error: 'Invalid session time format (expected HH:mm)' }
     }
     
     // Check for specific session time
@@ -93,12 +97,12 @@ async function revalidateBeforePayment(
   item: PaymentRequest
 ): Promise<{ valid: boolean; code?: 'PRICE_CHANGED' | 'SLOT_UNAVAILABLE'; newPrice?: number; error?: string }> {
   try {
-    // CRITICAL: Reject '00:00' - must have valid session time
-    if (!item.sesTime || item.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(item.sesTime)) {
+    // Accept date-only flows where sesTime can be "00:00" or null.
+    if (item.sesTime && item.sesTime !== '00:00' && !/^\d{2}:\d{2}$/.test(item.sesTime)) {
       return {
         valid: false,
         code: 'SLOT_UNAVAILABLE',
-        error: 'Invalid or missing session time (00:00 not allowed)',
+        error: 'Invalid session time format (expected HH:mm)',
       }
     }
     
@@ -345,12 +349,16 @@ export async function POST(request: NextRequest) {
     // The language in validatedBody should already be mapped by checkout page
     const normalizedLang = validatedBody.language
 
-    // CRITICAL: Reject '00:00' - must have valid session time
-    if (!validatedBody.sesTime || validatedBody.sesTime === '00:00' || !/^\d{2}:\d{2}$/.test(validatedBody.sesTime)) {
+    // Keep server aligned with checkout: allow null/"00:00" for date-only flows.
+    if (
+      validatedBody.sesTime &&
+      validatedBody.sesTime !== '00:00' &&
+      !/^\d{2}:\d{2}$/.test(validatedBody.sesTime)
+    ) {
       return NextResponse.json(
         {
           error: 'Invalid session time',
-          message: 'Invalid or missing session time (00:00 not allowed)',
+          message: 'Invalid session time format (expected HH:mm)',
         },
         { status: 400 }
       )
