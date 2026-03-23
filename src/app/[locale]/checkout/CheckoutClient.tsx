@@ -275,6 +275,7 @@ export function CheckoutClient({
         adults: item.adults,
         childs: item.childs || 0,
         infants: item.infants || 0,
+        currency: item.currency,
         name: customerData.name,
         email: customerData.email,
         phone: customerData.phone,
