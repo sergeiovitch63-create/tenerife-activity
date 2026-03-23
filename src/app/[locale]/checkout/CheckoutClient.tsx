@@ -328,43 +328,50 @@ export function CheckoutClient({
   const canSubmitPayment = !submitting && !revalidating && !(revalidationResult?.hasAvailabilityIssues ?? false)
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-glass-900 mb-8">{t('title')}</h1>
 
-      {/* 3-step flow inspired by Atlantico basket */}
-      <div className="mb-6 grid grid-cols-3 gap-2 rounded-lg border border-glass-200 bg-white p-2">
-        <button
-          type="button"
-          onClick={() => setCurrentStep(1)}
-          className={cn(
-            'rounded-md px-3 py-2 text-sm font-medium',
-            currentStep === 1 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
-          )}
-        >
-          1. Order Summary
-        </button>
-        <button
-          type="button"
-          onClick={() => setCurrentStep(2)}
-          className={cn(
-            'rounded-md px-3 py-2 text-sm font-medium',
-            currentStep === 2 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
-          )}
-        >
-          2. Booking Details
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            if (validateForm()) setCurrentStep(3)
-          }}
-          className={cn(
-            'rounded-md px-3 py-2 text-sm font-medium',
-            currentStep === 3 ? 'bg-ocean-600 text-white' : 'bg-glass-50 text-glass-700 hover:bg-glass-100'
-          )}
-        >
-          3. Payment Methods
-        </button>
+      {/* 3-step flow with Atlantico-like circles */}
+      <div className="mb-6 rounded-lg border border-glass-200 bg-white p-4">
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { id: 1 as const, label: 'Order Summary' },
+            { id: 2 as const, label: 'Booking Details' },
+            { id: 3 as const, label: 'Payment methods' },
+          ].map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => {
+                if (s.id === 3) {
+                  if (validateForm()) setCurrentStep(3)
+                  return
+                }
+                setCurrentStep(s.id)
+              }}
+              className="flex items-center justify-center gap-2 rounded-md py-2 hover:bg-glass-50"
+            >
+              <span
+                className={cn(
+                  'inline-flex h-7 w-7 items-center justify-center rounded-full border text-sm font-semibold',
+                  currentStep === s.id
+                    ? 'border-ocean-600 bg-ocean-600 text-white'
+                    : 'border-glass-300 bg-white text-glass-700'
+                )}
+              >
+                {s.id}
+              </span>
+              <span
+                className={cn(
+                  'text-sm font-semibold',
+                  currentStep === s.id ? 'text-ocean-700' : 'text-glass-700'
+                )}
+              >
+                {s.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Revalidation Status */}
@@ -396,7 +403,8 @@ export function CheckoutClient({
 
       {/* Cart Summary (Step 1, also shown on Step 3) */}
       {(currentStep === 1 || currentStep === 3) && (
-      <div className="bg-white border border-glass-200 rounded-lg p-6 mb-8">
+      <div className={cn('mb-8 grid gap-6', currentStep === 1 ? 'lg:grid-cols-[2fr_1fr]' : 'lg:grid-cols-[1.7fr_1fr]')}>
+      <div className="bg-white border border-glass-200 rounded-lg p-6">
         <h2 className="text-2xl font-semibold text-glass-900 mb-4">{t('orderSummary')}</h2>
         <div className="space-y-4 text-sm">
           {validItems.map((cartItem, idx) => {
@@ -433,11 +441,33 @@ export function CheckoutClient({
           </p>
         </div>
       </div>
+      <div className="bg-white border border-glass-200 rounded-lg p-6 h-fit">
+        <h3 className="text-xl font-semibold text-glass-900 mb-4">Basket Summary</h3>
+        <p className="text-sm text-glass-600 mb-2">{validItems.length} Product/s in Shopping Cart</p>
+        <p className="text-3xl font-bold text-glass-900 mb-6">
+          {new Intl.NumberFormat(locale, {
+            style: 'currency',
+            currency: item.currency,
+          }).format(cartTotal)}
+        </p>
+        {currentStep === 1 && (
+          <Button
+            type="button"
+            variant="primary"
+            fullWidth
+            onClick={() => setCurrentStep(2)}
+          >
+            Booking Details
+          </Button>
+        )}
+      </div>
+      </div>
       )}
 
       {/* Customer Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {currentStep === 2 && (
+        <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
         <div className="bg-white border border-glass-200 rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-glass-900 mb-6">{t('customerInfo')}</h2>
 
@@ -650,14 +680,61 @@ export function CheckoutClient({
             )}
           </div>
         </div>
+        <div className="bg-white border border-glass-200 rounded-lg p-6 h-fit">
+          <h3 className="text-lg font-semibold text-glass-900 mb-3">Selected activity</h3>
+          <p className="text-sm"><strong>{t('activity')}:</strong> {item.t_group} - {item.t_id}</p>
+          <p className="text-sm"><strong>{t('date')}:</strong> {item.tourDate}</p>
+          {item.sesTime && item.sesTime !== '00:00' && (
+            <p className="text-sm"><strong>{t('time')}:</strong> {item.sesTime}</p>
+          )}
+          <p className="text-sm mt-2">
+            <strong>{t('total')}:</strong>{' '}
+            {new Intl.NumberFormat(locale, {
+              style: 'currency',
+              currency: item.currency,
+            }).format(firstItemTotal)}
+          </p>
+        </div>
+        </div>
         )}
 
         {currentStep === 3 && (
+          <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
+          <div className="bg-white border border-glass-200 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-glass-900 mb-4">{t('orderSummary')}</h2>
+            <div className="space-y-3 text-sm">
+              {validItems.map((cartItem) => (
+                <div key={cartItem.itemKey} className="rounded border border-glass-100 p-3">
+                  <p><strong>{t('activity')}:</strong> {cartItem.t_group} - {cartItem.t_id}</p>
+                  <p><strong>{t('date')}:</strong> {cartItem.tourDate}</p>
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="bg-white border border-glass-200 rounded-lg p-6">
             <h2 className="text-2xl font-semibold text-glass-900 mb-4">Payment methods</h2>
-            <p className="text-sm text-glass-600 mb-4">
-              Credit card payment. You will be redirected to the secure payment gateway.
-            </p>
+            <div className="space-y-3 mb-5">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="radio" checked readOnly />
+                Credit card
+              </label>
+              <label className="flex items-center gap-2 text-sm text-glass-400">
+                <input type="radio" disabled />
+                PayPal
+              </label>
+              <label className="flex items-center gap-2 text-sm text-glass-400">
+                <input type="radio" disabled />
+                Bizum
+              </label>
+              <label className="flex items-center gap-2 text-sm text-glass-400">
+                <input type="radio" disabled />
+                Apple Pay
+              </label>
+              <label className="flex items-center gap-2 text-sm text-glass-400">
+                <input type="radio" disabled />
+                Google Pay
+              </label>
+            </div>
             <Button
               type="submit"
               variant="primary"
@@ -667,6 +744,7 @@ export function CheckoutClient({
             >
               {submitting ? t('processing') : t('pay')}
             </Button>
+          </div>
           </div>
         )}
 
