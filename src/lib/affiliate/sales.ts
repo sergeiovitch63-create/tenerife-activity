@@ -1,22 +1,37 @@
 import type { NextRequest } from 'next/server'
 import { getSql } from '@/lib/db/postgres'
-import { AFFILIATE_REF_COOKIE_NAME, parseAffiliateRef } from './ref'
+import {
+  AFFILIATE_REF_COOKIE_NAME,
+  parseAffiliateRef,
+} from './ref'
+import { AFFILIATE_VISITOR_COOKIE_NAME } from './clicks'
+import { computeAffiliateCommission, DEFAULT_COMMISSION_PERCENT } from './commission'
 
 export type RecordAffiliateSaleResult =
-  | { recorded: true }
+  | { recorded: true; affiliateCode: string; commissionAmount: number }
   | { recorded: false; reason: string }
 
+export interface RecordAffiliateSaleInput {
+  bookingReference: string
+  amount?: number | null
+  activityName?: string | null
+}
+
 /**
- * When a booking reference is confirmed, persist a row in affiliate_sales if the
- * request carries a valid ta_affiliate_ref cookie and the code exists in affiliates.
+ * When a booking reference is observed (plain /confirm/ response, or parsed
+ * from the Redsys HTML returned by /payment/), persist a row in affiliate_sales
+ * iff the request carries a valid ta_affiliate_ref cookie and the code exists
+ * in affiliates.
+ *
+ * Also stores the computed commission amount (10 % gross by default, overridden
+ * by the per-affiliate commission_percent column), the visitor cookie (if set),
+ * and leaves status='pending' (the DB default) for later reconciliation.
+ *
+ * Always non-fatal: any failure returns { recorded: false, reason } — never throws.
  */
 export async function recordAffiliateSaleFromRequest(
   request: NextRequest,
-  input: {
-    bookingReference: string
-    amount?: number | null
-    activityName?: string | null
-  }
+  input: RecordAffiliateSaleInput
 ): Promise<RecordAffiliateSaleResult> {
   const raw = request.cookies.get(AFFILIATE_REF_COOKIE_NAME)?.value
   const code = parseAffiliateRef(raw)
@@ -34,13 +49,31 @@ export async function recordAffiliateSaleFromRequest(
     return { recorded: false, reason: 'bad_booking_ref' }
   }
 
+  const amount = typeof input.amount === 'number' && Number.isFinite(input.amount) ? input.amount : null
+  const activityName = input.activityName ?? null
+  const visitorId = request.cookies.get(AFFILIATE_VISITOR_COOKIE_NAME)?.value ?? null
+
   try {
-    const found = await sql`
-      SELECT 1 AS ok FROM affiliates WHERE code = ${code} LIMIT 1
+    const affiliateRows = await sql`
+      SELECT commission_percent, status FROM affiliates
+      WHERE code = ${code}
+      LIMIT 1
     `
-    if (!Array.isArray(found) || found.length === 0) {
+    const affiliate = Array.isArray(affiliateRows) ? affiliateRows[0] as { commission_percent?: number | string; status?: string } | undefined : undefined
+    if (!affiliate) {
       return { recorded: false, reason: 'unknown_affiliate' }
     }
+    if (affiliate.status && affiliate.status !== 'active') {
+      return { recorded: false, reason: `affiliate_${affiliate.status}` }
+    }
+
+    const commissionPercentRaw = affiliate.commission_percent == null
+      ? DEFAULT_COMMISSION_PERCENT
+      : Number(affiliate.commission_percent)
+    const { commissionAmount, commissionPercent } = computeAffiliateCommission({
+      grossAmount: amount,
+      commissionPercent: commissionPercentRaw,
+    })
 
     const dup = await sql`
       SELECT id FROM affiliate_sales
@@ -51,11 +84,27 @@ export async function recordAffiliateSaleFromRequest(
       return { recorded: false, reason: 'duplicate' }
     }
 
+    // Insert. status defaults to 'pending' (column default). We store commission_amount
+    // at insert time so the dashboard/payout math doesn't have to re-derive it.
     await sql`
-      INSERT INTO affiliate_sales (affiliate_code, booking_reference, amount, activity_name)
-      VALUES (${code}, ${bookingRef}, ${input.amount ?? null}, ${input.activityName ?? null})
+      INSERT INTO affiliate_sales (
+        affiliate_code, booking_reference, amount, activity_name,
+        commission_amount, visitor_id
+      )
+      VALUES (
+        ${code}, ${bookingRef}, ${amount}, ${activityName},
+        ${commissionAmount}, ${visitorId}
+      )
     `
-    return { recorded: true }
+    console.log('[affiliate_sales] recorded', {
+      code,
+      bookingRef,
+      amount,
+      commissionPercent,
+      commissionAmount,
+      visitorId,
+    })
+    return { recorded: true, affiliateCode: code, commissionAmount }
   } catch (e) {
     console.error('[affiliate_sales] insert failed', e)
     return { recorded: false, reason: 'db_error' }

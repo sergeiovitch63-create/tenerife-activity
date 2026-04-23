@@ -48,6 +48,11 @@ data/.refresh.lock
 # debug files
 debug-gomera.html
 
+# affiliate test / dev artifacts (contain secrets or local-only state)
+cookies.txt
+response.html
+update_parent_env.ps1
+
 
 
 

@@ -17,6 +17,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { recordAffiliateSaleFromRequest } from '@/lib/affiliate/sales'
+import { extractBookingDataFromHtml } from '@/lib/affiliate/redsys'
 import { getBaseUrl } from '@/lib/atlantico/client'
 import { loadLimits } from '@/lib/atlantico/client-wrapper'
 
@@ -1082,7 +1083,22 @@ export async function POST(request: NextRequest) {
           // If this variant succeeded (not -1), use it
           if (retryTrimmed !== '-1' && retryTrimmed !== '-1\n' && retryTrimmed !== '-1\r\n') {
             console.log('[ATL_PAYMENT_RETRY] SUCCESS with variant:', variant)
-            
+
+            // Affiliate tracking on retry success (same hook as main path).
+            try {
+              const booking = extractBookingDataFromHtml(retryText)
+              if (booking) {
+                const result = await recordAffiliateSaleFromRequest(request, {
+                  bookingReference: booking.order,
+                  amount: booking.amount,
+                  activityName: booking.productDescription,
+                })
+                console.log('[ATL_PAYMENT_AFFILIATE] (retry)', { ...result, order: booking.order, amount: booking.amount })
+              }
+            } catch (affiliateErr) {
+              console.warn('[ATL_PAYMENT_AFFILIATE] retry hook error', affiliateErr)
+            }
+
             // Handle redirect
             if (retryResponse.status >= 300 && retryResponse.status < 400) {
               const location = retryResponse.headers.get('Location')
@@ -1224,6 +1240,22 @@ export async function POST(request: NextRequest) {
     const shouldReturnAsHTML = mightBeHTML || (upstreamStatus === 200 && upstreamText.length > 0 && trimmed !== '-1')
     
     if (shouldReturnAsHTML) {
+      // Affiliate tracking: extract Redsys booking ref + amount from the HTML form and
+      // record a pending conversion BEFORE piping to the browser. Non-blocking on failure.
+      try {
+        const booking = extractBookingDataFromHtml(upstreamText)
+        if (booking) {
+          const result = await recordAffiliateSaleFromRequest(request, {
+            bookingReference: booking.order,
+            amount: booking.amount,
+            activityName: booking.productDescription,
+          })
+          console.log('[ATL_PAYMENT_AFFILIATE]', { ...result, order: booking.order, amount: booking.amount })
+        }
+      } catch (affiliateErr) {
+        console.warn('[ATL_PAYMENT_AFFILIATE] hook error', affiliateErr)
+      }
+
       console.log('[ATL_PAYMENT_HTML_RESPONSE] Returning HTML to browser:', {
         baseUrl,
         path: paymentEndpoint,
