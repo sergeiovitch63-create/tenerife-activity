@@ -33,6 +33,7 @@ import { OperatorSignatureCard } from './OperatorSignature'
 import { BucketListRankCard } from './BucketListRank'
 import { FirstTimerTipsCard } from './FirstTimerTips'
 import { TimeBudgetCard } from './TimeBudget'
+import { CalimaBannerCard } from './CalimaBanner'
 
 export const MODULE_RENDERERS: Record<string, ModuleRenderer> = {
   'sunset-time-adapter': (p) => <SunsetTimeAdapterCard {...p} />,
@@ -57,4 +58,5 @@ export const MODULE_RENDERERS: Record<string, ModuleRenderer> = {
   'bucket-list-rank': (p) => <BucketListRankCard {...p} />,
   'first-timer-tips': (p) => <FirstTimerTipsCard {...p} />,
   'time-budget': (p) => <TimeBudgetCard {...p} />,
+  'calima-banner': (p) => <CalimaBannerCard {...p} />,
 }

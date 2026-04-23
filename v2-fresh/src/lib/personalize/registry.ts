@@ -45,6 +45,7 @@ import { operatorSignatureScorer } from './scorers/operator-signature'
 import { bucketListRankScorer } from './scorers/bucket-list-rank'
 import { firstTimerTipsScorer } from './scorers/first-timer-tips'
 import { timeBudgetScorer } from './scorers/time-budget'
+import { calimaBannerScorer } from './scorers/calima-banner'
 
 export const REGISTRY: ModuleDefinition[] = [
   {
@@ -156,6 +157,11 @@ export const REGISTRY: ModuleDefinition[] = [
     id: 'time-budget',
     defaultSlot: 'right-inline',
     score: timeBudgetScorer,
+  },
+  {
+    id: 'calima-banner',
+    defaultSlot: 'banner',
+    score: calimaBannerScorer,
   },
 ]
 
