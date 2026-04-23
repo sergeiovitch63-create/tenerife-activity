@@ -271,6 +271,6 @@ export const fr = {
     retry: 'Réessayer',
     back: 'Retour',
   },
-} as const
+}
 
 export type Dict = typeof fr
