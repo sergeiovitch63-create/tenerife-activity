@@ -27,6 +27,7 @@ import { PhotoSpotsCard } from './PhotoSpots'
 import { DepartureRhythmCard } from './DepartureRhythm'
 import { GuideExperienceCard } from './GuideExperience'
 import { CompanionFitCard } from './CompanionFit'
+import { CompanionDuoCard } from './CompanionDuo'
 import { EffortMeterCard } from './EffortMeter'
 import { SeasonalWindowCard } from './SeasonalWindow'
 import { OperatorSignatureCard } from './OperatorSignature'
@@ -52,6 +53,7 @@ export const MODULE_RENDERERS: Record<string, ModuleRenderer> = {
   'departure-rhythm': (p) => <DepartureRhythmCard {...p} />,
   'guide-experience': (p) => <GuideExperienceCard {...p} />,
   'companion-fit': (p) => <CompanionFitCard {...p} />,
+  'companion-duo': (p) => <CompanionDuoCard {...p} />,
   'effort-meter': (p) => <EffortMeterCard {...p} />,
   'seasonal-window': (p) => <SeasonalWindowCard {...p} />,
   'operator-signature': (p) => <OperatorSignatureCard {...p} />,
