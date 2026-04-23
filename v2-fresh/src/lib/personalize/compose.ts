@@ -21,7 +21,13 @@ const DEFAULT_MAX_PER_SLOT: Record<ModuleSlot, number> = {
   'left-primary': 2,
   'left-secondary': 4,
   'left-tertiary': 3,
-  'right-inline': 2,
+  // 8 modules target right-inline (multi-booking, next-available,
+  // pickup-coverage, value-story, guide-experience, operator-signature,
+  // time-budget, departure-rhythm-on-overflow). Cap of 2 was evicting
+  // planning-grade cards on almost every rich activity — 3 lets the
+  // booking sidebar tell a fuller trust + planning story without
+  // visually crowding the panel.
+  'right-inline': 3,
 }
 
 /**
