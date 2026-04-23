@@ -18,6 +18,17 @@ const nextConfig = {
       { protocol: 'https', hostname: 'picsum.photos' },
     ],
   },
+  // Belt-and-suspenders: the primary fix is the static image manifest in
+  // src/lib/local-images.ts (no runtime fs). This exclude still helps if
+  // anything else ever touches public/images/ via @vercel/nft-traced paths.
+  // The '*' key means "apply to every route".
+  outputFileTracingExcludes: {
+    '*': [
+      'public/images/**/*',
+      '.claude/**/*',
+      '**/*.map',
+    ],
+  },
 }
 
 export default nextConfig

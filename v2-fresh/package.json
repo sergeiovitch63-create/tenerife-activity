@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "image-manifest": "node scripts/build-image-manifest.mjs",
+    "predev": "node scripts/build-image-manifest.mjs",
+    "prebuild": "node scripts/build-image-manifest.mjs",
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
