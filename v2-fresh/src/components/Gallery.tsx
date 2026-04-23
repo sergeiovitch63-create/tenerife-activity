@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
 
@@ -21,7 +22,14 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
           }}
           className="col-span-4 md:col-span-2 md:row-span-2 relative group"
         >
-          <img src={images[0]} alt={alt} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
+          <Image
+            src={images[0]}
+            alt={alt}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            priority
+            className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
+          />
         </button>
         {images.slice(1, 5).map((src, i) => (
           <button
@@ -32,7 +40,13 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
             }}
             className="hidden md:block relative group aspect-square"
           >
-            <img src={src} alt={`${alt} ${i + 2}`} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
+            <Image
+              src={src}
+              alt={`${alt} ${i + 2}`}
+              fill
+              sizes="25vw"
+              className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
+            />
             {i === 3 && (
               <div className="absolute inset-0 bg-ink-900/40 text-white text-sm font-semibold flex items-center justify-center gap-1">
                 <Maximize2 className="w-4 h-4" /> Voir plus
@@ -81,10 +95,13 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-            <img
+            <Image
               src={images[idx]}
               alt={alt}
-              className="max-h-[90vh] max-w-[95vw] object-contain rounded-xl"
+              width={1920}
+              height={1280}
+              sizes="95vw"
+              className="max-h-[90vh] max-w-[95vw] h-auto w-auto object-contain rounded-xl"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">

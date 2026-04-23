@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { ArrowRight, Sparkles, ShieldCheck, Zap, Heart, Star, TrendingUp } from 'lucide-react'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryCard from '@/components/CategoryCard'
@@ -218,7 +219,15 @@ export default async function Home({ params }: { params: { locale: string } }) {
                   const img = localCovers[g.code] ?? coverImage(g)
                   return (
                     <LocaleLink key={g.id} href={`/activite/${g.code}`} className="rounded-xl overflow-hidden aspect-[4/5] relative group">
-                      {img && <img src={img} alt={g.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                      {img && (
+                        <Image
+                          src={img}
+                          alt={g.name}
+                          fill
+                          sizes="(min-width: 1024px) 200px, 50vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                       <div className="absolute inset-x-2 bottom-2 text-xs font-semibold line-clamp-2 text-white">{g.name}</div>
                     </LocaleLink>

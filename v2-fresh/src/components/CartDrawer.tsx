@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
 import { X, ShoppingBag, Trash2, ArrowRight } from 'lucide-react'
 import LocaleLink from './LocaleLink'
 import { useCart } from '@/lib/cart'
@@ -67,7 +68,9 @@ export default function CartDrawer() {
                     return (
                       <li key={it.itemId} className="p-4 flex gap-3">
                         {it.activityImage && (
-                          <img src={it.activityImage} alt="" className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
+                          <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                            <Image src={it.activityImage} alt="" fill sizes="80px" className="object-cover" />
+                          </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <LocaleLink

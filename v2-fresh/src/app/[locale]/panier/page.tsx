@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ArrowRight, ShoppingBag, Trash2, Minus, Plus, Calendar, Sparkles } from 'lucide-react'
 import LocaleLink from '@/components/LocaleLink'
 import { useCart } from '@/lib/cart'
@@ -40,7 +41,9 @@ export default function CartPage() {
               return (
                 <li key={it.itemId} className="card p-4 md:p-5 flex gap-4">
                   {it.activityImage && (
-                    <img src={it.activityImage} alt="" className="w-28 h-28 md:w-36 md:h-36 rounded-xl object-cover flex-shrink-0" />
+                    <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-xl overflow-hidden flex-shrink-0">
+                      <Image src={it.activityImage} alt="" fill sizes="(min-width: 768px) 144px, 112px" className="object-cover" />
+                    </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">

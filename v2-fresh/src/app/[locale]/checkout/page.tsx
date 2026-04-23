@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Image from 'next/image'
 import {
   ArrowRight, ArrowLeft, ShieldCheck, Lock, Check,
   User, Mail, Phone, MapPin, Home as HomeIcon,
@@ -188,7 +189,9 @@ export default function CheckoutPage() {
             {items.map((it) => (
               <li key={it.itemId} className="flex gap-3">
                 {it.activityImage && (
-                  <img src={it.activityImage} alt="" className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                  <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                    <Image src={it.activityImage} alt="" fill sizes="56px" className="object-cover" />
+                  </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold line-clamp-2">{it.activityTitle}</p>

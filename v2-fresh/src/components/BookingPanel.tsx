@@ -78,10 +78,14 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
   const [timeSlot, setTimeSlot] = useState<string>('')
   const [userPickedDate, setUserPickedDate] = useState(false)
 
+  // Narrow to just the event code — the other fields don't change the
+  // lookup, and depending on the whole object would re-run this memo
+  // every time the parent recomputed the events array.
+  const currentEventCode = currentEvent?.code
   const currentLimits = useMemo(() => {
-    if (!currentEvent) return null
-    return limitsCache[`${currentEvent.code}:${viewedMonth}`] ?? null
-  }, [limitsCache, currentEvent?.code, viewedMonth])
+    if (!currentEventCode) return null
+    return limitsCache[`${currentEventCode}:${viewedMonth}`] ?? null
+  }, [limitsCache, currentEventCode, viewedMonth])
 
   /** True when the option operates every day of the week — use full calendar.
    *  False when some weekdays are closed — use compact date squares. */
@@ -111,12 +115,12 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
 
   // Fetch limits per (option, month)
   useEffect(() => {
-    if (!currentEvent) return
-    const cacheKey = `${currentEvent.code}:${viewedMonth}`
+    if (!currentEventCode) return
+    const cacheKey = `${currentEventCode}:${viewedMonth}`
     if (limitsCache[cacheKey]) return
     let cancelled = false
     setLoadingLimits(true)
-    fetch(`/api/atlantico/limits/${currentEvent.code}?locale=${locale}&month=${viewedMonth}`)
+    fetch(`/api/atlantico/limits/${currentEventCode}?locale=${locale}&month=${viewedMonth}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data: AtlanticoLimits | null) => {
         if (cancelled || !data) return
@@ -125,7 +129,7 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
       .catch(() => {})
       .finally(() => !cancelled && setLoadingLimits(false))
     return () => { cancelled = true }
-  }, [currentEvent?.code, viewedMonth, locale, limitsCache])
+  }, [currentEventCode, viewedMonth, locale, limitsCache])
 
   // Snap to first available date when option changes — clear user-pick flag too
   useEffect(() => {
