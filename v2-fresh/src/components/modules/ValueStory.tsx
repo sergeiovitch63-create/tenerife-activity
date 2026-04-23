@@ -8,6 +8,7 @@
 
 import {
   Star, Award, ThumbsUp, Tag, Gem, Sparkles, ShieldCheck, Zap,
+  Images, FileText,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { ModuleScore, ActivitySignals } from '@/lib/personalize/types'
@@ -163,6 +164,18 @@ function renderPoint(point: ValueStoryPoint, labels: Record<string, string>): Re
         tone: 'text-indigo-600',
         text: labels.point_instantConfirmation,
       }
+    case 'richMedia':
+      return {
+        Icon: Images,
+        tone: 'text-sky-600',
+        text: interpolate(labels.point_richMedia, { count: point.photoCount }),
+      }
+    case 'documented':
+      return {
+        Icon: FileText,
+        tone: 'text-indigo-600',
+        text: labels.point_documented,
+      }
   }
 }
 
@@ -196,6 +209,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Nouveauté fraîchement arrivée dans le catalogue.',
     point_freeCancellation: 'Annulation gratuite jusqu\'à 24 h avant.',
     point_instantConfirmation: 'Confirmation immédiate, voucher par email.',
+    point_richMedia: '{count} photos et vidéos — visualise avant de réserver.',
+    point_documented: 'Fiche détaillée : itinéraire, FAQ, vidéo.',
   },
   en: {
     'title_great-deal': 'Today\'s best price',
@@ -221,6 +236,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Fresh arrival in the catalog.',
     point_freeCancellation: 'Free cancellation up to 24 h before.',
     point_instantConfirmation: 'Instant confirmation, voucher by email.',
+    point_richMedia: '{count} photos and videos — preview before you book.',
+    point_documented: 'Detailed page: itinerary, FAQ, video.',
   },
   es: {
     'title_great-deal': 'Mejor precio del momento',
@@ -246,6 +263,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Recién incorporada al catálogo.',
     point_freeCancellation: 'Cancelación gratuita hasta 24 h antes.',
     point_instantConfirmation: 'Confirmación inmediata, voucher por email.',
+    point_richMedia: '{count} fotos y vídeos — visualiza antes de reservar.',
+    point_documented: 'Ficha detallada: itinerario, FAQ, vídeo.',
   },
   de: {
     'title_great-deal': 'Bester Preis derzeit',
@@ -271,6 +290,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Frisch im Katalog.',
     point_freeCancellation: 'Kostenlose Stornierung bis 24 h vorher.',
     point_instantConfirmation: 'Sofortige Bestätigung, Voucher per E-Mail.',
+    point_richMedia: '{count} Fotos und Videos — vorab anschauen.',
+    point_documented: 'Detaillierte Seite: Route, FAQ, Video.',
   },
   it: {
     'title_great-deal': 'Miglior prezzo del momento',
@@ -296,6 +317,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Novità appena aggiunta al catalogo.',
     point_freeCancellation: 'Cancellazione gratuita fino a 24 h prima.',
     point_instantConfirmation: 'Conferma immediata, voucher via email.',
+    point_richMedia: '{count} foto e video — visualizza prima di prenotare.',
+    point_documented: 'Scheda dettagliata: itinerario, FAQ, video.',
   },
   ru: {
     'title_great-deal': 'Лучшая цена сейчас',
@@ -321,5 +344,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     point_freshCatalog: 'Свежее поступление в каталог.',
     point_freeCancellation: 'Бесплатная отмена за 24 ч.',
     point_instantConfirmation: 'Моментальное подтверждение, ваучер на email.',
+    point_richMedia: '{count} фото и видео — посмотрите до брони.',
+    point_documented: 'Детальная страница: маршрут, FAQ, видео.',
   },
 }

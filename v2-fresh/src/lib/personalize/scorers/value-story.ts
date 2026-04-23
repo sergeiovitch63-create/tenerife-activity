@@ -28,6 +28,8 @@ export type ValueStoryPoint =
   | { kind: 'freshCatalog' }
   | { kind: 'freeCancellation' }
   | { kind: 'instantConfirmation' }
+  | { kind: 'richMedia'; photoCount: number }
+  | { kind: 'documented' }
 
 export type ValueStoryProps = {
   points: ValueStoryPoint[]
@@ -90,17 +92,37 @@ export function valueStoryScorer(signals: ActivitySignals): ModuleScore | null {
   // --- Fresh catalog flag -----------------------------------------
   if (isNew) points.push({ kind: 'freshCatalog' })
 
+  // --- Content-investment proxy -----------------------------------
+  // The Atlantico dataset often ships reputation fields as empty or
+  // stuffed with non-numeric text (SEO keywords, internal flags), so
+  // `tadvisor` / `recom` can't be trusted as a universal signal.
+  // When an operator has invested in a deep gallery and structured
+  // content (detailed route, FAQ, video), that's a quality signal in
+  // its own right — we surface it instead of leaving the card silent.
+  const qualitySignals =
+    (signals.hasVideo ? 1 : 0) +
+    (signals.hasDetailedRoute ? 1 : 0) +
+    (signals.hasFaq ? 1 : 0)
+  const hasQualityContent = signals.imageCount >= 12 || qualitySignals >= 2
+  if (signals.imageCount >= 12) {
+    points.push({ kind: 'richMedia', photoCount: signals.imageCount })
+  }
+  if (qualitySignals >= 2) {
+    points.push({ kind: 'documented' })
+  }
+
   // --- Booking policy points (always worth repeating) --------------
   points.push({ kind: 'freeCancellation' })
   points.push({ kind: 'instantConfirmation' })
 
-  // Hard skip: no reputation AND no discount = same as the sidebar
-  // already shows. Don't pad the page with boilerplate policy chips.
+  // Hard skip: no reputation AND no discount AND no quality content
+  // = same as the sidebar already shows. Don't pad the page with
+  // boilerplate policy chips.
   const hasReputation =
     (tadvisor != null && tadvisor >= 3.5) ||
     (recom != null && recom >= 85)
   const hasDiscount = discount != null && discount >= 5
-  if (!hasReputation && !hasDiscount && !isNew) return null
+  if (!hasReputation && !hasDiscount && !isNew && !hasQualityContent) return null
 
   // --- Vibe --------------------------------------------------------
   let vibe: ValueStoryProps['vibe']
@@ -124,11 +146,20 @@ export function valueStoryScorer(signals: ActivitySignals): ModuleScore | null {
   }
   if (isNew) s += 3
 
+  // Content-investment bumps — kept modest so they never outshine a
+  // genuine discount or TripAdvisor rating, but enough for a card built
+  // purely on quality signals to clear threshold.
+  if (signals.imageCount >= 20) s += 4
+  else if (signals.imageCount >= 12) s += 2
+  if (qualitySignals >= 3) s += 3
+  else if (qualitySignals >= 2) s += 2
+
   // New + no reputation is a weaker story — cap it.
   if (vibe === 'new') s = Math.min(s, 55)
 
-  // Premium without TripAdvisor support is not a value story at all.
-  if (vibe === 'premium' && !hasReputation && !hasDiscount) {
+  // Premium without TripAdvisor support is not a value story at all,
+  // unless the operator has clearly invested in content quality.
+  if (vibe === 'premium' && !hasReputation && !hasDiscount && !hasQualityContent) {
     return null
   }
 
