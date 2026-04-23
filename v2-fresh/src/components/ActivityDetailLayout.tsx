@@ -14,7 +14,7 @@ import { extractSignals } from '@/lib/personalize/signals'
 import { composePage } from '@/lib/personalize/compose'
 import { REGISTRY } from '@/lib/personalize/registry'
 import { MODULE_RENDERERS } from './modules/renderers'
-import type { ModuleScore } from '@/lib/personalize/types'
+import type { ModuleScore, ReviewsMeta } from '@/lib/personalize/types'
 
 type Props = {
   group: AtlanticoGroup
@@ -23,6 +23,7 @@ type Props = {
   initialPrices: Record<string, ParsedPrice | null>
   initialDate: string
   nextDates: Record<string, string | null>
+  reviewsMeta?: ReviewsMeta | null
   t: Dict
   locale: Locale
 }
@@ -30,7 +31,7 @@ type Props = {
 type ViewMode = 'options' | 'booking'
 
 export default function ActivityDetailLayout({
-  group, events, faq, initialPrices, initialDate, nextDates, t, locale,
+  group, events, faq, initialPrices, initialDate, nextDates, reviewsMeta = null, t, locale,
 }: Props) {
   const [selectedCode, setSelectedCode] = useState<string>(events[0]?.code ?? '')
   const [viewMode, setViewMode] = useState<ViewMode>('options')
@@ -38,9 +39,9 @@ export default function ActivityDetailLayout({
 
   // Personalization: extract signals + compose modules once per activity
   const composed = useMemo(() => {
-    const signals = extractSignals(group, events)
+    const signals = extractSignals(group, events, reviewsMeta)
     return composePage(signals, REGISTRY)
-  }, [group, events])
+  }, [group, events, reviewsMeta])
 
   const renderSlot = (slot: keyof typeof composed.modulesBySlot) =>
     composed.modulesBySlot[slot].map((s: ModuleScore) => {

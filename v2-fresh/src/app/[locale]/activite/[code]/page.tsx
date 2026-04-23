@@ -14,6 +14,7 @@ import { parseFaq } from '@/lib/faq-parser'
 import { findNextAvailableDate } from '@/lib/atlantico/availability'
 import { atlanticoImageUrl, coverImage } from '@/lib/atlantico/images'
 import { getLocalGroupImages } from '@/lib/local-images'
+import { getReviewsMeta } from '@/lib/reviews/client'
 
 export const revalidate = 900
 
@@ -33,10 +34,14 @@ export default async function ActivityPage({ params }: Props) {
   if (!group) notFound()
 
   const eventIds = parseIds(group.ids)
-  const [events, related, categories] = await Promise.all([
+  const groupCodeNum = Number(group.code)
+  const [events, related, categories, reviewsMeta] = await Promise.all([
     Promise.all(eventIds.map((id) => getEventDetails(id, locale))),
     getGroups(locale, { page: -1 }),
     getClassifications(locale),
+    Number.isFinite(groupCodeNum) && groupCodeNum > 0
+      ? getReviewsMeta(groupCodeNum)
+      : Promise.resolve(null),
   ])
   const validEvents = events.filter((e): e is NonNullable<typeof e> => !!e)
 
@@ -132,6 +137,7 @@ export default async function ActivityPage({ params }: Props) {
         initialPrices={initialPrices}
         initialDate={priceDate}
         nextDates={nextDates}
+        reviewsMeta={reviewsMeta}
         t={t}
         locale={locale}
       />

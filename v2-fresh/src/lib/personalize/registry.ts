@@ -40,6 +40,7 @@ import { departureRhythmScorer } from './scorers/departure-rhythm'
 import { guideExperienceScorer } from './scorers/guide-experience'
 import { companionFitScorer } from './scorers/companion-fit'
 import { companionDuoScorer } from './scorers/companion-duo'
+import { testimonialsCuratedScorer } from './scorers/testimonials-curated'
 import { effortMeterScorer } from './scorers/effort-meter'
 import { seasonalWindowScorer } from './scorers/seasonal-window'
 import { operatorSignatureScorer } from './scorers/operator-signature'
@@ -133,6 +134,11 @@ export const REGISTRY: ModuleDefinition[] = [
     id: 'companion-duo',
     defaultSlot: 'left-secondary',
     score: companionDuoScorer,
+  },
+  {
+    id: 'testimonials-curated',
+    defaultSlot: 'left-secondary',
+    score: testimonialsCuratedScorer,
   },
   {
     id: 'effort-meter',
