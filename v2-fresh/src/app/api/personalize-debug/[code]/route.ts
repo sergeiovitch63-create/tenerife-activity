@@ -20,6 +20,7 @@ import { isLocale, type Locale } from '@/lib/locale'
 import { extractSignals } from '@/lib/personalize/signals'
 import { composePage } from '@/lib/personalize/compose'
 import { REGISTRY } from '@/lib/personalize/registry'
+import { getReviewsMeta } from '@/lib/reviews/client'
 import type { ModuleScore } from '@/lib/personalize/types'
 
 type Props = { params: { code: string } }
@@ -42,11 +43,17 @@ export async function GET(req: Request, { params }: Props) {
   }
 
   const eventIds = parseIds(group.ids)
-  const events = await Promise.all(eventIds.map((id) => getEventDetails(id, locale)))
+  const groupCodeNum = Number(group.code)
+  const [events, reviewsMeta] = await Promise.all([
+    Promise.all(eventIds.map((id) => getEventDetails(id, locale))),
+    Number.isFinite(groupCodeNum) && groupCodeNum > 0
+      ? getReviewsMeta(groupCodeNum)
+      : Promise.resolve(null),
+  ])
   const validEvents = events.filter((e): e is NonNullable<typeof e> => !!e)
 
   // Signal extraction
-  const signals = extractSignals(group, validEvents)
+  const signals = extractSignals(group, validEvents, reviewsMeta)
 
   // Collect raw scorer output (even rejections) for debugging
   type RawResult = {
@@ -154,6 +161,7 @@ export async function GET(req: Request, { params }: Props) {
       hasDetailedRoute: signals.hasDetailedRoute,
       hasFaq: signals.hasFaq,
       hasMultipleEvents: signals.hasMultipleEvents,
+      reviewsMeta: signals.reviewsMeta,
     },
     scorers: rawScores,
     composition,

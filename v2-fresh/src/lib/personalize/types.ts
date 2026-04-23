@@ -60,9 +60,22 @@ export type ActivitySignals = {
   // Raw keyword buckets for fine-grained scoring
   keywords: Set<string>
 
+  // Supabase-backed aggregates (reviews) — null when feature disabled
+  // or no published reviews exist for this activity. Populated by the
+  // server page before `extractSignals` runs so the scoring stays pure.
+  reviewsMeta: ReviewsMeta | null
+
   // Raw inputs for scorers that need to dig deeper
   _group: AtlanticoGroup
   _events: AtlanticoEvent[]
+}
+
+/** Aggregate over published reviews — lives in signals because scorers read it. */
+export type ReviewsMeta = {
+  count: number
+  avgRating: number
+  verifiedCount: number
+  lastReviewAt: string | null
 }
 
 export type GeoZone =

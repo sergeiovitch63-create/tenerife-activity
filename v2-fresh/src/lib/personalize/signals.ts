@@ -15,6 +15,7 @@ import type {
   Theme,
   ThemeSet,
   Setting,
+  ReviewsMeta,
 } from './types'
 
 // ---------------------------------------------------------------------
@@ -410,6 +411,7 @@ function parseAgeRange(raw: string | null | undefined): { min: number | null; ma
 export function extractSignals(
   group: AtlanticoGroup,
   events: AtlanticoEvent[] = [],
+  reviewsMeta: ReviewsMeta | null = null,
 ): ActivitySignals {
   // Full blob — used for broad keyword / theme extraction.
   const textBlob = [
@@ -500,6 +502,8 @@ export function extractSignals(
     hasMultipleEvents: events.length > 1,
 
     keywords,
+
+    reviewsMeta,
 
     _group: group,
     _events: events,
