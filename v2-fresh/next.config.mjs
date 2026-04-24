@@ -1,11 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Exclude public/images from serverless function bundle.
-  // local-images.ts uses fs.readdirSync on public/images/ at runtime;
-  // without this exclusion Next.js output-file-tracing bundles the entire
-  // images directory into the Lambda, blowing past Vercel's 300 MB limit.
-  outputFileTracingExcludes: {
-    '*': ['./public/images/**/*'],
+  experimental: {
+    // Exclude public/images from serverless function bundle.
+    // local-images.ts uses fs.readdirSync on public/images/ at runtime;
+    // without this exclusion Next.js output-file-tracing bundles the entire
+    // images directory into the Lambda, blowing past Vercel's 300 MB limit.
+    outputFileTracingExcludes: {
+      '*': ['./public/images/**/*'],
+    },
   },
   images: {
     remotePatterns: [
@@ -19,5 +21,4 @@ const nextConfig = {
     ],
   },
 }
-
 export default nextConfig
