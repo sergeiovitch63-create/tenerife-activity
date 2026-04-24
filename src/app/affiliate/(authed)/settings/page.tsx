@@ -23,8 +23,8 @@ export default async function AffiliateSettingsPage({
   return (
     <div className="max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Paramètres</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-semibold text-glass-900">Paramètres</h1>
+        <p className="text-sm text-glass-500 mt-1">
           Informations utilisées pour te contacter et t'envoyer tes commissions.
         </p>
       </div>
@@ -43,14 +43,14 @@ export default async function AffiliateSettingsPage({
       <form
         method="POST"
         action="/api/affiliate/settings"
-        className="bg-white border border-gray-200 rounded-lg p-6 space-y-4"
+        className="bg-white border border-glass-200 rounded-lg p-6 space-y-4"
       >
         <ReadOnlyField label="Nom" value={session.name} />
         <ReadOnlyField label="Code affilié" value={session.affiliateCode} />
         <ReadOnlyField label="Commission" value={`${session.commissionPercent}%`} />
 
-        <div className="border-t border-gray-100 pt-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="border-t border-glass-100 pt-4">
+          <label htmlFor="email" className="block text-sm font-medium text-glass-700 mb-1">
             Email de contact
           </label>
           <input
@@ -59,10 +59,10 @@ export default async function AffiliateSettingsPage({
             type="email"
             defaultValue={session.email ?? ''}
             placeholder="contact@hotel.com"
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="block w-full rounded-md border border-glass-300 px-3 py-2 text-sm"
             maxLength={200}
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-glass-500 mt-1">
             On t'enverra ici la notification de versement des commissions.
           </p>
         </div>
@@ -70,14 +70,14 @@ export default async function AffiliateSettingsPage({
         <div className="pt-2">
           <button
             type="submit"
-            className="rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700"
+            className="rounded-md bg-ocean-700 text-white px-4 py-2 text-sm hover:bg-ocean-800"
           >
             Enregistrer
           </button>
         </div>
       </form>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600 space-y-1">
+      <div className="bg-glass-50 border border-glass-200 rounded-lg p-4 text-sm text-glass-600 space-y-1">
         <p className="font-medium text-gray-800">Besoin de changer autre chose ?</p>
         <p>
           Le nom, le code affilié ou le taux de commission ne peuvent être modifiés que par
@@ -91,8 +91,8 @@ export default async function AffiliateSettingsPage({
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-sm font-medium text-gray-700 mb-1">{label}</div>
-      <div className="bg-gray-50 border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-700">
+      <div className="text-sm font-medium text-glass-700 mb-1">{label}</div>
+      <div className="bg-glass-50 border border-glass-200 rounded-md px-3 py-2 text-sm text-glass-700">
         {value}
       </div>
     </div>

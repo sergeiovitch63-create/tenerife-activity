@@ -12,10 +12,10 @@ const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
   paid: 'Payée',
 }
 const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-amber-100 text-amber-800',
   confirmed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-blue-100 text-blue-800',
+  paid: 'bg-ocean-100 text-ocean-900',
 }
 
 export default async function AffiliatePayoutsPage() {
@@ -38,8 +38,8 @@ export default async function AffiliatePayoutsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Mes commissions</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-semibold text-glass-900">Mes commissions</h1>
+        <p className="text-sm text-glass-500 mt-1">
           Suivi de toutes les ventes attribuées à ton code{' '}
           <span className="font-mono">{session.affiliateCode}</span>.
         </p>
@@ -66,20 +66,20 @@ export default async function AffiliatePayoutsPage() {
         />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900">
+      <div className="bg-white border border-glass-200 rounded-lg overflow-hidden">
+        <div className="px-5 py-3 border-b border-glass-100">
+          <h2 className="text-lg font-medium text-glass-900">
             Historique ({sales.length} vente{sales.length > 1 ? 's' : ''})
           </h2>
         </div>
         {sales.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
+          <div className="p-8 text-center text-glass-500 text-sm">
             Pas encore de vente. Partage tes liens pour commencer à toucher des
             commissions.
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+            <thead className="bg-glass-50 text-glass-500 text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Date</th>
                 <th className="text-left px-4 py-3 font-medium">Activité</th>
@@ -88,23 +88,23 @@ export default async function AffiliatePayoutsPage() {
                 <th className="text-center px-4 py-3 font-medium">Statut</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-glass-100">
               {sales.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                <tr key={s.id} className="hover:bg-glass-50">
+                  <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
                     {new Date(s.created_at).toLocaleString('fr-FR', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
                     })}
                   </td>
-                  <td className="px-4 py-3 text-gray-900 truncate max-w-xs">
+                  <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
                     {s.activity_name ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-600">
+                  <td className="px-4 py-3 text-right text-glass-600">
                     {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-900">
+                  <td className="px-4 py-3 text-right font-medium text-glass-900">
                     {s.commission_amount != null
                       ? `${s.commission_amount.toFixed(2)} €`
                       : '—'}
@@ -138,15 +138,15 @@ function SummaryCard({
   hint: string
 }) {
   const classes = {
-    yellow: 'bg-yellow-50 border-yellow-200',
+    yellow: 'bg-amber-50 border-amber-200',
     green: 'bg-green-50 border-green-200',
-    blue: 'bg-blue-50 border-blue-200',
+    blue: 'bg-ocean-50 border-ocean-200',
   }[tone]
   return (
     <div className={`border rounded-lg p-4 ${classes}`}>
-      <div className="text-xs uppercase tracking-wide text-gray-600">{label}</div>
-      <div className="mt-2 text-2xl font-semibold text-gray-900">{value}</div>
-      <div className="text-xs text-gray-500 mt-1">{hint}</div>
+      <div className="text-xs uppercase tracking-wide text-glass-600">{label}</div>
+      <div className="mt-2 text-2xl font-semibold text-glass-900">{value}</div>
+      <div className="text-xs text-glass-500 mt-1">{hint}</div>
     </div>
   )
 }

@@ -25,12 +25,12 @@ export default function NewAffiliatePage({
     <div className="max-w-xl space-y-6">
       <div>
         <div className="mb-2">
-          <Link href="/back-office/affiliates" className="text-sm text-gray-500 hover:text-gray-700">
+          <Link href="/back-office/affiliates" className="text-sm text-glass-500 hover:text-glass-700">
             ← Retour aux affiliés
           </Link>
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900">Nouvel affilié</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-semibold text-glass-900">Nouvel affilié</h1>
+        <p className="text-sm text-glass-500 mt-1">
           Créer un partenaire (hôtel, blog, guide, etc.) avec son code de tracking.
         </p>
       </div>
@@ -38,7 +38,7 @@ export default function NewAffiliatePage({
       <form
         method="POST"
         action="/api/admin/affiliates"
-        className="bg-white border border-gray-200 rounded-lg p-6 space-y-4"
+        className="bg-white border border-glass-200 rounded-lg p-6 space-y-4"
       >
         <Field
           label="Code (slug court, utilisé dans les liens /r/CODE)"
@@ -63,11 +63,11 @@ export default function NewAffiliatePage({
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Statut initial</label>
+          <label className="block text-sm font-medium text-glass-700 mb-1">Statut initial</label>
           <select
             name="status"
             defaultValue="active"
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+            className="block w-full rounded-md border border-glass-300 px-3 py-2 text-sm"
           >
             <option value="active">Actif (peut tracer dès maintenant)</option>
             <option value="pending">En attente d’approbation</option>
@@ -83,13 +83,13 @@ export default function NewAffiliatePage({
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            className="rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700"
+            className="rounded-md bg-ocean-700 text-white px-4 py-2 text-sm hover:bg-ocean-800"
           >
             Créer l’affilié
           </button>
           <Link
             href="/back-office/affiliates"
-            className="text-sm text-gray-600 hover:text-gray-900"
+            className="text-sm text-glass-600 hover:text-glass-900"
           >
             Annuler
           </Link>
@@ -108,7 +108,7 @@ function Field({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={name} className="block text-sm font-medium text-glass-700 mb-1">
         {label}
       </label>
       <input
@@ -116,9 +116,9 @@ function Field({
         name={name}
         type={type}
         {...props}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="block w-full rounded-md border border-glass-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500"
       />
-      {hint ? <p className="text-xs text-gray-500 mt-1">{hint}</p> : null}
+      {hint ? <p className="text-xs text-glass-500 mt-1">{hint}</p> : null}
     </div>
   )
 }
