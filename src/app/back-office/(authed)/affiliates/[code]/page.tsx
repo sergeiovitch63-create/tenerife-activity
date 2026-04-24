@@ -18,8 +18,8 @@ const STATUS_LABEL: Record<AffiliateStatus, string> = {
 }
 const STATUS_CLASS: Record<AffiliateStatus, string> = {
   active: 'bg-green-100 text-green-800',
-  pending: 'bg-yellow-100 text-yellow-800',
-  suspended: 'bg-gray-200 text-gray-700',
+  pending: 'bg-amber-100 text-amber-800',
+  suspended: 'bg-glass-200 text-glass-700',
 }
 const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
   pending: 'En attente',
@@ -28,10 +28,10 @@ const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
   paid: 'Payée',
 }
 const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-amber-100 text-amber-800',
   confirmed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-blue-100 text-blue-800',
+  paid: 'bg-ocean-100 text-ocean-900',
 }
 
 export default async function AffiliateDetailPage({
@@ -85,13 +85,13 @@ export default async function AffiliateDetailPage({
     <div className="space-y-6">
       <div>
         <div className="mb-2">
-          <Link href="/back-office/affiliates" className="text-sm text-gray-500 hover:text-gray-700">
+          <Link href="/back-office/affiliates" className="text-sm text-glass-500 hover:text-glass-700">
             ← Retour aux affiliés
           </Link>
         </div>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
+            <h1 className="text-2xl font-semibold text-glass-900 flex items-center gap-3">
               {affiliate.name}
               <span
                 className={`text-xs px-2 py-1 rounded ${STATUS_CLASS[affiliate.status]}`}
@@ -99,7 +99,7 @@ export default async function AffiliateDetailPage({
                 {STATUS_LABEL[affiliate.status]}
               </span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1 font-mono">{affiliate.code}</p>
+            <p className="text-sm text-glass-500 mt-1 font-mono">{affiliate.code}</p>
           </div>
         </div>
       </div>
@@ -165,8 +165,8 @@ export default async function AffiliateDetailPage({
 
       {/* Settings + actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
-          <h2 className="text-lg font-medium text-gray-900">Paramètres</h2>
+        <div className="bg-white border border-glass-200 rounded-lg p-5 space-y-4">
+          <h2 className="text-lg font-medium text-glass-900">Paramètres</h2>
           <form
             method="POST"
             action={`/api/admin/affiliates/${encodeURIComponent(affiliate.code)}`}
@@ -197,11 +197,11 @@ export default async function AffiliateDetailPage({
               step="0.01"
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block text-sm font-medium text-glass-700 mb-1">Statut</label>
               <select
                 name="status"
                 defaultValue={affiliate.status}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                className="block w-full rounded-md border border-glass-300 px-3 py-2 text-sm"
               >
                 <option value="active">Actif</option>
                 <option value="pending">En attente</option>
@@ -210,29 +210,29 @@ export default async function AffiliateDetailPage({
             </div>
             <button
               type="submit"
-              className="rounded-md bg-blue-600 text-white px-4 py-2 text-sm hover:bg-blue-700"
+              className="rounded-md bg-ocean-700 text-white px-4 py-2 text-sm hover:bg-ocean-800"
             >
               Enregistrer
             </button>
           </form>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
-          <h2 className="text-lg font-medium text-gray-900">Actions</h2>
+        <div className="bg-white border border-glass-200 rounded-lg p-5 space-y-4">
+          <h2 className="text-lg font-medium text-glass-900">Actions</h2>
 
           <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+            <p className="text-xs uppercase tracking-wide text-glass-500 mb-1">
               Lien de partage affilié
             </p>
-            <div className="flex items-center gap-2 font-mono text-xs bg-gray-50 rounded p-2 border border-gray-200">
+            <div className="flex items-center gap-2 font-mono text-xs bg-glass-50 rounded p-2 border border-glass-200">
               <span className="truncate">{refLink}</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-glass-500 mt-1">
               Exemple deep link : <code>/r/{affiliate.code}?to=/fr/activite/&lt;code&gt;</code>
             </p>
           </div>
 
-          <div className="border-t border-gray-100 pt-4 space-y-2">
+          <div className="border-t border-glass-100 pt-4 space-y-2">
             <form
               method="POST"
               action={`/api/admin/affiliates/${encodeURIComponent(affiliate.code)}/reset-password`}
@@ -243,7 +243,7 @@ export default async function AffiliateDetailPage({
               >
                 🔑 Réinitialiser le mot de passe
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-glass-500 mt-1">
                 Génère un nouveau mot de passe. Le précédent cesse de fonctionner
                 immédiatement et toutes les sessions actives de l'affilié sont
                 déconnectées.
@@ -256,11 +256,11 @@ export default async function AffiliateDetailPage({
             >
               <button
                 type="submit"
-                className="w-full rounded-md bg-gray-100 text-gray-800 px-4 py-2 text-sm hover:bg-gray-200 text-left"
+                className="w-full rounded-md bg-glass-100 text-gray-800 px-4 py-2 text-sm hover:bg-glass-200 text-left"
               >
                 ✓ Marquer toutes les ventes « en attente » comme confirmées
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-glass-500 mt-1">
                 Reconciliation manuelle tant qu'il n'y a pas de webhook Atlantico.
               </p>
             </form>
@@ -271,11 +271,11 @@ export default async function AffiliateDetailPage({
             >
               <button
                 type="submit"
-                className="w-full rounded-md bg-blue-50 text-blue-800 px-4 py-2 text-sm hover:bg-blue-100 text-left"
+                className="w-full rounded-md bg-ocean-50 text-ocean-900 px-4 py-2 text-sm hover:bg-ocean-100 text-left"
               >
                 € Payout : marquer les ventes confirmées comme payées
               </button>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-glass-500 mt-1">
                 Action à faire après virement / paiement effectif.
               </p>
             </form>
@@ -284,18 +284,18 @@ export default async function AffiliateDetailPage({
       </div>
 
       {/* Sales history */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900">Historique des ventes</h2>
-          <p className="text-xs text-gray-500">{sales.length} ventes total</p>
+      <div className="bg-white border border-glass-200 rounded-lg overflow-hidden">
+        <div className="px-5 py-3 border-b border-glass-100">
+          <h2 className="text-lg font-medium text-glass-900">Historique des ventes</h2>
+          <p className="text-xs text-glass-500">{sales.length} ventes total</p>
         </div>
         {sales.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
+          <div className="p-8 text-center text-glass-500 text-sm">
             Aucune vente attribuée à ce code pour le moment.
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+            <thead className="bg-glass-50 text-glass-500 text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Date</th>
                 <th className="text-left px-4 py-3 font-medium">Ref</th>
@@ -305,22 +305,22 @@ export default async function AffiliateDetailPage({
                 <th className="text-center px-4 py-3 font-medium">Statut</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-glass-100">
               {sales.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-500 text-xs">
+                <tr key={s.id} className="hover:bg-glass-50">
+                  <td className="px-4 py-3 text-glass-500 text-xs">
                     {new Date(s.created_at).toLocaleString('fr-FR')}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-gray-700">
+                  <td className="px-4 py-3 font-mono text-xs text-glass-700">
                     {s.booking_reference ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-900 truncate max-w-xs">
+                  <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
                     {s.activity_name ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
+                  <td className="px-4 py-3 text-right text-glass-700">
                     {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
+                  <td className="px-4 py-3 text-right text-glass-700">
                     {s.commission_amount != null
                       ? `${s.commission_amount.toFixed(2)} €`
                       : '—'}
@@ -344,9 +344,9 @@ export default async function AffiliateDetailPage({
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
-      <div className="mt-2 text-xl font-semibold text-gray-900">{value}</div>
+    <div className="bg-white border border-glass-200 rounded-lg p-4">
+      <div className="text-xs uppercase tracking-wide text-glass-500">{label}</div>
+      <div className="mt-2 text-xl font-semibold text-glass-900">{value}</div>
     </div>
   )
 }
@@ -358,14 +358,14 @@ function SettingField({
 }: React.InputHTMLAttributes<HTMLInputElement> & { label: string; name: string }) {
   return (
     <div>
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={name} className="block text-sm font-medium text-glass-700 mb-1">
         {label}
       </label>
       <input
         id={name}
         name={name}
         {...props}
-        className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="block w-full rounded-md border border-glass-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ocean-500"
       />
     </div>
   )

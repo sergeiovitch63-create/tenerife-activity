@@ -53,12 +53,12 @@ export default async function PayoutsPage() {
     <div className="space-y-6">
       <div>
         <div className="mb-2">
-          <Link href="/back-office/affiliates" className="text-sm text-gray-500 hover:text-gray-700">
+          <Link href="/back-office/affiliates" className="text-sm text-glass-500 hover:text-glass-700">
             ← Retour aux affiliés
           </Link>
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900">Payouts</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-semibold text-glass-900">Payouts</h1>
+        <p className="text-sm text-glass-500 mt-1">
           Commissions confirmées à verser aux affiliés. Clique « Payer » après avoir
           fait le virement réel — ça marque les ventes correspondantes comme payées.
         </p>
@@ -70,18 +70,18 @@ export default async function PayoutsPage() {
         <StatCard label="Déjà payé (total)" value={`${totalPaid.toFixed(2)} €`} />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-glass-200 rounded-lg overflow-hidden">
         {rows.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
+          <div className="p-8 text-center text-glass-500 text-sm">
             Aucun affilié. Crée-en un{' '}
-            <Link href="/back-office/affiliates/new" className="text-blue-600 hover:underline">
+            <Link href="/back-office/affiliates/new" className="text-ocean-700 hover:underline">
               ici
             </Link>
             .
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+            <thead className="bg-glass-50 text-glass-500 text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Affilié</th>
                 <th className="text-right px-4 py-3 font-medium">Ventes confirmées</th>
@@ -90,26 +90,26 @@ export default async function PayoutsPage() {
                 <th className="text-right px-4 py-3 font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-glass-100">
               {rows.map((r) => (
-                <tr key={r.code} className="hover:bg-gray-50">
+                <tr key={r.code} className="hover:bg-glass-50">
                   <td className="px-4 py-3">
                     <Link
                       href={`/back-office/affiliates/${encodeURIComponent(r.code)}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-ocean-700 hover:underline"
                     >
                       {r.name}
                     </Link>
-                    <div className="text-xs text-gray-500 font-mono">{r.code}</div>
+                    <div className="text-xs text-glass-500 font-mono">{r.code}</div>
                     {r.email ? (
-                      <div className="text-xs text-gray-500">{r.email}</div>
+                      <div className="text-xs text-glass-500">{r.email}</div>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">{r.confirmedCount}</td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-900">
+                  <td className="px-4 py-3 text-right text-glass-700">{r.confirmedCount}</td>
+                  <td className="px-4 py-3 text-right font-medium text-glass-900">
                     {r.confirmedTotal > 0 ? `${r.confirmedTotal.toFixed(2)} €` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-500">
+                  <td className="px-4 py-3 text-right text-glass-500">
                     {r.paidTotal > 0 ? `${r.paidTotal.toFixed(2)} €` : '—'}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -120,13 +120,13 @@ export default async function PayoutsPage() {
                       >
                         <button
                           type="submit"
-                          className="rounded-md bg-blue-600 text-white px-3 py-1 text-xs hover:bg-blue-700"
+                          className="rounded-md bg-ocean-700 text-white px-3 py-1 text-xs hover:bg-ocean-800"
                         >
                           Payer {r.confirmedTotal.toFixed(2)} €
                         </button>
                       </form>
                     ) : (
-                      <span className="text-xs text-gray-400">Rien à payer</span>
+                      <span className="text-xs text-glass-400">Rien à payer</span>
                     )}
                   </td>
                 </tr>
@@ -152,14 +152,14 @@ function StatCard({
     <div
       className={`border rounded-lg p-4 ${
         highlight
-          ? 'bg-blue-50 border-blue-200'
-          : 'bg-white border-gray-200'
+          ? 'bg-ocean-50 border-ocean-200'
+          : 'bg-white border-glass-200'
       }`}
     >
-      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-glass-500">{label}</div>
       <div
         className={`mt-2 text-2xl font-semibold ${
-          highlight ? 'text-blue-900' : 'text-gray-900'
+          highlight ? 'text-ocean-900' : 'text-glass-900'
         }`}
       >
         {value}

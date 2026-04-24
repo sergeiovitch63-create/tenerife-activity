@@ -17,10 +17,10 @@ const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
   paid: 'Payée',
 }
 const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-amber-100 text-amber-800',
   confirmed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-blue-100 text-blue-800',
+  paid: 'bg-ocean-100 text-ocean-900',
 }
 
 interface DashboardStats {
@@ -110,10 +110,10 @@ export default async function AffiliateDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900">Bonjour {session.name}</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-semibold text-glass-900">Bonjour {session.name}</h1>
+        <p className="text-sm text-glass-500 mt-1">
           Ton code :{' '}
-          <span className="font-mono text-gray-700">{session.affiliateCode}</span>{' '}
+          <span className="font-mono text-glass-700">{session.affiliateCode}</span>{' '}
           · Commission : <span className="font-medium">{session.commissionPercent}%</span> du
           montant brut
         </p>
@@ -139,56 +139,56 @@ export default async function AffiliateDashboardPage() {
         />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Actions rapides</h2>
+      <div className="bg-white border border-glass-200 rounded-lg p-6">
+        <h2 className="text-lg font-medium text-glass-900 mb-4">Actions rapides</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Link
             href="/affiliate/links"
-            className="block rounded-md border border-gray-200 p-4 hover:bg-gray-50"
+            className="block rounded-md border border-glass-200 p-4 hover:bg-glass-50"
           >
-            <div className="font-medium text-gray-900">Générer un lien</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="font-medium text-glass-900">Générer un lien</div>
+            <div className="text-xs text-glass-500 mt-1">
               Partager vers une activité ou ta page d'accueil affilié
             </div>
           </Link>
           <Link
             href="/affiliate/payouts"
-            className="block rounded-md border border-gray-200 p-4 hover:bg-gray-50"
+            className="block rounded-md border border-glass-200 p-4 hover:bg-glass-50"
           >
-            <div className="font-medium text-gray-900">Mes commissions</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="font-medium text-glass-900">Mes commissions</div>
+            <div className="text-xs text-glass-500 mt-1">
               Historique des ventes et versements
             </div>
           </Link>
           <Link
             href="/affiliate/settings"
-            className="block rounded-md border border-gray-200 p-4 hover:bg-gray-50"
+            className="block rounded-md border border-glass-200 p-4 hover:bg-glass-50"
           >
-            <div className="font-medium text-gray-900">Mes infos</div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="font-medium text-glass-900">Mes infos</div>
+            <div className="text-xs text-glass-500 mt-1">
               Email de contact pour les versements
             </div>
           </Link>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-900">Ventes récentes</h2>
+      <div className="bg-white border border-glass-200 rounded-lg overflow-hidden">
+        <div className="px-5 py-3 border-b border-glass-100 flex items-center justify-between">
+          <h2 className="text-lg font-medium text-glass-900">Ventes récentes</h2>
           <Link
             href="/affiliate/payouts"
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-ocean-700 hover:underline"
           >
             Tout voir →
           </Link>
         </div>
         {recentSales.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 text-sm">
+          <div className="p-8 text-center text-glass-500 text-sm">
             Aucune vente pour le moment. Partage tes liens pour commencer ! 🚀
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+            <thead className="bg-glass-50 text-glass-500 text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Date</th>
                 <th className="text-left px-4 py-3 font-medium">Activité</th>
@@ -196,16 +196,16 @@ export default async function AffiliateDashboardPage() {
                 <th className="text-center px-4 py-3 font-medium">Statut</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-glass-100">
               {recentSales.map((s) => (
                 <tr key={s.id}>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
+                  <td className="px-4 py-3 text-glass-500 text-xs">
                     {new Date(s.created_at).toLocaleString('fr-FR')}
                   </td>
-                  <td className="px-4 py-3 text-gray-900 truncate max-w-xs">
+                  <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
                     {s.activity_name ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
+                  <td className="px-4 py-3 text-right text-glass-700">
                     {s.commission_amount != null
                       ? `${s.commission_amount.toFixed(2)} €`
                       : '—'}
@@ -241,18 +241,18 @@ function StatCard({
   return (
     <div
       className={`border rounded-lg p-4 ${
-        highlight ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'
+        highlight ? 'bg-ocean-50 border-ocean-200' : 'bg-white border-glass-200'
       }`}
     >
-      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-glass-500">{label}</div>
       <div
         className={`mt-2 text-2xl font-semibold ${
-          highlight ? 'text-blue-900' : 'text-gray-900'
+          highlight ? 'text-ocean-900' : 'text-glass-900'
         }`}
       >
         {value}
       </div>
-      {sub ? <div className="text-xs text-gray-500 mt-1">{sub}</div> : null}
+      {sub ? <div className="text-xs text-glass-500 mt-1">{sub}</div> : null}
     </div>
   )
 }
