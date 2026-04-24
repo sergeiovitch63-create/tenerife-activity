@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import LocaleLink from './LocaleLink'
@@ -54,11 +54,11 @@ export default function ActivityCard({
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-ocean-100 to-ember-100" />
+          <div className="h-full w-full bg-gradient-to-br from-brand-turquoise-100 to-brand-gold-100" />
         )}
         <div className="absolute inset-x-3 bottom-3 flex gap-1.5 flex-wrap">
           <span className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur px-2 py-0.5 text-[11px] font-medium text-ink-800">
-            <Zap className="w-3 h-3 text-ember-500" /> {t.activity.instantConfirm}
+            <Zap className="w-3 h-3 text-brand-gold-500" /> {t.activity.instantConfirm}
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-white/90 backdrop-blur px-2 py-0.5 text-[11px] font-medium text-ink-800">
             <ShieldCheck className="w-3 h-3 text-emerald-500" /> {t.activity.freeCancellation}
@@ -67,7 +67,7 @@ export default function ActivityCard({
       </div>
       <div className={`p-4 flex-1 flex flex-col ${compact ? 'gap-1' : 'gap-2'}`}>
         {contextLabel && (
-          <div className="inline-flex self-start items-center gap-1.5 rounded-full bg-ember-50 text-ember-700 border border-ember-200 px-2 py-0.5 text-[11px] font-semibold mb-1">
+          <div className="inline-flex self-start items-center gap-1.5 rounded-full bg-brand-gold-50 text-brand-gold-700 border border-brand-gold-200 px-2 py-0.5 text-[11px] font-semibold mb-1">
             {contextIcon}
             <span>{contextLabel}</span>
           </div>
@@ -77,20 +77,20 @@ export default function ActivityCard({
           <span>Tenerife</span>
           {duration && (
             <>
-              <span className="text-ink-300">·</span>
+              <span className="text-ink-300">В·</span>
               <Clock className="w-3 h-3" />
               <span>{duration}</span>
             </>
           )}
         </div>
-        <h3 className="text-[15px] font-semibold leading-snug line-clamp-2 text-ink-900 group-hover:text-ocean-700 transition-colors">
+        <h3 className="text-[15px] font-semibold leading-snug line-clamp-2 text-ink-900 group-hover:text-brand-turquoise-700 transition-colors">
           {group.name}
         </h3>
         {!compact && group.desc && (
           <p className="text-sm text-ink-500 line-clamp-2">{cleanText(group.desc)}</p>
         )}
         {nextLabel && (
-          <div className="inline-flex items-center gap-1.5 text-xs text-ocean-700 font-medium mt-2 capitalize">
+          <div className="inline-flex items-center gap-1.5 text-xs text-brand-turquoise-700 font-medium mt-2 capitalize">
             <Calendar className="w-3 h-3" />
             <span className="text-ink-500 normal-case">{t.activity.nextAvailable}:</span>
             <span>{nextLabel}</span>

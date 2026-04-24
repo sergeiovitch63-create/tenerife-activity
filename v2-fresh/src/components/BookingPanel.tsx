@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -78,7 +78,7 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
   const [timeSlot, setTimeSlot] = useState<string>('')
   const [userPickedDate, setUserPickedDate] = useState(false)
 
-  // Narrow to just the event code — the other fields don't change the
+  // Narrow to just the event code вЂ” the other fields don't change the
   // lookup, and depending on the whole object would re-run this memo
   // every time the parent recomputed the events array.
   const currentEventCode = currentEvent?.code
@@ -87,8 +87,8 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
     return limitsCache[`${currentEventCode}:${viewedMonth}`] ?? null
   }, [limitsCache, currentEventCode, viewedMonth])
 
-  /** True when the option operates every day of the week — use full calendar.
-   *  False when some weekdays are closed — use compact date squares. */
+  /** True when the option operates every day of the week вЂ” use full calendar.
+   *  False when some weekdays are closed вЂ” use compact date squares. */
   const isFullWeek = useMemo(() => {
     const wdays = currentLimits?.dates?.wdays ?? []
     if (wdays.length !== 7) return true // default to calendar when data missing
@@ -131,7 +131,7 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
     return () => { cancelled = true }
   }, [currentEventCode, viewedMonth, locale, limitsCache])
 
-  // Snap to first available date when option changes — clear user-pick flag too
+  // Snap to first available date when option changes вЂ” clear user-pick flag too
   useEffect(() => {
     if (!currentEvent || !currentLimits) return
     setUserPickedDate(false)
@@ -223,12 +223,12 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
       {/* Duration + Cancellation info */}
       <div className="space-y-3 mb-5 pb-5 border-b border-ink-100">
         {group.duration && (
-          <div className="rounded-xl bg-ocean-50/60 border border-ocean-100 p-3 flex items-center gap-3">
+          <div className="rounded-xl bg-brand-turquoise-50/60 border border-brand-turquoise-100 p-3 flex items-center gap-3">
             <span className="w-9 h-9 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-              <Clock className="w-4 h-4 text-ocean-700" />
+              <Clock className="w-4 h-4 text-brand-turquoise-700" />
             </span>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-ocean-800">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-turquoise-800">
                 {t.activity.duration}
               </p>
               <p className="text-base font-display font-bold text-ink-900">{group.duration} h</p>
@@ -254,10 +254,10 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
         </div>
       </div>
 
-      {/* Date picker — calendar if 7/7, squares if limited */}
+      {/* Date picker вЂ” calendar if 7/7, squares if limited */}
       <div className="mb-4">
         <label className="block text-xs font-semibold text-ink-700 uppercase tracking-wide mb-2">
-          {t.activity.selectDate} <span className="text-ember-600">*</span>
+          {t.activity.selectDate} <span className="text-brand-gold-600">*</span>
         </label>
         {isFullWeek ? (
           <DateCalendar
@@ -275,13 +275,13 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
           />
         )}
         {placesLeft !== null && (
-          <p className={`mt-1.5 text-[11px] ${placesLeft > 0 ? 'text-ink-500' : 'text-ember-600 font-semibold'}`}>
+          <p className={`mt-1.5 text-[11px] ${placesLeft > 0 ? 'text-ink-500' : 'text-brand-gold-600 font-semibold'}`}>
             {placesLeft > 0 ? `${placesLeft} ${t.activity.placesAvailable}` : t.activity.soldOutHint}
           </p>
         )}
       </div>
 
-      {/* Weekly schedule reference — only when calendar mode (helpful context) */}
+      {/* Weekly schedule reference вЂ” only when calendar mode (helpful context) */}
       {isFullWeek && Array.isArray(currentEvent.days) && currentEvent.days.length === 7 && (
         <div className="mb-4">
           <label className="block text-xs font-semibold text-ink-700 uppercase tracking-wide mb-2">
@@ -291,14 +291,14 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
         </div>
       )}
 
-      {/* Time — only after user actively picked a date */}
+      {/* Time вЂ” only after user actively picked a date */}
       {userPickedDate && availableTimes.length > 0 && (
         <div className="mb-4">
           <label className="block text-xs font-semibold text-ink-700 uppercase tracking-wide mb-2">
-            {t.activity.selectTime} <span className="text-ember-600">*</span>
+            {t.activity.selectTime} <span className="text-brand-gold-600">*</span>
           </label>
           {availableTimes.length === 1 ? (
-            <div className="inline-flex items-center gap-2 rounded-full bg-ocean-50 border border-ocean-100 px-3 py-1.5 text-sm text-ocean-800 font-semibold">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand-turquoise-50 border border-brand-turquoise-100 px-3 py-1.5 text-sm text-brand-turquoise-800 font-semibold">
               <Clock className="w-4 h-4" />
               {availableTimes[0]}
             </div>
@@ -313,8 +313,8 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
                     onClick={() => setTimeSlot(tt)}
                     className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                       active
-                        ? 'bg-ocean-600 text-white shadow-soft'
-                        : 'bg-white border border-ink-200 text-ink-800 hover:border-ocean-400'
+                        ? 'bg-brand-turquoise-600 text-white shadow-soft'
+                        : 'bg-white border border-ink-200 text-ink-800 hover:border-brand-turquoise-400'
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" />
@@ -372,7 +372,7 @@ const BookingPanel = forwardRef<HTMLDivElement, Props>(function BookingPanel(
         <button
           onClick={() => addToCart('checkout')}
           disabled={!canBook}
-          className="btn-ember w-full justify-center text-base py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-gold w-full justify-center text-base py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t.activity.book} <ArrowRight className="w-4 h-4" />
         </button>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -33,15 +33,15 @@ export default function AIGuide() {
       role: 'teo',
       text: t.teo.replies[key],
     })
-    if (/famil|kid|child|bamb|niñ|ребён|kind|ragaz/.test(s)) return pick('family')
-    if (/sensation|adrenalin|thrill|эмоц|nervenkitzel|emozioni|emocion/.test(s)) return pick('thrill')
-    if (/romant|couple|amor|amour|love|роман/.test(s)) return pick('romantic')
-    if (/budget|cheap|éco|eco|дешёв|billig|barato|budget/.test(s)) return pick('budget')
-    if (/pluie|rain|lluvia|regen|дожд|piog/.test(s)) return pick('rain')
-    if (/first|premier|primer|prim|эрст|erste/.test(s)) return pick('first')
-    if (/dive|plong|subma|tauch|буце|immers/.test(s)) return pick('diving')
+    if (/famil|kid|child|bamb|niГ±|СЂРµР±С‘РЅ|kind|ragaz/.test(s)) return pick('family')
+    if (/sensation|adrenalin|thrill|СЌРјРѕС†|nervenkitzel|emozioni|emocion/.test(s)) return pick('thrill')
+    if (/romant|couple|amor|amour|love|СЂРѕРјР°РЅ/.test(s)) return pick('romantic')
+    if (/budget|cheap|Г©co|eco|РґРµС€С‘РІ|billig|barato|budget/.test(s)) return pick('budget')
+    if (/pluie|rain|lluvia|regen|РґРѕР¶Рґ|piog/.test(s)) return pick('rain')
+    if (/first|premier|primer|prim|СЌСЂСЃС‚|erste/.test(s)) return pick('first')
+    if (/dive|plong|subma|tauch|Р±СѓС†Рµ|immers/.test(s)) return pick('diving')
     if (/teide|volcan|volcano/.test(s)) return pick('teide')
-    if (/hola|hi|hey|bonjour|salut|hallo|ciao|привет|guten/.test(s)) return pick('greet')
+    if (/hola|hi|hey|bonjour|salut|hallo|ciao|РїСЂРёРІРµС‚|guten/.test(s)) return pick('greet')
     return pick('fallback')
   }
 
@@ -76,8 +76,8 @@ export default function AIGuide() {
           >
             <TeoAvatar size={64} />
             <span className="absolute -top-1 -right-1 inline-flex">
-              <span className="absolute inset-0 rounded-full bg-ember-400/60 animate-pulse-ring" />
-              <span className="relative w-3 h-3 rounded-full bg-ember-500 border-2 border-white" />
+              <span className="absolute inset-0 rounded-full bg-brand-gold-400/60 animate-pulse-ring" />
+              <span className="relative w-3 h-3 rounded-full bg-brand-gold-500 border-2 border-white" />
             </span>
             {hasBubble && (
               <motion.span
@@ -103,12 +103,12 @@ export default function AIGuide() {
             transition={{ type: 'spring', damping: 24, stiffness: 300 }}
             className="fixed bottom-6 right-6 z-50 w-[94vw] sm:w-[400px] h-[600px] max-h-[80vh] rounded-3xl bg-white shadow-card border border-ink-100 flex flex-col overflow-hidden"
           >
-            <div className="relative px-5 py-4 bg-gradient-to-br from-ink-900 via-ink-800 to-ocean-900 text-white">
+            <div className="relative px-5 py-4 bg-gradient-to-br from-ink-900 via-ink-800 to-brand-turquoise-900 text-white">
               <div className="flex items-center gap-3">
                 <TeoAvatar size={44} />
                 <div>
                   <div className="font-display font-bold text-sm flex items-center gap-1.5">
-                    {t.teo.name} <Sparkles className="w-3.5 h-3.5 text-ember-300" />
+                    {t.teo.name} <Sparkles className="w-3.5 h-3.5 text-brand-gold-300" />
                   </div>
                   <div className="text-xs text-ink-300 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> {t.teo.subtitle}
@@ -158,7 +158,7 @@ export default function AIGuide() {
                 <button
                   key={k}
                   onClick={() => send(t.teo.quickPrompts[k])}
-                  className="text-xs px-2.5 py-1 rounded-full bg-ink-100 text-ink-700 hover:bg-ocean-100 hover:text-ocean-800"
+                  className="text-xs px-2.5 py-1 rounded-full bg-ink-100 text-ink-700 hover:bg-brand-turquoise-100 hover:text-brand-turquoise-800"
                 >
                   {t.teo.quickPrompts[k]}
                 </button>
@@ -203,7 +203,7 @@ function TeoAvatar({ size = 56 }: { size?: number }) {
         width: size,
         height: size,
         background:
-          'radial-gradient(circle at 30% 25%, #CFFAFE 0%, #06B6D4 35%, #0E7490 75%, #0F172A 100%)',
+          'radial-gradient(circle at 30% 25%, #D1F1F3 0%, #3DB8BE 35%, #1B5A66 75%, #0F172A 100%)',
       }}
     >
       <div

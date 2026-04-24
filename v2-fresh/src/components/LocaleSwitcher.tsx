@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
@@ -56,7 +56,7 @@ export default function LocaleSwitcher() {
             >
               <span>{localeLabels[loc].flag}</span>
               <span className="flex-1 text-left">{localeLabels[loc].native}</span>
-              {loc === locale && <Check className="w-4 h-4 text-ocean-600" />}
+              {loc === locale && <Check className="w-4 h-4 text-brand-turquoise-600" />}
             </button>
           ))}
         </div>

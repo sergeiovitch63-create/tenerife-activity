@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { ArrowRight, ShoppingBag, Trash2, Minus, Plus, Calendar, Sparkles } from 'lucide-react'
@@ -53,7 +53,7 @@ export default function CartPage() {
                         </LocaleLink>
                         <p className="text-xs text-ink-500 mt-0.5">{it.optionTitle}</p>
                       </div>
-                      <button onClick={() => remove(it.itemId)} className="text-ink-500 hover:text-ember-600 p-1" aria-label={t.cart.remove}>
+                      <button onClick={() => remove(it.itemId)} className="text-ink-500 hover:text-brand-gold-600 p-1" aria-label={t.cart.remove}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -95,8 +95,8 @@ export default function CartPage() {
 
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-xs text-ink-500">
-                        {it.adults} × {formatPrice(it.unitAdult, locale)}
-                        {it.children > 0 && ` + ${it.children} × ${formatPrice(it.unitChild, locale)}`}
+                        {it.adults} Г— {formatPrice(it.unitAdult, locale)}
+                        {it.children > 0 && ` + ${it.children} Г— ${formatPrice(it.unitChild, locale)}`}
                       </span>
                       <span className="text-lg font-display font-bold">{formatPrice(lineTotal, locale)}</span>
                     </div>
@@ -113,11 +113,11 @@ export default function CartPage() {
                 <span>{t.cart.total}</span><span>{formatPrice(total, locale)}</span>
               </div>
             </div>
-            <LocaleLink href="/checkout" className="btn-ember w-full justify-center text-base py-3.5 mt-5">
+            <LocaleLink href="/checkout" className="btn-gold w-full justify-center text-base py-3.5 mt-5">
               {t.cart.checkout} <ArrowRight className="w-4 h-4" />
             </LocaleLink>
-            <div className="mt-4 rounded-xl border border-ocean-100 bg-ocean-50/60 p-3 text-xs text-ocean-900 flex gap-2">
-              <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-ocean-600" />
+            <div className="mt-4 rounded-xl border border-brand-turquoise-100 bg-brand-turquoise-50/60 p-3 text-xs text-brand-turquoise-900 flex gap-2">
+              <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-brand-turquoise-600" />
               <span>{t.cart.guarantee}</span>
             </div>
           </aside>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Calendar, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
@@ -119,12 +119,12 @@ export default function DateCalendar({ value, onChange, limits, onMonthChange, l
               onClick={() => { onChange(inputDate); if (!inline) setOpen(false) }}
               className={`${cellHeight} rounded-lg text-sm relative transition-colors ${
                 isSelected
-                  ? 'bg-ocean-600 text-white font-semibold'
+                  ? 'bg-brand-turquoise-600 text-white font-semibold'
                   : !clickable
                     ? 'text-ink-300 cursor-not-allowed line-through decoration-ink-200'
                     : isFull
                       ? 'text-ink-300 cursor-not-allowed'
-                      : 'hover:bg-ocean-50 text-ink-900'
+                      : 'hover:bg-brand-turquoise-50 text-ink-900'
               }`}
               title={
                 past ? '' :
@@ -135,7 +135,7 @@ export default function DateCalendar({ value, onChange, limits, onMonthChange, l
             >
               {day}
               {remaining !== null && remaining > 0 && remaining <= 10 && !isSelected && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-ember-500" />
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-brand-gold-500" />
               )}
             </button>
           )
@@ -232,7 +232,7 @@ export default function DateCalendar({ value, onChange, limits, onMonthChange, l
               </div>
               {renderMonthCells(view.year, view.month, 'h-11')}
             </div>
-            {/* Month 2 — hidden below xl */}
+            {/* Month 2 вЂ” hidden below xl */}
             <div className="hidden xl:block">
               <div className="grid grid-cols-7 gap-1 text-[11px] text-ink-400 mb-2 capitalize">
                 {dayNames.map((d) => (
@@ -253,10 +253,10 @@ export default function DateCalendar({ value, onChange, limits, onMonthChange, l
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full rounded-xl border border-ink-200 bg-white pl-9 pr-3 py-2.5 text-sm outline-none focus:border-ocean-500 relative text-left"
+        className="w-full rounded-xl border border-ink-200 bg-white pl-9 pr-3 py-2.5 text-sm outline-none focus:border-brand-turquoise-500 relative text-left"
       >
         <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
-        <span className="capitalize">{valueLabel || '—'}</span>
+        <span className="capitalize">{valueLabel || 'вЂ”'}</span>
       </button>
 
       {open && (

@@ -6,7 +6,6 @@ import { getClassifications, getGroups, nextDatesForGroups } from '@/lib/atlanti
 import { applyFilters } from '@/lib/filter'
 import { getDictionary } from '@/i18n'
 import { isLocale, type Locale } from '@/lib/locale'
-import { themeFor } from '@/lib/category-theme'
 import { cleanText } from '@/lib/atlantico/normalize'
 import { getLocalCovers } from '@/lib/local-images'
 
@@ -29,7 +28,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const category = allCategories.find((c) => c.code === params.code)
   if (!category) notFound()
 
-  const theme = themeFor(category.id)
   const filtered = applyFilters(groups, searchParams)
   const localCovers = getLocalCovers(filtered.map((g) => g.code))
   const nextDates = await nextDatesForGroups(filtered, locale)
@@ -38,7 +36,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
     <>
       <section
         className="relative overflow-hidden text-white py-16"
-        style={{ background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})` }}
+        style={{
+          background:
+            'linear-gradient(160deg, #2A9BA2 0%, #1F7A83 45%, #14424A 100%)',
+        }}
       >
         <div className="absolute inset-0 bg-grid opacity-20 mix-blend-overlay" />
         <div className="relative container-x">

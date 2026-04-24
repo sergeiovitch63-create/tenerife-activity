@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { ArrowRight, CheckCircle2, XCircle, Calendar, MapPin } from 'lucide-react'
 import type { AtlanticoEvent, ParsedPrice } from '@/lib/atlantico/types'
@@ -46,7 +46,7 @@ export default function OptionCard({
     <div
       className={`relative rounded-2xl border-2 bg-white transition-all overflow-hidden ${
         isSelected
-          ? 'border-ocean-500 shadow-card ring-2 ring-ocean-200'
+          ? 'border-brand-turquoise-500 shadow-card ring-2 ring-brand-turquoise-200'
           : 'border-ink-100 hover:border-ink-200 hover:shadow-soft'
       }`}
     >
@@ -66,7 +66,7 @@ export default function OptionCard({
               return (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 rounded-full bg-ocean-50 border border-ocean-100 px-2 py-0.5 text-[11px] font-medium text-ocean-800"
+                  className="inline-flex items-center gap-1 rounded-full bg-brand-turquoise-50 border border-brand-turquoise-100 px-2 py-0.5 text-[11px] font-medium text-brand-turquoise-800"
                 >
                   <Icon className="w-3 h-3" />
                   {iconLabel(raw, locale)}
@@ -98,7 +98,7 @@ export default function OptionCard({
             <Calendar className="w-3.5 h-3.5" />
             {t.activity.nextAvailable}
           </div>
-          <p className="text-sm font-semibold text-ocean-700 capitalize">
+          <p className="text-sm font-semibold text-brand-turquoise-700 capitalize">
             {nextLabel}
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function OptionCard({
           )}
           {faq.notIncluded.length > 0 && (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-ember-700 mb-1.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold-700 mb-1.5">
                 {t.activity.notIncluded}
               </p>
               <ul className="space-y-1">
@@ -150,14 +150,14 @@ export default function OptionCard({
               <span className="text-xs font-normal text-ink-500 ml-1">{t.activity.perAdult}</span>
             </p>
           ) : (
-            <p className="text-sm text-ink-500">—</p>
+            <p className="text-sm text-ink-500">вЂ”</p>
           )}
         </div>
         <button
           onClick={() => onSelect(event.code)}
           className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all ${
             isSelected
-              ? 'bg-ocean-600 text-white hover:bg-ocean-700'
+              ? 'bg-brand-turquoise-600 text-white hover:bg-brand-turquoise-700'
               : 'bg-ink-900 text-white hover:bg-ink-800'
           }`}
         >
@@ -169,7 +169,7 @@ export default function OptionCard({
   )
 }
 
-/** Weekly schedule — one row per day (long names), with time or "—" */
+/** Weekly schedule вЂ” one row per day (long names), with time or "вЂ”" */
 export function ScheduleGrid({ event, t }: { event: AtlanticoEvent; t: Dict }) {
   return (
     <div className="rounded-xl border border-ink-200 bg-white divide-y divide-ink-100 overflow-hidden">
@@ -186,8 +186,8 @@ export function ScheduleGrid({ event, t }: { event: AtlanticoEvent; t: Dict }) {
             }`}
           >
             <span className="font-medium">{dayName}</span>
-            <span className={`font-semibold ${closed ? '' : 'text-ocean-700'}`}>
-              {closed ? '—' : time}
+            <span className={`font-semibold ${closed ? '' : 'text-brand-turquoise-700'}`}>
+              {closed ? 'вЂ”' : time}
             </span>
           </div>
         )

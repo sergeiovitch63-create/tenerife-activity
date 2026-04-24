@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Logo from './Logo'
 import LocaleLink from './LocaleLink'
@@ -19,16 +19,16 @@ export default function Footer({ categories = [] }: { categories?: AtlanticoClas
             <p className="text-sm text-ink-400 mt-4 max-w-xs">{t.footer.tagline}</p>
             <div className="mt-6 grid grid-cols-2 gap-3 text-xs">
               <span className="flex items-center gap-2 text-ink-300">
-                <ShieldCheck className="w-4 h-4 text-ocean-400" /> {t.footer.security}
+                <ShieldCheck className="w-4 h-4 text-brand-turquoise-400" /> {t.footer.security}
               </span>
               <span className="flex items-center gap-2 text-ink-300">
-                <Headset className="w-4 h-4 text-ocean-400" /> {t.footer.support}
+                <Headset className="w-4 h-4 text-brand-turquoise-400" /> {t.footer.support}
               </span>
               <span className="flex items-center gap-2 text-ink-300">
-                <Globe className="w-4 h-4 text-ocean-400" /> 6 {t.footer.languages}
+                <Globe className="w-4 h-4 text-brand-turquoise-400" /> 6 {t.footer.languages}
               </span>
               <span className="flex items-center gap-2 text-ink-300">
-                <Sparkles className="w-4 h-4 text-ocean-400" /> Teo {t.nav.aiGuide}
+                <Sparkles className="w-4 h-4 text-brand-turquoise-400" /> Teo {t.nav.aiGuide}
               </span>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function Footer({ categories = [] }: { categories?: AtlanticoClas
         </div>
 
         <div className="mt-12 pt-8 border-t border-ink-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-ink-500">
-          <span>© {new Date().getFullYear()} {t.footer.copyright}</span>
+          <span>В© {new Date().getFullYear()} {t.footer.copyright}</span>
           <span className="flex items-center gap-3">
             <span>{t.footer.payments}</span>
             <span className="inline-flex items-center gap-1">

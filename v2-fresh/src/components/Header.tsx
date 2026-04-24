@@ -1,7 +1,12 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
-import { Search, ShoppingBag, Heart, Menu, X, ChevronDown } from 'lucide-react'
+import {
+  Search, ShoppingBag, Heart, Menu, X, ChevronDown,
+  Ship, Mountain, Waves, FerrisWheel, MountainSnow, Fish, Theater, Crown,
+  CarFront, Bike, UtensilsCrossed, Bus, Ticket, Plane, Accessibility, Sparkles,
+  type LucideIcon,
+} from 'lucide-react'
 import Logo from './Logo'
 import LocaleLink from './LocaleLink'
 import LocaleSwitcher from './LocaleSwitcher'
@@ -11,6 +16,11 @@ import { cn } from '@/lib/utils'
 import type { AtlanticoClassification } from '@/lib/atlantico/types'
 import { themeFor } from '@/lib/category-theme'
 import { cleanText } from '@/lib/atlantico/normalize'
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Ship, Mountain, Waves, FerrisWheel, MountainSnow, Fish, Theater, Crown,
+  CarFront, Bike, UtensilsCrossed, Bus, Ticket, Plane, Accessibility, Sparkles,
+}
 
 export default function Header({ categories = [] }: { categories?: AtlanticoClassification[] }) {
   const { count, setOpenDrawer } = useCart()
@@ -51,18 +61,16 @@ export default function Header({ categories = [] }: { categories?: AtlanticoClas
                   <div className="card p-4 grid grid-cols-2 gap-1">
                     {categories.map((c) => {
                       const theme = themeFor(c.id)
+                      const Icon = ICON_MAP[theme.icon] ?? Sparkles
                       return (
                         <LocaleLink
                           key={c.id}
                           href={`/categorie/${c.code}`}
                           className="flex items-center gap-3 rounded-xl p-2 hover:bg-ink-50"
                         >
-                          <span
-                            className="flex-shrink-0 w-8 h-8 rounded-lg"
-                            style={{
-                              background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})`,
-                            }}
-                          />
+                          <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-brand-turquoise-600 to-brand-turquoise-800 flex items-center justify-center">
+                            <Icon className="w-4 h-4 text-brand-gold-400" strokeWidth={2} />
+                          </span>
                           <span className="min-w-0">
                             <span className="block text-sm font-semibold text-ink-900 truncate">
                               {c.name}
@@ -105,7 +113,7 @@ export default function Header({ categories = [] }: { categories?: AtlanticoClas
           >
             <ShoppingBag className="w-5 h-5" />
             {count > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-ember-500 text-white text-[10px] font-bold inline-flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brand-gold-500 text-white text-[10px] font-bold inline-flex items-center justify-center">
                 {count}
               </span>
             )}

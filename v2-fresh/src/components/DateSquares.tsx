@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
@@ -31,9 +31,9 @@ export default function DateSquares({ value, onChange, limits, initialShow = 12 
    * Build the list of available dates for this option.
    *
    * Atlantico loadLimits can return either:
-   *   a) `dates.date[]` empty + `wdays[]` only → operator hasn't touched specific
+   *   a) `dates.date[]` empty + `wdays[]` only в†’ operator hasn't touched specific
    *      dates; availability comes purely from the weekly template
-   *   b) `dates.date[]` populated → contains specific dates with either extra
+   *   b) `dates.date[]` populated в†’ contains specific dates with either extra
    *      capacity info or blocked flags (limit=0 means blocked)
    *
    * We iterate future days and:
@@ -111,19 +111,19 @@ export default function DateSquares({ value, onChange, limits, initialShow = 12 
               onClick={() => onChange(input)}
               className={`rounded-xl border-2 p-3 text-center transition-all ${
                 isSelected
-                  ? 'border-ocean-500 bg-ocean-50 ring-2 ring-ocean-200'
-                  : 'border-ink-200 bg-white hover:border-ocean-300'
+                  ? 'border-brand-turquoise-500 bg-brand-turquoise-50 ring-2 ring-brand-turquoise-200'
+                  : 'border-ink-200 bg-white hover:border-brand-turquoise-300'
               }`}
             >
               <div className="text-[10px] uppercase font-semibold tracking-wide text-ink-500">
                 {weekday}
               </div>
-              <div className={`text-2xl font-display font-bold mt-0.5 ${isSelected ? 'text-ocean-700' : 'text-ink-900'}`}>
+              <div className={`text-2xl font-display font-bold mt-0.5 ${isSelected ? 'text-brand-turquoise-700' : 'text-ink-900'}`}>
                 {day}
               </div>
               <div className="text-[10px] uppercase text-ink-500">{month}</div>
               {lowStock && (
-                <div className="mt-1 text-[9px] font-semibold text-ember-600">
+                <div className="mt-1 text-[9px] font-semibold text-brand-gold-600">
                   {places} {t.activity.placesAvailable.split(' ')[0]}
                 </div>
               )}
@@ -136,7 +136,7 @@ export default function DateSquares({ value, onChange, limits, initialShow = 12 
         <button
           type="button"
           onClick={() => setShow((s) => s + 12)}
-          className="mt-3 w-full text-sm text-ocean-700 hover:text-ocean-800 font-medium flex items-center justify-center gap-1 py-2 rounded-xl hover:bg-ocean-50 transition-colors"
+          className="mt-3 w-full text-sm text-brand-turquoise-700 hover:text-brand-turquoise-800 font-medium flex items-center justify-center gap-1 py-2 rounded-xl hover:bg-brand-turquoise-50 transition-colors"
         >
           <Plus className="w-4 h-4" />
           {t.activity.moreDates}

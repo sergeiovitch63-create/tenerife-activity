@@ -1,4 +1,4 @@
-import { Check, Mail, Calendar, ArrowRight, Sparkles } from 'lucide-react'
+﻿import { Check, Mail, Calendar, ArrowRight, Sparkles } from 'lucide-react'
 import LocaleLink from '@/components/LocaleLink'
 import { getDictionary } from '@/i18n'
 import { isLocale, type Locale } from '@/lib/locale'
@@ -28,15 +28,15 @@ export default function ConfirmationPage({
         <div className="card p-6 mt-8 text-left">
           <ul className="space-y-3 text-sm">
             <li className="flex items-start gap-3">
-              <Mail className="w-5 h-5 text-ocean-600 mt-0.5 flex-shrink-0" />
+              <Mail className="w-5 h-5 text-brand-turquoise-600 mt-0.5 flex-shrink-0" />
               <span>{t.checkout.confirmText1}</span>
             </li>
             <li className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-ocean-600 mt-0.5 flex-shrink-0" />
+              <Calendar className="w-5 h-5 text-brand-turquoise-600 mt-0.5 flex-shrink-0" />
               <span>{t.checkout.confirmText2}</span>
             </li>
             <li className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-ocean-600 mt-0.5 flex-shrink-0" />
+              <Sparkles className="w-5 h-5 text-brand-turquoise-600 mt-0.5 flex-shrink-0" />
               <span>{t.checkout.confirmText3}</span>
             </li>
           </ul>

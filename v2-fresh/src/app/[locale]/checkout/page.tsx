@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
@@ -116,7 +116,7 @@ export default function CheckoutPage() {
                     value={info.notes}
                     onChange={(e) => setInfo({ ...info, notes: e.target.value })}
                     placeholder={t.checkout.notesHint}
-                    className="w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-ocean-500 min-h-[96px]"
+                    className="w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-turquoise-500 min-h-[96px]"
                   />
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
               <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900 flex gap-2 mb-6">
                 <ShieldCheck className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <div>
-                  <strong>Atlantico Excursiones · Redsys</strong>
+                  <strong>Atlantico Excursiones В· Redsys</strong>
                   <p className="text-xs mt-1 text-emerald-800">{t.checkout.paymentHint}</p>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
                 <button
                   onClick={submitPayment}
                   disabled={processing}
-                  className="btn-ember text-base py-3.5 px-6"
+                  className="btn-gold text-base py-3.5 px-6"
                 >
                   {processing ? t.checkout.processing : `${t.checkout.payNow} ${formatPrice(total, locale)}`}
                   {!processing && <ArrowRight className="w-4 h-4" />}
@@ -196,7 +196,7 @@ export default function CheckoutPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold line-clamp-2">{it.activityTitle}</p>
                   <p className="text-[11px] text-ink-500 truncate">
-                    {it.optionTitle} · {it.date} · {it.adults}A{it.children > 0 ? ` ${it.children}E` : ''}
+                    {it.optionTitle} В· {it.date} В· {it.adults}A{it.children > 0 ? ` ${it.children}E` : ''}
                   </p>
                 </div>
                 <span className="text-xs font-semibold whitespace-nowrap">
@@ -236,7 +236,7 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full rounded-xl border border-ink-200 bg-white ${Icon ? 'pl-9' : 'pl-3'} pr-3 py-2.5 text-sm outline-none focus:border-ocean-500`}
+          className={`w-full rounded-xl border border-ink-200 bg-white ${Icon ? 'pl-9' : 'pl-3'} pr-3 py-2.5 text-sm outline-none focus:border-brand-turquoise-500`}
         />
       </div>
     </div>

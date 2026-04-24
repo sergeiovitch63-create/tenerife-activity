@@ -19,8 +19,8 @@ html, body {
 }
 
 ::selection {
-  background: #CFFAFE;
-  color: #164E63;
+  background: #D1F1F3;
+  color: #14424A;
 }
 
 /* Stripe-like subtle scrollbar */
@@ -42,8 +42,8 @@ html, body {
     @apply btn bg-ink-900 text-white px-5 py-3 text-sm hover:bg-ink-800 shadow-soft hover:shadow-card active:scale-[0.98];
   }
 
-  .btn-ember {
-    @apply btn bg-ember-500 text-white px-5 py-3 text-sm hover:bg-ember-600 shadow-soft active:scale-[0.98];
+  .btn-gold {
+    @apply btn bg-brand-gold-500 text-ink-900 px-5 py-3 text-sm hover:bg-brand-gold-400 shadow-soft active:scale-[0.98];
   }
 
   .btn-ghost {
@@ -58,12 +58,12 @@ html, body {
     @apply inline-flex items-center gap-1.5 rounded-full bg-ink-50 border border-ink-100 px-3 py-1 text-xs font-medium text-ink-700;
   }
 
-  .chip-ember {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-ember-50 border border-ember-100 px-3 py-1 text-xs font-semibold text-ember-700;
+  .chip-gold {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-brand-gold-50 border border-brand-gold-200 px-3 py-1 text-xs font-semibold text-brand-gold-700;
   }
 
-  .chip-ocean {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-ocean-50 border border-ocean-100 px-3 py-1 text-xs font-semibold text-ocean-700;
+  .chip-turquoise {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-brand-turquoise-50 border border-brand-turquoise-100 px-3 py-1 text-xs font-semibold text-brand-turquoise-700;
   }
 
   .h-display {
@@ -87,9 +87,9 @@ html, body {
   background-size: 48px 48px;
 }
 
-/* Gradient text */
+/* Brand gradient text — turquoise → gold */
 .gradient-text {
-  background: linear-gradient(90deg, #06B6D4 0%, #6366F1 45%, #F97316 100%);
+  background: linear-gradient(90deg, #3DB8BE 0%, #46BCC4 40%, #F4BE3D 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -126,7 +126,7 @@ html, body {
   @apply leading-relaxed;
 }
 .rich-text a {
-  @apply text-ocean-600 underline hover:text-ocean-700;
+  @apply text-brand-turquoise-600 underline hover:text-brand-turquoise-700;
 }
 .rich-text h1, .rich-text h2, .rich-text h3, .rich-text h4 {
   @apply font-semibold text-ink-900 mt-4 mb-2;
@@ -134,5 +134,5 @@ html, body {
 .rich-text h3 { @apply text-lg; }
 .rich-text h4 { @apply text-base; }
 .rich-text blockquote {
-  @apply border-l-2 border-ocean-300 pl-4 italic text-ink-600 my-3;
+  @apply border-l-2 border-brand-turquoise-300 pl-4 italic text-ink-600 my-3;
 }

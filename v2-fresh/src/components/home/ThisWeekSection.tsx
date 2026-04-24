@@ -1,5 +1,5 @@
-/**
- * ThisWeekSection — server-rendered home hero row.
+﻿/**
+ * ThisWeekSection вЂ” server-rendered home hero row.
  *
  * Renders up to 3 ActivityCards selected by the contextual picker,
  * each with a short "why now" chip (calm morning, sunset tonight, orca
@@ -50,7 +50,7 @@ export function ThisWeekSection({
     <section className="container-x mt-20 md:mt-24">
       <div className="mb-6 md:mb-8 flex items-end justify-between gap-6">
         <div className="max-w-2xl">
-          <span className="chip-ember mb-2">{dict.badge}</span>
+          <span className="chip-gold mb-2">{dict.badge}</span>
           <h2 className="h-display text-3xl md:text-4xl">{sectionTitle}</h2>
           <p className="text-ink-500 mt-2">{sectionSubtitle}</p>
         </div>

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -51,7 +51,7 @@ export default function HeroSearch() {
           <option value="group">{t.search.participants.group}</option>
         </select>
       </label>
-      <button type="submit" className="btn-ember px-6 md:px-8">
+      <button type="submit" className="btn-gold px-6 md:px-8">
         {t.search.submit}
       </button>
     </form>

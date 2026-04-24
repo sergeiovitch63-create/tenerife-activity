@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import { Star, MapPin, Clock, Share2, Heart } from 'lucide-react'
 import Gallery from '@/components/Gallery'
 import ActivityCard from '@/components/ActivityCard'
@@ -93,12 +93,12 @@ export default async function ActivityPage({ params }: Props) {
 
         <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
           <div className="max-w-3xl">
-            {group.isNew === '1' && <span className="chip-ember mb-3 inline-flex">{t.home.featuredBadge}</span>}
+            {group.isNew === '1' && <span className="chip-gold mb-3 inline-flex">{t.home.featuredBadge}</span>}
             <h1 className="h-display text-3xl md:text-5xl leading-tight">{group.name}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
               {reviews > 0 && (
                 <span className="inline-flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-ember-500 text-ember-500" />
+                  <Star className="w-4 h-4 fill-brand-gold-500 text-brand-gold-500" />
                   <strong>{rating.toFixed(1)}</strong>
                   <span className="text-ink-500">({reviews.toLocaleString()} {t.activity.reviews})</span>
                 </span>

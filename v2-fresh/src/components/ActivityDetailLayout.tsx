@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronRight, Zap, ShieldCheck, Clock, MapPin, XCircle } from 'lucide-react'
@@ -81,13 +81,13 @@ export default function ActivityDetailLayout({
 
   return (
     <>
-      {/* Banner slot — full-width advisories (calima, weather warnings, etc.) */}
+      {/* Banner slot вЂ” full-width advisories (calima, weather warnings, etc.) */}
       {composed.modulesBySlot.banner.length > 0 && (
         <div className="container-x mt-6 space-y-3">{renderSlot('banner')}</div>
       )}
 
       <div className="container-x mt-10 grid lg:grid-cols-[1.5fr_1fr] gap-10">
-        {/* LEFT — content */}
+        {/* LEFT вЂ” content */}
         <div className="min-w-0 space-y-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <InfoChip Icon={Zap} label={t.activity.instantConfirm} />
@@ -141,7 +141,7 @@ export default function ActivityDetailLayout({
           {group.canDesc && (
             <section>
               <h2 className="h-display text-2xl mb-4 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-ocean-600" />
+                <XCircle className="w-5 h-5 text-brand-turquoise-600" />
                 {group.canTitle || t.activity.cancellation}
               </h2>
               <div
@@ -170,7 +170,7 @@ export default function ActivityDetailLayout({
           )}
         </div>
 
-        {/* RIGHT — toggle between options list and booking panel */}
+        {/* RIGHT вЂ” toggle between options list and booking panel */}
         <aside ref={rightColRef} className="lg:sticky lg:top-20 lg:self-start">
           {viewMode === 'options' ? (
             <div className="space-y-4">
@@ -237,7 +237,7 @@ function InfoChip({
 }) {
   return (
     <div className="rounded-xl border border-ink-100 bg-white p-3">
-      <Icon className="w-4 h-4 text-ocean-600 mb-1.5" />
+      <Icon className="w-4 h-4 text-brand-turquoise-600 mb-1.5" />
       <div className="text-[11px] text-ink-500 uppercase tracking-wide font-semibold">{label}</div>
       {value && <div className="text-xs text-ink-800 mt-0.5">{value}</div>}
     </div>
@@ -268,13 +268,13 @@ function StickyMobileCta({
         <div className="flex-1 min-w-0">
           <p className="text-[11px] text-ink-500 uppercase tracking-wide">{fromLabel}</p>
           <p className="text-lg font-display font-bold text-ink-900 truncate">
-            {price > 0 ? formatPrice(price, locale) : '—'}
+            {price > 0 ? formatPrice(price, locale) : 'вЂ”'}
             <span className="text-xs font-normal text-ink-500 ml-1">{perAdult}</span>
           </p>
         </div>
         <button
           onClick={onClick}
-          className="btn-ember px-5 py-3 text-sm whitespace-nowrap"
+          className="btn-gold px-5 py-3 text-sm whitespace-nowrap"
         >
           {label}
           <ChevronRight className="w-4 h-4" />

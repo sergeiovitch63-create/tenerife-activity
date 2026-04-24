@@ -18,33 +18,34 @@ const config: Config = {
           900: '#0F172A',
           950: '#020617',
         },
-        ocean: {
-          50: '#ECFEFF',
-          100: '#CFFAFE',
-          200: '#A5F3FC',
-          300: '#67E8F9',
-          400: '#22D3EE',
-          500: '#06B6D4',
-          600: '#0891B2',
-          700: '#0E7490',
-          800: '#155E75',
-          900: '#164E63',
+        // Brand — derived from the logo (turquoise waves + gold sun).
+        // turquoise-500 = light wave, turquoise-800 = dark wave,
+        // gold-500 = sun, gold-300 = halo/rays.
+        'brand-turquoise': {
+          50:  '#ECF9FA',
+          100: '#D1F1F3',
+          200: '#A6E3E7',
+          300: '#6FCDD4',
+          400: '#46BCC4',
+          500: '#3DB8BE',
+          600: '#2A9BA2',
+          700: '#1F7A83',
+          800: '#1B5A66',
+          900: '#14424A',
+          950: '#0B2D34',
         },
-        ember: {
-          50: '#FFF7ED',
-          100: '#FFEDD5',
-          200: '#FED7AA',
-          300: '#FDBA74',
-          400: '#FB923C',
-          500: '#F97316',
-          600: '#EA580C',
-          700: '#C2410C',
-          800: '#9A3412',
-          900: '#7C2D12',
-        },
-        iris: {
-          500: '#635BFF',
-          600: '#5851EC',
+        'brand-gold': {
+          50:  '#FEFAEB',
+          100: '#FDF2C8',
+          200: '#FBE28A',
+          300: '#F8CD52',
+          400: '#F5C84A',
+          500: '#F4BE3D',
+          600: '#D9A41E',
+          700: '#A87D15',
+          800: '#7C5D12',
+          900: '#604812',
+          950: '#382B0A',
         },
       },
       fontFamily: {
@@ -53,12 +54,13 @@ const config: Config = {
       },
       boxShadow: {
         soft: '0 2px 12px -2px rgb(15 23 42 / 0.06), 0 1px 3px -1px rgb(15 23 42 / 0.04)',
-        glow: '0 0 0 1px rgb(255 255 255 / 0.1), 0 8px 40px -8px rgb(6 182 212 / 0.35)',
+        glow: '0 0 0 1px rgb(255 255 255 / 0.1), 0 8px 40px -8px rgb(61 184 190 / 0.35)',
         card: '0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12)',
       },
       backgroundImage: {
+        // Brand hero: turquoise depth + gold warm accent on dark slate
         'hero-gradient':
-          'radial-gradient(80% 60% at 20% 10%, rgba(6,182,212,0.25), transparent 60%), radial-gradient(70% 70% at 90% 20%, rgba(249,115,22,0.18), transparent 60%), linear-gradient(180deg, #0B1220 0%, #0F172A 100%)',
+          'radial-gradient(80% 60% at 20% 10%, rgba(61,184,190,0.28), transparent 60%), radial-gradient(70% 70% at 90% 20%, rgba(244,190,61,0.20), transparent 60%), linear-gradient(180deg, #0B1220 0%, #0F172A 100%)',
         'shine':
           'linear-gradient(130deg, transparent 0%, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%, transparent 100%)',
       },

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
@@ -82,14 +82,14 @@ export default function CartDrawer() {
                           </LocaleLink>
                           <p className="text-xs text-ink-500 mt-0.5">{it.optionTitle}</p>
                           <p className="text-xs text-ink-500">
-                            {it.date} · {it.adults} {t.activity.adults.toLowerCase()}
-                            {it.children > 0 ? ` · ${it.children} ${t.activity.children.toLowerCase()}` : ''}
+                            {it.date} В· {it.adults} {t.activity.adults.toLowerCase()}
+                            {it.children > 0 ? ` В· ${it.children} ${t.activity.children.toLowerCase()}` : ''}
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <span className="text-sm font-bold">{formatPrice(total, locale)}</span>
                             <button
                               onClick={() => remove(it.itemId)}
-                              className="text-xs text-ink-500 hover:text-ember-600 inline-flex items-center gap-1"
+                              className="text-xs text-ink-500 hover:text-brand-gold-600 inline-flex items-center gap-1"
                             >
                               <Trash2 className="w-3.5 h-3.5" /> {t.cart.remove}
                             </button>
@@ -111,7 +111,7 @@ export default function CartDrawer() {
                 <LocaleLink
                   href="/checkout"
                   onClick={() => setOpenDrawer(false)}
-                  className="btn-ember w-full justify-center text-base py-3.5"
+                  className="btn-gold w-full justify-center text-base py-3.5"
                 >
                   {t.cart.checkout} <ArrowRight className="w-4 h-4" />
                 </LocaleLink>

@@ -1,7 +1,7 @@
-/**
- * TrustBar — thin social-proof band before the footer.
+﻿/**
+ * TrustBar вЂ” thin social-proof band before the footer.
  *
- * Intentionally NOT lazy-loaded — trust signals that load after the
+ * Intentionally NOT lazy-loaded вЂ” trust signals that load after the
  * user scrolls to them might as well not exist. Shows four concrete
  * stats (rating, reply time, cancellation, payment) plus a reassuring
  * tagline. Deliberately no partner logos: we only advertise what we
@@ -30,7 +30,7 @@ export function TrustBar({ headline, stats }: Props) {
             const Icon = ICONS[i] ?? ShieldCheck
             return (
               <div key={s.label} className="flex items-start gap-3">
-                <span className="mt-0.5 h-9 w-9 rounded-full bg-ocean-50 text-ocean-700 inline-flex items-center justify-center shrink-0">
+                <span className="mt-0.5 h-9 w-9 rounded-full bg-brand-turquoise-50 text-brand-turquoise-700 inline-flex items-center justify-center shrink-0">
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0">

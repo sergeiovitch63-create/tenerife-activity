@@ -1,4 +1,4 @@
-import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react'
+﻿import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryCard from '@/components/CategoryCard'
 import { ContextualBanner } from '@/components/home/ContextualBanner'
@@ -30,7 +30,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
   const localCovers = getLocalCovers(groups.map((g) => g.code))
   const withImage = groups.filter((g) => !!g.image || !!localCovers[g.code])
 
-  // Contextual "This week" — 3 picks based on hour + month + group keywords.
+  // Contextual "This week" вЂ” 3 picks based on hour + month + group keywords.
   const picks = pickThisWeek(withImage)
   const pickedGroups = picks.map((p) => p.group)
   const nextDates = pickedGroups.length
@@ -44,12 +44,12 @@ export default async function Home({ params }: { params: { locale: string } }) {
         <div className="absolute inset-0 bg-hero-gradient" />
         <div className="absolute inset-0 bg-grid opacity-30 mix-blend-overlay" />
         <HeroVideoBackground src="https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Hero.mp4">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-ember-500/20 blur-[120px] pointer-events-none" />
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full bg-ocean-500/20 blur-[120px] pointer-events-none" />
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-brand-gold-500/20 blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full bg-brand-turquoise-500/20 blur-[120px] pointer-events-none" />
 
         <div className="relative container-x pt-20 pb-32 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl px-3 py-1 text-xs font-medium text-white/90">
-            <Sparkles className="w-3.5 h-3.5 text-ember-300" />
+            <Sparkles className="w-3.5 h-3.5 text-brand-gold-300" />
             {t.hero.badge}
           </div>
           <h1 className="mt-6 h-display text-5xl md:text-7xl leading-[1.05] max-w-4xl">
@@ -77,7 +77,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
             </span>
             <span className="flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-white/10 border border-white/20 inline-flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-ember-300" />
+                <Zap className="w-3.5 h-3.5 text-brand-gold-300" />
               </span>
               {t.hero.trustInstant}
             </span>
@@ -97,7 +97,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         body={t.home.calima.body}
       />
 
-      {/* ---- This Week — 3 contextual picks ---- */}
+      {/* ---- This Week вЂ” 3 contextual picks ---- */}
       <ThisWeekSection
         picks={picks}
         covers={localCovers}
@@ -109,7 +109,7 @@ export default async function Home({ params }: { params: { locale: string } }) {
         seeAllHref="/activites"
       />
 
-      {/* ---- Choose Your Vibe — categories ---- */}
+      {/* ---- Choose Your Vibe вЂ” categories ---- */}
       <section className="container-x mt-24">
         <div className="mb-6 md:mb-8 text-center max-w-2xl mx-auto">
           <h2 className="h-display text-3xl md:text-4xl">{t.home.categoriesTitle}</h2>

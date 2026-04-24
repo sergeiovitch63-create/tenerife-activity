@@ -1,5 +1,5 @@
-/**
- * Event-Highlights card — compact "pick your flavour" comparison.
+﻿/**
+ * Event-Highlights card вЂ” compact "pick your flavour" comparison.
  *
  * Renders 2-3 of the richest event variants as side-by-side mini-cards
  * (name, icon chips, days/week, earliest time, price-from, one-line teaser).
@@ -33,9 +33,9 @@ export function EventHighlightsCard({ score: moduleScore, locale }: Props) {
   const more = totalVariants - highlights.length
 
   return (
-    <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white to-ocean-50/30 p-5">
+    <div className="rounded-3xl border border-neutral-200 bg-gradient-to-br from-white to-brand-turquoise-50/30 p-5">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 rounded-2xl bg-gradient-to-br from-ocean-500 to-indigo-600 p-2.5 shadow-sm">
+        <div className="flex-shrink-0 rounded-2xl bg-gradient-to-br from-brand-turquoise-500 to-indigo-600 p-2.5 shadow-sm">
           <Sparkles className="h-5 w-5 text-white" strokeWidth={2.25} />
         </div>
         <div className="min-w-0 flex-1">
@@ -100,7 +100,7 @@ function HighlightCard({
             return (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-full bg-ocean-50 px-2 py-0.5 text-[10px] font-medium text-ocean-800 ring-1 ring-ocean-100"
+                className="inline-flex items-center gap-1 rounded-full bg-brand-turquoise-50 px-2 py-0.5 text-[10px] font-medium text-brand-turquoise-800 ring-1 ring-brand-turquoise-100"
               >
                 <Icon className="h-3 w-3" />
                 {iconLabel(raw, locale)}
@@ -143,11 +143,11 @@ function interpolate(template: string, params: Record<string, string | number>):
 
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   fr: {
-    title: 'Les variantes qui valent le détour',
-    subtitle: 'Comparez en un coup d\'œil les formules les plus distinctes.',
+    title: 'Les variantes qui valent le dГ©tour',
+    subtitle: 'Comparez en un coup d\'Е“il les formules les plus distinctes.',
     daysPerWeek: '{count} j/sem.',
-    priceFrom: 'dès {price}',
-    moreVariants: '+{count} autre(s) formule(s) dans la liste complète ci-dessous.',
+    priceFrom: 'dГЁs {price}',
+    moreVariants: '+{count} autre(s) formule(s) dans la liste complГЁte ci-dessous.',
   },
   en: {
     title: 'Variants worth a closer look',
@@ -157,31 +157,31 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     moreVariants: '+{count} more option(s) in the full list below.',
   },
   es: {
-    title: 'Variantes que merecen atención',
-    subtitle: 'Compara las fórmulas más distintas de un vistazo.',
+    title: 'Variantes que merecen atenciГіn',
+    subtitle: 'Compara las fГіrmulas mГЎs distintas de un vistazo.',
     daysPerWeek: '{count} d/sem.',
     priceFrom: 'desde {price}',
-    moreVariants: '+{count} opción(es) más en la lista completa abajo.',
+    moreVariants: '+{count} opciГіn(es) mГЎs en la lista completa abajo.',
   },
   de: {
     title: 'Varianten, die sich lohnen',
     subtitle: 'Vergleichen Sie die deutlichsten Formeln auf einen Blick.',
     daysPerWeek: '{count} T/Wo.',
     priceFrom: 'ab {price}',
-    moreVariants: '+{count} weitere Option(en) in der vollständigen Liste unten.',
+    moreVariants: '+{count} weitere Option(en) in der vollstГ¤ndigen Liste unten.',
   },
   it: {
     title: 'Le varianti che valgono uno sguardo',
-    subtitle: 'Confronta a colpo d\'occhio le formule più diverse.',
+    subtitle: 'Confronta a colpo d\'occhio le formule piГ№ diverse.',
     daysPerWeek: '{count} g/set.',
     priceFrom: 'da {price}',
     moreVariants: '+{count} altra/e opzione/i nell\'elenco completo qui sotto.',
   },
   ru: {
-    title: 'Варианты, на которые стоит взглянуть',
-    subtitle: 'Сравните самые разные форматы в одном месте.',
-    daysPerWeek: '{count} дн./нед.',
-    priceFrom: 'от {price}',
-    moreVariants: 'Ещё +{count} вариант(а/ов) в полном списке ниже.',
+    title: 'Р’Р°СЂРёР°РЅС‚С‹, РЅР° РєРѕС‚РѕСЂС‹Рµ СЃС‚РѕРёС‚ РІР·РіР»СЏРЅСѓС‚СЊ',
+    subtitle: 'РЎСЂР°РІРЅРёС‚Рµ СЃР°РјС‹Рµ СЂР°Р·РЅС‹Рµ С„РѕСЂРјР°С‚С‹ РІ РѕРґРЅРѕРј РјРµСЃС‚Рµ.',
+    daysPerWeek: '{count} РґРЅ./РЅРµРґ.',
+    priceFrom: 'РѕС‚ {price}',
+    moreVariants: 'Р•С‰С‘ +{count} РІР°СЂРёР°РЅС‚(Р°/РѕРІ) РІ РїРѕР»РЅРѕРј СЃРїРёСЃРєРµ РЅРёР¶Рµ.',
   },
 }
