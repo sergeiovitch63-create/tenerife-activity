@@ -47,8 +47,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Flash the plain password ONCE via query string. Admin copies it from the
+  // purple banner; after any navigation it's gone.
+  const flash = `newpwd:${result.plainPassword}`
   return NextResponse.redirect(
-    new URL(`/back-office/affiliates/${encodeURIComponent(result.affiliate.code)}`, request.nextUrl.origin),
+    new URL(
+      `/back-office/affiliates/${encodeURIComponent(result.affiliate.code)}?flash=${encodeURIComponent(flash)}`,
+      request.nextUrl.origin,
+    ),
     { status: 303 },
   )
 }

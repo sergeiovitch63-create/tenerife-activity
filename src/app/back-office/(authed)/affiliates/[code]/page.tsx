@@ -49,27 +49,32 @@ export default async function AffiliateDetailPage({
 
   const siteUrl = getSiteUrl()
 
-  const flash = (() => {
+  const loginUrl = `${siteUrl}/affiliate/login`
+
+  type Flash =
+    | { tone: 'ok'; text: string }
+    | { tone: 'err'; text: string }
+    | { tone: 'creds'; kind: 'new' | 'reset'; password: string }
+
+  const flash: Flash | null = (() => {
     if (!searchParams?.flash) return null
     const v = searchParams.flash
-    if (v === 'updated') return { tone: 'ok' as const, text: 'Affilié mis à jour.' }
+    if (v === 'updated') return { tone: 'ok', text: 'Affilié mis à jour.' }
     if (v.startsWith('confirmed:')) {
       const n = v.split(':')[1]
-      return { tone: 'ok' as const, text: `${n} ventes marquées comme confirmées.` }
+      return { tone: 'ok', text: `${n} ventes marquées comme confirmées.` }
     }
     if (v.startsWith('paid:')) {
       const [, count, total] = v.split(':')
-      return { tone: 'ok' as const, text: `Payout effectué : ${count} ventes, ${total} €.` }
+      return { tone: 'ok', text: `Payout effectué : ${count} ventes, ${total} €.` }
     }
-    if (v.startsWith('magiclink:')) {
-      const tok = v.slice('magiclink:'.length)
-      const fullUrl = `${siteUrl}/affiliate/auth?token=${tok}`
-      return {
-        tone: 'magic' as const,
-        text: fullUrl,
-      }
+    if (v.startsWith('newpwd:')) {
+      return { tone: 'creds', kind: 'new', password: v.slice('newpwd:'.length) }
     }
-    if (v === 'error') return { tone: 'err' as const, text: 'Erreur, réessaie.' }
+    if (v.startsWith('resetpwd:')) {
+      return { tone: 'creds', kind: 'reset', password: v.slice('resetpwd:'.length) }
+    }
+    if (v === 'error') return { tone: 'err', text: 'Erreur, réessaie.' }
     return null
   })()
 
@@ -99,24 +104,40 @@ export default async function AffiliateDetailPage({
         </div>
       </div>
 
-      {flash && flash.tone === 'magic' ? (
-        <div className="rounded-md p-4 bg-purple-50 border border-purple-200 space-y-2">
+      {flash && flash.tone === 'creds' ? (
+        <div className="rounded-md p-4 bg-purple-50 border border-purple-200 space-y-3">
           <p className="text-sm font-medium text-purple-900">
-            🔑 Lien magique généré — à envoyer à l'affilié
+            🔑 {flash.kind === 'new'
+              ? 'Affilié créé — voici ses identifiants de connexion'
+              : 'Mot de passe réinitialisé — transmet ces nouveaux identifiants'}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[120px_1fr] gap-x-3 gap-y-2 text-sm">
+            <div className="text-purple-800">Page de login :</div>
             <input
               readOnly
-              defaultValue={flash.text}
-              className="flex-1 rounded-md border border-purple-300 bg-white px-3 py-2 text-xs font-mono"
+              defaultValue={loginUrl}
+              className="rounded-md border border-purple-300 bg-white px-2 py-1 text-xs font-mono"
+            />
+            <div className="text-purple-800">Code :</div>
+            <input
+              readOnly
+              defaultValue={affiliate.code}
+              className="rounded-md border border-purple-300 bg-white px-2 py-1 text-xs font-mono w-48"
+            />
+            <div className="text-purple-800">Mot de passe :</div>
+            <input
+              readOnly
+              defaultValue={flash.password}
+              className="rounded-md border border-purple-300 bg-white px-2 py-1 text-sm font-mono font-semibold w-48"
             />
           </div>
           <p className="text-xs text-purple-800">
-            Copie ce lien et envoie-le à l'affilié (email, WhatsApp, etc.). Il est valide 30 jours.
-            À l'ouverture, il est automatiquement connecté à son dashboard.
+            ⚠️ Le mot de passe n'est affiché qu'une seule fois. Copie-le maintenant
+            et envoie-le à l'affilié (email, WhatsApp, SMS). Après avoir quitté
+            cette page il faudra générer un nouveau mot de passe.
           </p>
         </div>
-      ) : flash ? (
+      ) : flash && flash.tone !== 'ok' && flash.tone !== 'err' ? null : flash ? (
         <div
           className={`rounded-md p-3 text-sm ${
             flash.tone === 'ok'
@@ -214,18 +235,18 @@ export default async function AffiliateDetailPage({
           <div className="border-t border-gray-100 pt-4 space-y-2">
             <form
               method="POST"
-              action={`/api/admin/affiliates/${encodeURIComponent(affiliate.code)}/magic-link`}
+              action={`/api/admin/affiliates/${encodeURIComponent(affiliate.code)}/reset-password`}
             >
               <button
                 type="submit"
                 className="w-full rounded-md bg-purple-50 text-purple-800 px-4 py-2 text-sm hover:bg-purple-100 text-left"
-                disabled={affiliate.status !== 'active'}
               >
-                🔑 Générer un lien de connexion affilié (magic link)
+                🔑 Réinitialiser le mot de passe
               </button>
               <p className="text-xs text-gray-500 mt-1">
-                Crée un lien unique à envoyer à l'affilié pour qu'il accède à son
-                dashboard. Valide 30 jours. {affiliate.status !== 'active' ? '⚠️ Affilié non actif — activer d\'abord.' : ''}
+                Génère un nouveau mot de passe. Le précédent cesse de fonctionner
+                immédiatement et toutes les sessions actives de l'affilié sont
+                déconnectées.
               </p>
             </form>
 

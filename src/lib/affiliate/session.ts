@@ -1,8 +1,6 @@
 import 'server-only'
-import { randomBytes } from 'crypto'
 import { cookies } from 'next/headers'
 import { getSql } from '@/lib/db/postgres'
-import { parseAffiliateRef } from './ref'
 import {
   AFFILIATE_SESSION_COOKIE_NAME,
   AFFILIATE_SESSION_TTL_SECONDS,
@@ -19,37 +17,12 @@ export interface AffiliateSessionRecord {
 }
 
 /**
- * Admin-generated magic link: create a new session token for an affiliate,
- * store in affiliate_sessions with a 30-day TTL, return the token.
- * The caller (admin UI) builds the URL to send to the affiliate.
- */
-export async function createAffiliateSessionToken(code: string): Promise<string | null> {
-  const normalized = parseAffiliateRef(code)
-  if (!normalized) return null
-  const sql = getSql()
-  if (!sql) return null
-  try {
-    const affiliateRows = await sql`
-      SELECT 1 AS ok FROM affiliates WHERE code = ${normalized} AND status = 'active' LIMIT 1
-    `
-    if (!Array.isArray(affiliateRows) || affiliateRows.length === 0) return null
-
-    const token = randomBytes(32).toString('hex')
-    const expiresAt = new Date(Date.now() + AFFILIATE_SESSION_TTL_SECONDS * 1000)
-    await sql`
-      INSERT INTO affiliate_sessions (affiliate_code, token, expires_at)
-      VALUES (${normalized}, ${token}, ${expiresAt.toISOString()})
-    `
-    return token
-  } catch (e) {
-    console.error('[affiliate_session] create failed', e)
-    return null
-  }
-}
-
-/**
  * Verify a session token and return the associated affiliate record.
- * Returns null if token is invalid/expired/DB down.
+ * Returns null if the token is invalid/expired/unknown or the DB is unreachable.
+ *
+ * Session tokens are created by POST /api/affiliate/login after verifying the
+ * affiliate's code + password. This module is only responsible for reading /
+ * destroying sessions from an incoming request.
  */
 export async function verifyAffiliateSession(
   token: string | null | undefined,
