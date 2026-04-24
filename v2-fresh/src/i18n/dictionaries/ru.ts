@@ -35,8 +35,8 @@ export const ru: Dict = {
     },
   },
   home: {
-    categoriesTitle: 'Выберите свой стиль',
-    categoriesSubtitle: 'Остров для открытий.',
+    categoriesTitle: 'Выберите свой vibe',
+    categoriesSubtitle: 'Не категория. Настроение.',
     featuredBadge: 'Наши фавориты',
     featuredTitle: 'Must-do прямо сейчас',
     seeAll: 'Показать всё',
@@ -55,6 +55,36 @@ export const ru: Dict = {
       title: 'Готовы почувствовать Тенерифе?',
       subtitle: 'Начните с бестселлера.',
       button: 'Смотреть все экскурсии',
+    },
+    calima: {
+      title: 'Возможна калима в этом месяце',
+      body: 'Пыль из Сахары может снизить видимость. Рекомендуем морские экскурсии или гибкий билет.',
+    },
+    thisWeek: {
+      badge: 'На этой неделе',
+      title: 'Подобрано под погоду и сезон',
+      subtitle: 'Три момента, которые стоит поймать — подходят под время вашего визита.',
+      reasons: {
+        reason_sunset_tonight: 'Закат сегодня вечером',
+        reason_sunset_tomorrow: 'Запланируйте на завтра',
+        reason_calm_morning: 'Спокойное море утром',
+        reason_whales_orca: 'Сезон косаток',
+        reason_clear_skies: 'Ясное небо',
+        reason_sea_warm: 'Море 22°C',
+        reason_signature: 'Обязательно',
+        reason_indoor_calima: 'Безопасно при калиме',
+        reason_family_safe: 'Для всей семьи',
+        reason_teide_peak: 'Тейде в лучшем виде',
+      },
+    },
+    trust: {
+      headline: 'Безопасный платёж · Поддержка 24/7 · Официальный оператор Тенерифе',
+      stats: [
+        { value: '4,8/5', label: '18 420 отзывов' },
+        { value: '< 5 мин', label: 'Ответ человека' },
+        { value: '24 ч', label: 'Бесплатная отмена' },
+        { value: '100 %', label: 'Шифрованная оплата' },
+      ],
     },
   },
   teoPromo: {

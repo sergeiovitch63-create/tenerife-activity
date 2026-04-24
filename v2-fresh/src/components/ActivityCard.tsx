@@ -15,11 +15,17 @@ export default function ActivityCard({
   compact = false,
   coverOverride,
   nextDate,
+  contextLabel,
+  contextIcon,
 }: {
   group: AtlanticoGroup
   compact?: boolean
   coverOverride?: string | null
   nextDate?: string | null
+  /** Short contextual reason shown as a highlighted chip above the title. */
+  contextLabel?: string
+  /** Optional lucide icon node rendered inside the context chip. */
+  contextIcon?: React.ReactNode
 }) {
   const { t, locale } = useI18n()
   const price = group.price ? parseFloat(group.price) : null
@@ -60,6 +66,12 @@ export default function ActivityCard({
         </div>
       </div>
       <div className={`p-4 flex-1 flex flex-col ${compact ? 'gap-1' : 'gap-2'}`}>
+        {contextLabel && (
+          <div className="inline-flex self-start items-center gap-1.5 rounded-full bg-ember-50 text-ember-700 border border-ember-200 px-2 py-0.5 text-[11px] font-semibold mb-1">
+            {contextIcon}
+            <span>{contextLabel}</span>
+          </div>
+        )}
         <div className="flex items-center gap-1.5 text-xs text-ink-500">
           <MapPin className="w-3 h-3" />
           <span>Tenerife</span>

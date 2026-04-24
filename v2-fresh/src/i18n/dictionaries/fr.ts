@@ -33,8 +33,8 @@ export const fr = {
     },
   },
   home: {
-    categoriesTitle: 'Choisissez votre style',
-    categoriesSubtitle: 'Une île à dévorer.',
+    categoriesTitle: 'Choisissez votre vibe',
+    categoriesSubtitle: 'Pas une catégorie. Une ambiance.',
     featuredBadge: 'Coups de cœur',
     featuredTitle: 'Les immanquables du moment',
     seeAll: 'Tout voir',
@@ -53,6 +53,36 @@ export const fr = {
       title: 'Prêt à vivre Tenerife ?',
       subtitle: 'Commencez par un best-seller.',
       button: 'Voir toutes les activités',
+    },
+    calima: {
+      title: 'Calima possible ce mois-ci',
+      body: 'Des épisodes de poussière saharienne peuvent réduire la visibilité. On recommande de privilégier les excursions en mer ou de choisir un billet flexible.',
+    },
+    thisWeek: {
+      badge: 'Cette semaine',
+      title: 'Calé sur la météo et la saison',
+      subtitle: 'Trois créneaux qui valent le coup, choisis pour le moment de votre visite.',
+      reasons: {
+        reason_sunset_tonight: 'Coucher de soleil ce soir',
+        reason_sunset_tomorrow: 'À prévoir demain',
+        reason_calm_morning: 'Mer plate le matin',
+        reason_whales_orca: 'Saison des orques',
+        reason_clear_skies: 'Ciel dégagé en vue',
+        reason_sea_warm: 'Eau à 22°C',
+        reason_signature: 'Incontournable',
+        reason_indoor_calima: 'Safe pendant la calima',
+        reason_family_safe: 'Idéal en famille',
+        reason_teide_peak: 'Teide en pleine forme',
+      },
+    },
+    trust: {
+      headline: 'Paiement sécurisé · Support 24/7 · Opérateur officiel Tenerife',
+      stats: [
+        { value: '4,8/5', label: '18 420 avis' },
+        { value: '< 5 min', label: 'Réponse humaine' },
+        { value: '24 h', label: 'Annulation gratuite' },
+        { value: '100 %', label: 'Paiement chiffré' },
+      ],
     },
   },
   teoPromo: {

@@ -35,8 +35,8 @@ export const de: Dict = {
     },
   },
   home: {
-    categoriesTitle: 'Wählen Sie Ihren Stil',
-    categoriesSubtitle: 'Eine Insel voller Möglichkeiten.',
+    categoriesTitle: 'Wählen Sie Ihren Vibe',
+    categoriesSubtitle: 'Keine Kategorie. Eine Stimmung.',
     featuredBadge: 'Favoriten',
     featuredTitle: 'Die Must-Dos gerade jetzt',
     seeAll: 'Alle ansehen',
@@ -55,6 +55,36 @@ export const de: Dict = {
       title: 'Bereit für Teneriffa?',
       subtitle: 'Starten Sie mit einem Bestseller.',
       button: 'Alle Aktivitäten ansehen',
+    },
+    calima: {
+      title: 'Calima diesen Monat möglich',
+      body: 'Saharastaub kann die Sicht einschränken. Wir empfehlen Seetouren oder ein flexibles Ticket.',
+    },
+    thisWeek: {
+      badge: 'Diese Woche',
+      title: 'Auf Wetter und Saison abgestimmt',
+      subtitle: 'Drei lohnende Zeitfenster, passend zu Ihrem Besuch.',
+      reasons: {
+        reason_sunset_tonight: 'Sonnenuntergang heute Abend',
+        reason_sunset_tomorrow: 'Für morgen planen',
+        reason_calm_morning: 'Ruhige See am Morgen',
+        reason_whales_orca: 'Orca-Saison',
+        reason_clear_skies: 'Klarer Himmel',
+        reason_sea_warm: 'Meer bei 22°C',
+        reason_signature: 'Muss man erleben',
+        reason_indoor_calima: 'Sicher bei Calima',
+        reason_family_safe: 'Familientauglich',
+        reason_teide_peak: 'Teide in Bestform',
+      },
+    },
+    trust: {
+      headline: 'Sichere Zahlung · Support 24/7 · Offizieller Teneriffa-Anbieter',
+      stats: [
+        { value: '4,8/5', label: '18.420 Bewertungen' },
+        { value: '< 5 Min', label: 'Menschliche Antwort' },
+        { value: '24 h', label: 'Kostenlose Stornierung' },
+        { value: '100 %', label: 'Verschlüsselte Zahlung' },
+      ],
     },
   },
   teoPromo: {

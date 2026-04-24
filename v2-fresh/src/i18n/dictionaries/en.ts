@@ -35,8 +35,8 @@ export const en: Dict = {
     },
   },
   home: {
-    categoriesTitle: 'Pick your style',
-    categoriesSubtitle: 'One island, endless possibilities.',
+    categoriesTitle: 'Pick your vibe',
+    categoriesSubtitle: 'Not a category. A mood.',
     featuredBadge: 'Staff picks',
     featuredTitle: 'The must-dos right now',
     seeAll: 'See all',
@@ -55,6 +55,36 @@ export const en: Dict = {
       title: 'Ready to live Tenerife?',
       subtitle: 'Start with a best-seller.',
       button: 'See all activities',
+    },
+    calima: {
+      title: 'Calima possible this month',
+      body: 'Saharan dust can reduce visibility. We recommend sea-based trips or picking a flexible ticket.',
+    },
+    thisWeek: {
+      badge: 'This week',
+      title: 'Tuned to the weather and season',
+      subtitle: 'Three windows worth catching, picked for the moment of your visit.',
+      reasons: {
+        reason_sunset_tonight: 'Sunset tonight',
+        reason_sunset_tomorrow: 'Plan it for tomorrow',
+        reason_calm_morning: 'Flat sea in the morning',
+        reason_whales_orca: 'Orca season',
+        reason_clear_skies: 'Clear skies ahead',
+        reason_sea_warm: 'Sea at 22°C',
+        reason_signature: 'Must-do',
+        reason_indoor_calima: 'Calima-safe',
+        reason_family_safe: 'Family-friendly',
+        reason_teide_peak: 'Teide at its best',
+      },
+    },
+    trust: {
+      headline: 'Secure payment · 24/7 support · Official Tenerife operator',
+      stats: [
+        { value: '4.8/5', label: '18,420 reviews' },
+        { value: '< 5 min', label: 'Human reply' },
+        { value: '24 h', label: 'Free cancellation' },
+        { value: '100%', label: 'Encrypted payment' },
+      ],
     },
   },
   teoPromo: {

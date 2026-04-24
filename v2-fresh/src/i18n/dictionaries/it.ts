@@ -35,8 +35,8 @@ export const it: Dict = {
     },
   },
   home: {
-    categoriesTitle: 'Scegli il tuo stile',
-    categoriesSubtitle: 'Un\'isola tutta da scoprire.',
+    categoriesTitle: 'Scegli il tuo vibe',
+    categoriesSubtitle: 'Non una categoria. Un\'atmosfera.',
     featuredBadge: 'I nostri preferiti',
     featuredTitle: 'Gli imperdibili del momento',
     seeAll: 'Vedi tutto',
@@ -55,6 +55,36 @@ export const it: Dict = {
       title: 'Pronto a vivere Tenerife?',
       subtitle: 'Inizia con un best-seller.',
       button: 'Vedi tutte le attività',
+    },
+    calima: {
+      title: 'Calima possibile questo mese',
+      body: 'La polvere del Sahara può ridurre la visibilità. Consigliamo escursioni in mare o un biglietto flessibile.',
+    },
+    thisWeek: {
+      badge: 'Questa settimana',
+      title: 'Calibrato su meteo e stagione',
+      subtitle: 'Tre momenti che valgono la pena, scelti per la tua visita.',
+      reasons: {
+        reason_sunset_tonight: 'Tramonto stasera',
+        reason_sunset_tomorrow: 'Da pianificare domani',
+        reason_calm_morning: 'Mare calmo al mattino',
+        reason_whales_orca: 'Stagione delle orche',
+        reason_clear_skies: 'Cielo sereno in arrivo',
+        reason_sea_warm: 'Mare a 22°C',
+        reason_signature: 'Imperdibile',
+        reason_indoor_calima: 'Sicuro con la calima',
+        reason_family_safe: 'Perfetto in famiglia',
+        reason_teide_peak: 'Teide al meglio',
+      },
+    },
+    trust: {
+      headline: 'Pagamento sicuro · Supporto 24/7 · Operatore ufficiale Tenerife',
+      stats: [
+        { value: '4,8/5', label: '18.420 recensioni' },
+        { value: '< 5 min', label: 'Risposta umana' },
+        { value: '24 h', label: 'Cancellazione gratuita' },
+        { value: '100 %', label: 'Pagamento cifrato' },
+      ],
     },
   },
   teoPromo: {
