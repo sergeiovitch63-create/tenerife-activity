@@ -2,6 +2,7 @@ import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryCard from '@/components/CategoryCard'
 import { ContextualBanner } from '@/components/home/ContextualBanner'
+import { HeroVideoBackground } from '@/components/home/HeroVideoBackground'
 import { ThisWeekSection } from '@/components/home/ThisWeekSection'
 import { TrustBar } from '@/components/home/TrustBar'
 import { getClassifications, getGroups, nextDatesForGroups } from '@/lib/atlantico/client'
@@ -42,8 +43,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-gradient" />
         <div className="absolute inset-0 bg-grid opacity-30 mix-blend-overlay" />
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-ember-500/20 blur-[120px]" />
-        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full bg-ocean-500/20 blur-[120px]" />
+        <HeroVideoBackground src="https://pub-9b5481c9681440ba850c2f985db0680e.r2.dev/Hero.mp4">
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-ember-500/20 blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full bg-ocean-500/20 blur-[120px] pointer-events-none" />
 
         <div className="relative container-x pt-20 pb-32 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl px-3 py-1 text-xs font-medium text-white/90">
@@ -82,7 +84,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
           </div>
         </div>
 
-        <svg className="block w-full h-[60px] text-white" viewBox="0 0 1440 60" preserveAspectRatio="none" fill="currentColor" aria-hidden>
+        </HeroVideoBackground>
+
+        <svg className="relative block w-full h-[60px] text-white" viewBox="0 0 1440 60" preserveAspectRatio="none" fill="currentColor" aria-hidden>
           <path d="M0,60 C240,20 480,10 720,20 C960,30 1200,50 1440,30 L1440,60 L0,60 Z" />
         </svg>
       </section>
