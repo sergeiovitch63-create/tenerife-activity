@@ -1,22 +1,13 @@
 import { redirect } from 'next/navigation'
 import { getCurrentAffiliate } from '@/lib/affiliate/session'
-import { listSalesForAffiliate, type SaleStatus } from '@/lib/back-office/affiliates'
+import { listSalesForAffiliate } from '@/lib/back-office/affiliates'
+import {
+  getAffiliateDisplayState,
+  TONE_BADGE_CLASS,
+} from '@/lib/affiliate/sale-display'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Commissions — Tenerife Activity' }
-
-const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmée',
-  cancelled: 'Annulée',
-  paid: 'Payée',
-}
-const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  confirmed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-ocean-100 text-ocean-900',
-}
 
 export default async function AffiliatePayoutsPage() {
   const session = await getCurrentAffiliate()
@@ -24,15 +15,18 @@ export default async function AffiliatePayoutsPage() {
 
   const sales = await listSalesForAffiliate(session.affiliateCode, 500)
 
+  // Sums based on derived display state — more aligned with what the partner sees.
+  const now = new Date()
   const sums = sales.reduce(
     (acc, s) => {
       const c = s.commission_amount ?? 0
-      if (s.status === 'pending') acc.pending += c
-      else if (s.status === 'confirmed') acc.confirmed += c
-      else if (s.status === 'paid') acc.paid += c
+      const ds = getAffiliateDisplayState(s, now)
+      if (ds.code === 'pending' || ds.code === 'upcoming') acc.upcoming += c
+      else if (ds.code === 'completed') acc.completed += c
+      else if (ds.code === 'paid') acc.paid += c
       return acc
     },
-    { pending: 0, confirmed: 0, paid: 0 },
+    { upcoming: 0, completed: 0, paid: 0 },
   )
 
   return (
@@ -51,21 +45,21 @@ export default async function AffiliatePayoutsPage() {
       {/* Résumé : 1 col mobile, 3 cols desktop */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <SummaryCard
-          label="En attente de confirmation"
-          value={sums.pending}
-          tone="yellow"
-          hint="Paiement encaissé, statut pas encore validé par l'équipe"
+          label="Réservations à venir"
+          value={sums.upcoming}
+          tone="blue"
+          hint="Activités non encore effectuées — versement après réalisation"
         />
         <SummaryCard
-          label="À verser prochainement"
-          value={sums.confirmed}
+          label="À verser au prochain payout"
+          value={sums.completed}
           tone="green"
-          hint="Confirmé — sera inclus au prochain virement"
+          hint="Activités effectuées — virement à la fin du mois"
         />
         <SummaryCard
           label="Total déjà versé"
           value={sums.paid}
-          tone="blue"
+          tone="ocean"
           hint="Cumulé à vie"
         />
       </div>
@@ -107,83 +101,116 @@ export default async function AffiliatePayoutsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-glass-100">
-                  {sales.map((s) => (
-                    <tr key={s.id} className="hover:bg-ocean-50/40 transition">
-                      <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
-                        {new Date(s.created_at).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
-                        {s.activity_name ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right text-glass-600">
-                        {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold text-glass-900">
-                        {s.commission_amount != null
-                          ? `${s.commission_amount.toFixed(2)} €`
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-block text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                        >
-                          {SALE_STATUS_LABEL[s.status]}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {sales.map((s) => {
+                    const ds = getAffiliateDisplayState(s, now)
+                    return (
+                      <tr key={s.id} className="hover:bg-ocean-50/40 transition">
+                        <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
+                          {new Date(s.created_at).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-4 py-3 text-glass-900 max-w-xs">
+                          <div className="truncate">{s.activity_name ?? '—'}</div>
+                          {s.activity_date ? (
+                            <div className="text-xs text-glass-500 mt-0.5">
+                              Activité le{' '}
+                              {new Date(s.activity_date).toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: 'short',
+                              })}
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 text-right text-glass-600">
+                          {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-glass-900">
+                          {s.commission_amount != null
+                            ? `${s.commission_amount.toFixed(2)} €`
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                            title={ds.hint}
+                          >
+                            <span aria-hidden>{ds.icon}</span>
+                            <span>{ds.label}</span>
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile: cards empilées */}
             <div className="md:hidden space-y-2.5">
-              {sales.map((s) => (
-                <div
-                  key={s.id}
-                  className="bg-white border border-glass-200 rounded-xl p-4 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-glass-900 truncate">
-                        {s.activity_name ?? 'Activité non renseignée'}
+              {sales.map((s) => {
+                const ds = getAffiliateDisplayState(s, now)
+                return (
+                  <div
+                    key={s.id}
+                    className="bg-white border border-glass-200 rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-glass-900 truncate">
+                          {s.activity_name ?? 'Activité non renseignée'}
+                        </div>
+                        {s.activity_date ? (
+                          <div className="text-xs text-glass-500 mt-0.5">
+                            📅 Activité le{' '}
+                            {new Date(s.activity_date).toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-glass-500 mt-0.5">
+                            Réservée le{' '}
+                            {new Date(s.created_at).toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-glass-500 mt-0.5">
-                        {new Date(s.created_at).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                      <span
+                        className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                        aria-label={ds.label}
+                      >
+                        {ds.icon}
+                      </span>
+                    </div>
+                    <div className="text-xs text-glass-700 mb-2 leading-relaxed">
+                      {ds.label}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-glass-100">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-glass-400">
+                          Vente
+                        </div>
+                        <div className="text-sm text-glass-700 mt-0.5">
+                          {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] uppercase tracking-wide text-glass-400">
+                          Ta commission
+                        </div>
+                        <div className="text-base font-bold text-ocean-900 mt-0.5">
+                          {s.commission_amount != null
+                            ? `${s.commission_amount.toFixed(2)} €`
+                            : '—'}
+                        </div>
                       </div>
                     </div>
-                    <span
-                      className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                    >
-                      {SALE_STATUS_LABEL[s.status]}
-                    </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-glass-100">
-                    <div>
-                      <div className="text-[10px] uppercase tracking-wide text-glass-400">
-                        Vente
-                      </div>
-                      <div className="text-sm text-glass-700 mt-0.5">
-                        {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[10px] uppercase tracking-wide text-glass-400">
-                        Ta commission
-                      </div>
-                      <div className="text-base font-bold text-ocean-900 mt-0.5">
-                        {s.commission_amount != null
-                          ? `${s.commission_amount.toFixed(2)} €`
-                          : '—'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </>
         )}
@@ -200,18 +227,20 @@ function SummaryCard({
 }: {
   label: string
   value: number
-  tone: 'yellow' | 'green' | 'blue'
+  tone: 'yellow' | 'green' | 'blue' | 'ocean'
   hint: string
 }) {
   const classes = {
     yellow: 'bg-amber-50 border-amber-200',
     green: 'bg-green-50 border-green-200',
-    blue: 'bg-ocean-50 border-ocean-200',
+    blue: 'bg-sky-50 border-sky-200',
+    ocean: 'bg-ocean-50 border-ocean-200',
   }[tone]
   const valueColor = {
     yellow: 'text-amber-900',
     green: 'text-green-900',
-    blue: 'text-ocean-900',
+    blue: 'text-sky-900',
+    ocean: 'text-ocean-900',
   }[tone]
   return (
     <div className={`border rounded-xl p-4 ${classes}`}>

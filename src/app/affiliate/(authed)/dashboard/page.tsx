@@ -3,22 +3,13 @@ import { redirect } from 'next/navigation'
 import { getSql } from '@/lib/db/postgres'
 import { getCurrentAffiliate } from '@/lib/affiliate/session'
 import { listSalesForAffiliate, type SaleStatus } from '@/lib/back-office/affiliates'
+import {
+  getAffiliateDisplayState,
+  TONE_BADGE_CLASS,
+} from '@/lib/affiliate/sale-display'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Tableau de bord — Tenerife Activity' }
-
-const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmée',
-  cancelled: 'Annulée',
-  paid: 'Payée',
-}
-const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  confirmed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-ocean-100 text-ocean-900',
-}
 
 interface DashboardStats {
   clicks30d: number
@@ -222,64 +213,78 @@ export default async function AffiliateDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-glass-100">
-                  {recentSales.map((s) => (
-                    <tr key={s.id} className="hover:bg-ocean-50/40 transition">
-                      <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
-                        {new Date(s.created_at).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
-                        {s.activity_name ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold text-glass-900">
-                        {s.commission_amount != null
-                          ? `${s.commission_amount.toFixed(2)} €`
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-block text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                        >
-                          {SALE_STATUS_LABEL[s.status]}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {recentSales.map((s) => {
+                    const ds = getAffiliateDisplayState(s)
+                    return (
+                      <tr key={s.id} className="hover:bg-ocean-50/40 transition">
+                        <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
+                          {new Date(s.created_at).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
+                          {s.activity_name ?? '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-glass-900">
+                          {s.commission_amount != null
+                            ? `${s.commission_amount.toFixed(2)} €`
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                            title={ds.hint}
+                          >
+                            <span aria-hidden>{ds.icon}</span>
+                            <span>{ds.label}</span>
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile: cards */}
             <div className="md:hidden space-y-2.5">
-              {recentSales.map((s) => (
-                <div
-                  key={s.id}
-                  className="bg-white border border-glass-200 rounded-xl p-4 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-glass-900 truncate">
-                        {s.activity_name ?? 'Activité non renseignée'}
+              {recentSales.map((s) => {
+                const ds = getAffiliateDisplayState(s)
+                return (
+                  <div
+                    key={s.id}
+                    className="bg-white border border-glass-200 rounded-xl p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-glass-900 truncate">
+                          {s.activity_name ?? 'Activité non renseignée'}
+                        </div>
+                        <div className="text-xs text-glass-500 mt-0.5">
+                          Réservée le{' '}
+                          {new Date(s.created_at).toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: 'short',
+                          })}
+                        </div>
                       </div>
-                      <div className="text-xs text-glass-500 mt-0.5">
-                        {new Date(s.created_at).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: 'short',
-                        })}
+                      <span
+                        className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                      >
+                        {ds.icon}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-baseline justify-between gap-2">
+                      <div className="text-lg font-bold text-ocean-900">
+                        {s.commission_amount != null
+                          ? `+ ${s.commission_amount.toFixed(2)} €`
+                          : '—'}
+                      </div>
+                      <div className="text-[11px] text-glass-600 text-right truncate max-w-[55%]">
+                        {ds.label}
                       </div>
                     </div>
-                    <span
-                      className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                    >
-                      {SALE_STATUS_LABEL[s.status]}
-                    </span>
                   </div>
-                  <div className="mt-2 text-lg font-bold text-ocean-900">
-                    {s.commission_amount != null
-                      ? `+ ${s.commission_amount.toFixed(2)} €`
-                      : '—'}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </>
         )}

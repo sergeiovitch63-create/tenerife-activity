@@ -1092,6 +1092,7 @@ export async function POST(request: NextRequest) {
                   bookingReference: booking.order,
                   amount: booking.amount,
                   activityName: booking.productDescription,
+                  activityDate: tourDateValue,
                 })
                 console.log('[ATL_PAYMENT_AFFILIATE] (retry)', { ...result, order: booking.order, amount: booking.amount })
               }
@@ -1249,6 +1250,7 @@ export async function POST(request: NextRequest) {
             bookingReference: booking.order,
             amount: booking.amount,
             activityName: booking.productDescription,
+            activityDate: tourDateValue,
           })
           console.log('[ATL_PAYMENT_AFFILIATE]', { ...result, order: booking.order, amount: booking.amount })
         }
@@ -1354,6 +1356,7 @@ export async function POST(request: NextRequest) {
       }
       const affiliateSale = await recordAffiliateSaleFromRequest(request, {
         bookingReference: trimmed,
+        activityDate: tourDateValue,
       })
       if (process.env.NODE_ENV === 'development') {
         console.log('[ATL_PAYMENT_AFFILIATE]', affiliateSale)

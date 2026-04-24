@@ -35,6 +35,7 @@ export interface AffiliateSaleRow {
   confirmed_at: string | null
   cancelled_at: string | null
   paid_at: string | null
+  activity_date: string | null
 }
 
 function toNumber(v: unknown, fallback = 0): number {
@@ -75,6 +76,7 @@ function normalizeSale(r: Record<string, unknown>): AffiliateSaleRow {
     confirmed_at: r.confirmed_at == null ? null : String(r.confirmed_at),
     cancelled_at: r.cancelled_at == null ? null : String(r.cancelled_at),
     paid_at: r.paid_at == null ? null : String(r.paid_at),
+    activity_date: r.activity_date == null ? null : String(r.activity_date),
   }
 }
 
