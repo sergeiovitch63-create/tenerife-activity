@@ -1,9 +1,15 @@
-﻿/**
- * ThisWeekSection вЂ” server-rendered home hero row.
+/**
+ * ThisWeekSection — server-rendered home hero row.
  *
  * Renders up to 3 ActivityCards selected by the contextual picker,
  * each with a short "why now" chip (calm morning, sunset tonight, orca
  * season, Teide peak, calima-safe indoor, etc.).
+ *
+ * Each card is wrapped in a relative container so we can overlay an
+ * `UrgencyBadge` (live sunset countdown / live-spot pulse) without
+ * touching the reusable ActivityCard component. The urgency badge only
+ * renders on picks where it makes sense — sunset reasons get a live
+ * countdown, seasonal picks get a "live spot" pulse.
  *
  * The heavy lifting (picking + season logic) happens in
  * src/lib/home/contextual.ts; this component is a pure layout shell.
@@ -11,6 +17,7 @@
 import { ArrowRight, Sunset, Fish, Mountain, Sparkles, Waves, Sun } from 'lucide-react'
 import LocaleLink from '@/components/LocaleLink'
 import ActivityCard from '@/components/ActivityCard'
+import { UrgencyBadge } from '@/components/home/UrgencyBadge'
 import type { ContextualPick, ContextReasonKey } from '@/lib/home/contextual'
 import type { Dict } from '@/i18n'
 
@@ -33,6 +40,11 @@ const ICON_MAP = {
   Waves,
   Sun,
 } as const
+
+const SUNSET_REASONS: ContextReasonKey[] = [
+  'reason_sunset_tonight',
+  'reason_sunset_tomorrow',
+]
 
 export function ThisWeekSection({
   picks,
@@ -65,15 +77,30 @@ export function ThisWeekSection({
         {picks.map(({ group, reasonKey, iconName }) => {
           const Icon = iconName ? ICON_MAP[iconName] : null
           const label = dict.reasons[reasonKey as ContextReasonKey]
+          const isSunset = SUNSET_REASONS.includes(reasonKey as ContextReasonKey)
+
           return (
-            <ActivityCard
-              key={group.id}
-              group={group}
-              coverOverride={covers[group.code]}
-              nextDate={nextDates[group.code] ?? null}
-              contextLabel={label}
-              contextIcon={Icon ? <Icon className="w-3 h-3" /> : null}
-            />
+            <div key={group.id} className="relative">
+              {/* Urgency badge — floats above the cover, top-left.
+                  Sunset picks get a live countdown; everything else
+                  gets a gold-pulsing "live spot" pill. */}
+              <div className="absolute top-3 left-3 z-10">
+                <UrgencyBadge
+                  variant={isSunset ? 'sunset' : 'live-spot'}
+                  labelSunset={dict.urgency.sunsetTonight}
+                  labelSunsetTomorrow={dict.urgency.sunsetTomorrow}
+                  labelLiveSpot={dict.urgency.liveSpot}
+                />
+              </div>
+
+              <ActivityCard
+                group={group}
+                coverOverride={covers[group.code]}
+                nextDate={nextDates[group.code] ?? null}
+                contextLabel={label}
+                contextIcon={Icon ? <Icon className="w-3 h-3" /> : null}
+              />
+            </div>
           )
         })}
       </div>

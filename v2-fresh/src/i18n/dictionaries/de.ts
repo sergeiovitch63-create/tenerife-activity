@@ -59,6 +59,10 @@ export const de: Dict = {
     calima: {
       title: 'Calima diesen Monat möglich',
       body: 'Saharastaub kann die Sicht einschränken. Wir empfehlen Seetouren oder ein flexibles Ticket.',
+      indexLabel: 'Calima-Index',
+      low: 'niedrig',
+      moderate: 'moderat',
+      high: 'hoch',
     },
     thisWeek: {
       badge: 'Diese Woche',
@@ -76,6 +80,68 @@ export const de: Dict = {
         reason_family_safe: 'Familientauglich',
         reason_teide_peak: 'Teide in Bestform',
       },
+      urgency: {
+        sunsetTonight: 'Sonnenuntergang in {time}',
+        sunsetTomorrow: 'Morgen {time}',
+        liveSpot: 'Live-Plätze',
+      },
+    },
+    regions: {
+      badge: 'Ecken Teneriffas',
+      title: 'Eine Insel, sechs Gesichter',
+      subtitle: 'Grüner Norden, sonniger Süden, spektakulärer Westen — wählen Sie Ihre Inselseite.',
+      cards: {
+        nord:  { tag: 'Norden',  title: 'Grüner Norden',   body: 'La Laguna, Taganana, Weingärten von Orotava — die kühle, bewaldete Seite.' },
+        sud:   { tag: 'Süden',   title: 'Sonniger Süden',  body: 'Adeje, Los Cristianos, Vulkanstrände und Themenparks.' },
+        ouest: { tag: 'Westen',  title: 'Westküste',       body: 'Los Gigantes, Delfine, spektakuläre Sonnenuntergänge.' },
+        teide: { tag: 'Gipfel',  title: 'Teide & Vulkan',  body: 'Das Dach Spaniens — Seilbahn, Sterne, Mondlandschaften.' },
+        anaga: { tag: 'Anaga',   title: 'Anaga-Wald',      body: 'Uralter Lorbeerwald, mystische Pfade, Ozeanpanoramen.' },
+        mer:   { tag: 'Meer',    title: 'Auf See',         body: 'Katamaran, Jetski, Tauchen — Atlantik bei 22°C im Sommer.' },
+      },
+    },
+    packs: {
+      badge: 'Clevere Kombis',
+      title: 'Pakete & Kombitickets',
+      subtitle: 'Mehrere Aktivitäten, ein Ticket, ein sanfterer Preis.',
+      cards: {
+        twin:     { title: 'Twin Ticket',      body: 'Zwei ikonische Parks in einem Kauf.',                save: '-20%' },
+        twoParks: { title: 'Two Parks Ticket', body: 'Siam Park + Loro Parque — der perfekte Tag.',         save: '-25%' },
+        booster:  { title: 'Booster Packs',    body: 'Mehrere Aktivitäten gebündelt für den Urlaub-Boost.', save: '-15%' },
+        special:  { title: 'Special Packs',    body: 'Premium-Auswahl für eine außergewöhnliche Reise.',     save: null   },
+      },
+    },
+    whyUs: {
+      badge: 'Warum wir',
+      title: 'Buchen Sie dort, wo Einheimische bauen',
+      subtitle: 'Kein weiterer Zwischenhändler. Ein Team auf Teneriffa, mit den richtigen Kontakten.',
+      cards: [
+        {
+          title: 'Offizieller Anbieter auf der Insel',
+          body: 'Wir sitzen auf Teneriffa, keine versteckten Wiederverkäufer. Direkter Partnerkontakt, schnelle Antworten.',
+          proof: 'Vom Cabildo verifiziert',
+        },
+        {
+          title: 'Keine Vermittlerprovision',
+          body: 'Null versteckte Marge. Der angezeigte Preis ist der Endpreis — oft günstiger als globale Riesen.',
+          proof: 'Bestpreis-Garantie',
+        },
+        {
+          title: 'Menschlicher Support DE/EN',
+          body: 'Ein echter Mensch antwortet in unter 5 Minuten. Teo, unsere KI, übernimmt nachts.',
+          proof: '< 5 Min · 24/7',
+        },
+      ],
+    },
+    newsletter: {
+      badge: 'Newsletter',
+      title: 'Die besten Inseltipps, einmal im Monat',
+      body: 'Flash-Angebote, saisonale Events, Insider-Tipps — sonst nichts, versprochen.',
+      placeholder: 'ihre.email@beispiel.com',
+      button: 'Abonnieren',
+      sending: 'Wird gesendet…',
+      successTitle: 'Sie sind dabei!',
+      successBody: 'Unsere nächsten Auswahl kommt direkt in Ihr Postfach.',
+      disclaimer: 'Abmeldung mit einem Klick. Kein Spam.',
     },
     trust: {
       headline: 'Sichere Zahlung · Support 24/7 · Offizieller Teneriffa-Anbieter',

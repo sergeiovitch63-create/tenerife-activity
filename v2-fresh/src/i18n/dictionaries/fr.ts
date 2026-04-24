@@ -57,6 +57,10 @@ export const fr = {
     calima: {
       title: 'Calima possible ce mois-ci',
       body: 'Des épisodes de poussière saharienne peuvent réduire la visibilité. On recommande de privilégier les excursions en mer ou de choisir un billet flexible.',
+      indexLabel: 'Indice calima',
+      low: 'faible',
+      moderate: 'modéré',
+      high: 'élevé',
     },
     thisWeek: {
       badge: 'Cette semaine',
@@ -74,6 +78,68 @@ export const fr = {
         reason_family_safe: 'Idéal en famille',
         reason_teide_peak: 'Teide en pleine forme',
       },
+      urgency: {
+        sunsetTonight: 'Coucher dans {time}',
+        sunsetTomorrow: 'Demain {time}',
+        liveSpot: 'Places live',
+      },
+    },
+    regions: {
+      badge: 'Coins de Tenerife',
+      title: 'Une île, six visages',
+      subtitle: 'Le nord vert, le sud ensoleillé, l\'ouest spectaculaire — choisissez votre côté de l\'île.',
+      cards: {
+        nord:  { tag: 'Nord',   title: 'Nord vert',       body: 'La Laguna, Taganana, vignobles d\'Orotava — la face fraîche et forestière.' },
+        sud:   { tag: 'Sud',    title: 'Sud ensoleillé',  body: 'Adeje, Los Cristianos, plages volcaniques et parcs à thème.' },
+        ouest: { tag: 'Ouest',  title: 'Côte Ouest',      body: 'Los Gigantes, dauphins, couchers de soleil spectaculaires.' },
+        teide: { tag: 'Sommet', title: 'Teide & volcan',  body: 'Le toit de l\'Espagne — téléphérique, stargazing, paysages lunaires.' },
+        anaga: { tag: 'Anaga',  title: 'Forêt d\'Anaga',   body: 'Laurisylve millénaire, sentiers mystiques, panoramas océan.' },
+        mer:   { tag: 'Mer',    title: 'En mer',          body: 'Catamaran, jet-ski, plongée — l\'Atlantique à 22°C en été.' },
+      },
+    },
+    packs: {
+      badge: 'Combos malins',
+      title: 'Packs & billets combinés',
+      subtitle: 'Plusieurs activités, un seul ticket, un prix plus doux.',
+      cards: {
+        twin:     { title: 'Twin Ticket',     body: 'Deux parcs iconiques en un seul achat.',                 save: '-20%' },
+        twoParks: { title: 'Two Parks Ticket',body: 'Siam Park + Loro Parque — la journée parfaite.',          save: '-25%' },
+        booster:  { title: 'Booster Packs',   body: 'Plusieurs activités groupées pour booster le séjour.',    save: '-15%' },
+        special:  { title: 'Special Packs',   body: 'Sélection premium pour un séjour d\'exception.',          save: null    },
+      },
+    },
+    whyUs: {
+      badge: 'Pourquoi nous',
+      title: 'Réservez là où c\'est fait par des locaux',
+      subtitle: 'Pas un revendeur de plus. Une équipe basée à Tenerife, avec les bons contacts.',
+      cards: [
+        {
+          title: 'Opérateur officiel sur l\'île',
+          body: 'Nous sommes basés à Tenerife, pas revendeurs cachés. Contact direct avec les partenaires, réponses rapides.',
+          proof: 'Vérifié par le Cabildo',
+        },
+        {
+          title: 'Sans commission intermédiaire',
+          body: 'Zéro marge cachée. Le prix affiché, c\'est le prix final — et souvent moins cher que les géants internationaux.',
+          proof: 'Meilleur prix garanti',
+        },
+        {
+          title: 'Support humain FR/EN',
+          body: 'Un vrai humain répond en moins de 5 minutes. Teo, notre IA, prend le relais la nuit.',
+          proof: '< 5 min · 24/7',
+        },
+      ],
+    },
+    newsletter: {
+      badge: 'Newsletter',
+      title: 'Les meilleurs plans de l\'île, une fois par mois',
+      body: 'Offres flash, événements saisonniers, conseils d\'initiés — rien d\'autre, promis.',
+      placeholder: 'votre.email@exemple.com',
+      button: 'S\'inscrire',
+      sending: 'Envoi…',
+      successTitle: 'C\'est noté !',
+      successBody: 'Vous recevrez les prochaines sélections directement dans votre boîte mail.',
+      disclaimer: 'Désinscription en un clic. Jamais de spam.',
     },
     trust: {
       headline: 'Paiement sécurisé · Support 24/7 · Opérateur officiel Tenerife',

@@ -1,11 +1,16 @@
-﻿import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react'
+import { Sparkles, ShieldCheck, Zap, Star } from 'lucide-react'
 import HeroSearch from '@/components/HeroSearch'
 import CategoryCard from '@/components/CategoryCard'
 import { ContextualBanner } from '@/components/home/ContextualBanner'
 import { HeroVideoBackground } from '@/components/home/HeroVideoBackground'
 import { ThisWeekSection } from '@/components/home/ThisWeekSection'
 import { TrustBar } from '@/components/home/TrustBar'
+import { RegionsSection } from '@/components/home/RegionsSection'
+import { PacksSection } from '@/components/home/PacksSection'
+import { WhyUs } from '@/components/home/WhyUs'
+import { Newsletter } from '@/components/home/Newsletter'
 import { getClassifications, getGroups, nextDatesForGroups } from '@/lib/atlantico/client'
+import type { AtlanticoGroup } from '@/lib/atlantico/types'
 import { getDictionary } from '@/i18n'
 import { isLocale, type Locale } from '@/lib/locale'
 import { themeFor } from '@/lib/category-theme'
@@ -13,6 +18,30 @@ import { getLocalCovers } from '@/lib/local-images'
 import { pickThisWeek } from '@/lib/home/contextual'
 
 export const revalidate = 1800
+
+/**
+ * Compute per-category aggregates (count + min price) in a single pass.
+ * Returns a map keyed by classification id. Groups with no price are
+ * skipped for the "from" figure but still counted.
+ */
+function aggregateByCategory(
+  groups: AtlanticoGroup[],
+): Record<string, { count: number; fromPrice: number | null }> {
+  const acc: Record<string, { count: number; fromPrice: number | null }> = {}
+  for (const g of groups) {
+    const cat = g.category
+    if (!cat) continue
+    const entry = acc[cat] ?? { count: 0, fromPrice: null }
+    entry.count += 1
+    const p = g.price ? parseFloat(g.price) : NaN
+    if (Number.isFinite(p) && p > 0) {
+      entry.fromPrice =
+        entry.fromPrice === null ? p : Math.min(entry.fromPrice, p)
+    }
+    acc[cat] = entry
+  }
+  return acc
+}
 
 export default async function Home({ params }: { params: { locale: string } }) {
   const locale = (isLocale(params.locale) ? params.locale : 'fr') as Locale
@@ -29,8 +58,9 @@ export default async function Home({ params }: { params: { locale: string } }) {
 
   const localCovers = getLocalCovers(groups.map((g) => g.code))
   const withImage = groups.filter((g) => !!g.image || !!localCovers[g.code])
+  const categoryAggregates = aggregateByCategory(groups)
 
-  // Contextual "This week" вЂ” 3 picks based on hour + month + group keywords.
+  // Contextual "This week" — 3 picks based on hour + month + group keywords.
   const picks = pickThisWeek(withImage)
   const pickedGroups = picks.map((p) => p.group)
   const nextDates = pickedGroups.length
@@ -91,13 +121,17 @@ export default async function Home({ params }: { params: { locale: string } }) {
         </svg>
       </section>
 
-      {/* ---- Contextual banner (calima months only) ---- */}
+      {/* ---- Live calima visual (only renders in calima months) ---- */}
       <ContextualBanner
         title={t.home.calima.title}
         body={t.home.calima.body}
+        indexLabel={t.home.calima.indexLabel}
+        lowLabel={t.home.calima.low}
+        moderateLabel={t.home.calima.moderate}
+        highLabel={t.home.calima.high}
       />
 
-      {/* ---- This Week вЂ” 3 contextual picks ---- */}
+      {/* ---- This Week — 3 contextual picks with urgency badges ---- */}
       <ThisWeekSection
         picks={picks}
         covers={localCovers}
@@ -109,24 +143,44 @@ export default async function Home({ params }: { params: { locale: string } }) {
         seeAllHref="/activites"
       />
 
-      {/* ---- Choose Your Vibe вЂ” categories ---- */}
-      <section className="container-x mt-24">
+      {/* ---- Régions — Coins de Tenerife ---- */}
+      <RegionsSection dict={t.home.regions} />
+
+      {/* ---- Choose Your Vibe — categories with info density ---- */}
+      <section className="container-x mt-20 md:mt-24">
         <div className="mb-6 md:mb-8 text-center max-w-2xl mx-auto">
           <h2 className="h-display text-3xl md:text-4xl">{t.home.categoriesTitle}</h2>
           <p className="text-ink-500 mt-2">{t.home.categoriesSubtitle}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {sortedCategories.map((c) => (
-            <CategoryCard key={c.id} category={c} />
-          ))}
+          {sortedCategories.map((c) => {
+            const agg = categoryAggregates[c.id]
+            return (
+              <CategoryCard
+                key={c.id}
+                category={c}
+                groupsCount={agg?.count}
+                fromPrice={agg?.fromPrice ?? null}
+              />
+            )
+          })}
         </div>
       </section>
+
+      {/* ---- Packs / Combos ---- */}
+      <PacksSection dict={t.home.packs} seeAllLabel={t.home.discover} />
+
+      {/* ---- Why us — objection handling ---- */}
+      <WhyUs dict={t.home.whyUs} />
 
       {/* ---- Trust bar ---- */}
       <TrustBar
         headline={t.home.trust.headline}
         stats={t.home.trust.stats}
       />
+
+      {/* ---- Newsletter capture ---- */}
+      <Newsletter dict={t.home.newsletter} />
     </>
   )
 }

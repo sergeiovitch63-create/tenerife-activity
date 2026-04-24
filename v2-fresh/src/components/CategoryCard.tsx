@@ -10,6 +10,8 @@ import {
 import type { AtlanticoClassification } from '@/lib/atlantico/types'
 import { themeFor } from '@/lib/category-theme'
 import { cleanText } from '@/lib/atlantico/normalize'
+import { useI18n } from '@/i18n/context'
+import { formatPrice } from '@/lib/utils'
 
 /**
  * CategoryCard — photo-first tile with gold brand accents.
@@ -22,6 +24,10 @@ import { cleanText } from '@/lib/atlantico/normalize'
  * Brand presence comes from the gold accents only: the icon chip (top-right),
  * the hover halo, and the thin underline that extends under the title.
  *
+ * Info density: when `groupsCount` or `fromPrice` are provided, we render
+ * a gold "X activités · dès Y€" meta row above the title so the tile
+ * answers "how much choice?" and "is it in my budget?" without a click.
+ *
  * If a category has no photo (image: null) we fall back to the turquoise
  * gradient backdrop with an SVG wave — the card still reads on-brand.
  */
@@ -31,11 +37,25 @@ const iconMap: Record<string, LucideIcon> = {
   CarFront, Bike, UtensilsCrossed, Bus, Ticket, Plane, Accessibility, Sparkles,
 }
 
-export default function CategoryCard({ category }: { category: AtlanticoClassification }) {
+type Props = {
+  category: AtlanticoClassification
+  /** Optional activity count — rendered as a gold pill when provided. */
+  groupsCount?: number
+  /** Optional "from" price — rendered next to the count when provided. */
+  fromPrice?: number | null
+}
+
+export default function CategoryCard({ category, groupsCount, fromPrice }: Props) {
+  const { t, locale } = useI18n()
   const theme = themeFor(category.id)
   const Icon = iconMap[theme.icon] ?? Sparkles
   const desc = cleanText(category.desc)
   const hasPhoto = !!theme.image
+
+  const countLabel =
+    groupsCount && groupsCount > 0
+      ? `${groupsCount} ${groupsCount > 1 ? t.listing.foundPlural : t.listing.found}`
+      : null
 
   return (
     <LocaleLink
@@ -100,8 +120,16 @@ export default function CategoryCard({ category }: { category: AtlanticoClassifi
         style={{ background: 'radial-gradient(circle, #F4BE3D 0%, transparent 70%)' }}
       />
 
-      {/* Icon chip — top-right, gold accent */}
-      <div className="relative flex justify-end p-4 md:p-5">
+      {/* Top row — count pill (left) + icon chip (right) */}
+      <div className="relative flex items-start justify-between p-4 md:p-5">
+        {countLabel ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-ink-900 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-gold-500" />
+            {countLabel}
+          </span>
+        ) : (
+          <span />
+        )}
         <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/15 border border-white/25 backdrop-blur-sm flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
           <Icon
             className="w-5 h-5 md:w-6 md:h-6 text-brand-gold-400 transition-colors duration-300 group-hover:text-brand-gold-300"
@@ -118,6 +146,11 @@ export default function CategoryCard({ category }: { category: AtlanticoClassifi
         {desc && (
           <p className="mt-1 text-[11px] md:text-xs text-white/80 line-clamp-2 leading-snug">
             {desc}
+          </p>
+        )}
+        {fromPrice !== null && fromPrice !== undefined && fromPrice > 0 && (
+          <p className="mt-1.5 text-[11px] md:text-xs text-brand-gold-300 font-semibold">
+            {t.activity.from} {formatPrice(fromPrice, locale)}
           </p>
         )}
         {/* Thin gold line — animates in on hover */}

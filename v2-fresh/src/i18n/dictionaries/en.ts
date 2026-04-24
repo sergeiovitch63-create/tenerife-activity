@@ -59,6 +59,10 @@ export const en: Dict = {
     calima: {
       title: 'Calima possible this month',
       body: 'Saharan dust can reduce visibility. We recommend sea-based trips or picking a flexible ticket.',
+      indexLabel: 'Calima index',
+      low: 'low',
+      moderate: 'moderate',
+      high: 'high',
     },
     thisWeek: {
       badge: 'This week',
@@ -76,6 +80,68 @@ export const en: Dict = {
         reason_family_safe: 'Family-friendly',
         reason_teide_peak: 'Teide at its best',
       },
+      urgency: {
+        sunsetTonight: 'Sunset in {time}',
+        sunsetTomorrow: 'Tomorrow {time}',
+        liveSpot: 'Live spots',
+      },
+    },
+    regions: {
+      badge: 'Corners of Tenerife',
+      title: 'One island, six faces',
+      subtitle: 'Green north, sunny south, spectacular west — pick your side of the island.',
+      cards: {
+        nord:  { tag: 'North',  title: 'Green north',     body: 'La Laguna, Taganana, Orotava vineyards — the cool, forested face.' },
+        sud:   { tag: 'South',  title: 'Sunny south',     body: 'Adeje, Los Cristianos, volcanic beaches and theme parks.' },
+        ouest: { tag: 'West',   title: 'West coast',      body: 'Los Gigantes, dolphins, showstopper sunsets.' },
+        teide: { tag: 'Peak',   title: 'Teide & volcano', body: 'The roof of Spain — cable car, stargazing, lunar landscapes.' },
+        anaga: { tag: 'Anaga',  title: 'Anaga forest',    body: 'Ancient laurisilva, mystical trails, ocean panoramas.' },
+        mer:   { tag: 'Sea',    title: 'At sea',          body: 'Catamaran, jet-ski, diving — Atlantic at 22°C in summer.' },
+      },
+    },
+    packs: {
+      badge: 'Smart combos',
+      title: 'Packs & bundled tickets',
+      subtitle: 'Multiple activities, one ticket, a softer price.',
+      cards: {
+        twin:     { title: 'Twin Ticket',      body: 'Two iconic parks in a single purchase.',          save: '-20%' },
+        twoParks: { title: 'Two Parks Ticket', body: 'Siam Park + Loro Parque — the perfect day.',      save: '-25%' },
+        booster:  { title: 'Booster Packs',    body: 'Multiple activities grouped to boost your stay.', save: '-15%' },
+        special:  { title: 'Special Packs',    body: 'Premium picks for an exceptional trip.',           save: null   },
+      },
+    },
+    whyUs: {
+      badge: 'Why us',
+      title: 'Book where it\'s built by locals',
+      subtitle: 'Not another reseller. A team based in Tenerife, with the right contacts.',
+      cards: [
+        {
+          title: 'Official operator on the island',
+          body: 'We\'re based in Tenerife, not hidden resellers. Direct partner contact, fast answers.',
+          proof: 'Verified by the Cabildo',
+        },
+        {
+          title: 'No middleman commission',
+          body: 'Zero hidden margin. The posted price is the final price — often cheaper than global giants.',
+          proof: 'Best price guarantee',
+        },
+        {
+          title: 'Human support EN/FR',
+          body: 'A real human answers in under 5 minutes. Teo, our AI, takes over at night.',
+          proof: '< 5 min · 24/7',
+        },
+      ],
+    },
+    newsletter: {
+      badge: 'Newsletter',
+      title: 'The island\'s best plans, once a month',
+      body: 'Flash deals, seasonal events, insider tips — nothing else, promise.',
+      placeholder: 'you@example.com',
+      button: 'Subscribe',
+      sending: 'Sending…',
+      successTitle: 'You\'re on the list!',
+      successBody: 'You\'ll get our next picks straight in your inbox.',
+      disclaimer: 'One-click unsubscribe. Never any spam.',
     },
     trust: {
       headline: 'Secure payment · 24/7 support · Official Tenerife operator',
