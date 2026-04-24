@@ -12,18 +12,18 @@ import { themeFor } from '@/lib/category-theme'
 import { cleanText } from '@/lib/atlantico/normalize'
 
 /**
- * CategoryCard — brand duotone tile.
+ * CategoryCard — photo-first tile with gold brand accents.
  *
  * Photos are the v1 thumbnails ported into `/images/categories/`, rendered
- * desaturated and tinted turquoise via a multiply-blended gradient overlay.
- * This is the "duotone" look: all 15 cards read as one family visually
- * (brand turquoise), while the photo still communicates the category.
+ * in their natural color with only a bottom-to-top dark gradient for text
+ * legibility. No color tint — earlier iterations used a turquoise multiply
+ * overlay but it read as a weird green filter.
  *
- * A gold icon chip (top-right) + a gold halo + a gold underline (bottom)
- * are the only non-turquoise accents — consistent with the 2-color brand.
+ * Brand presence comes from the gold accents only: the icon chip (top-right),
+ * the hover halo, and the thin underline that extends under the title.
  *
- * If a category has no photo (image: null) we fall back to an SVG wave
- * backdrop, keeping the card usable without breaking the grid.
+ * If a category has no photo (image: null) we fall back to the turquoise
+ * gradient backdrop with an SVG wave — the card still reads on-brand.
  */
 
 const iconMap: Record<string, LucideIcon> = {
@@ -59,7 +59,7 @@ export default function CategoryCard({ category }: { category: AtlanticoClassifi
           alt=""
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-          className="object-cover grayscale contrast-[1.1] brightness-[0.9] transition-transform duration-700 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
           priority={theme.order <= 5}
         />
       ) : (
@@ -82,26 +82,14 @@ export default function CategoryCard({ category }: { category: AtlanticoClassifi
         </svg>
       )}
 
-      {/* Turquoise duotone tint — multiply blend tints the grayscale photo.
-          The diagonal mirrors the gradient below it so cards read together. */}
-      {hasPhoto && (
-        <div
-          aria-hidden
-          className="absolute inset-0 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-80"
-          style={{
-            background:
-              'linear-gradient(160deg, rgba(42,155,162,0.85) 0%, rgba(31,122,131,0.92) 45%, rgba(20,66,74,0.98) 100%)',
-          }}
-        />
-      )}
-
-      {/* Bottom-to-top dark gradient for text legibility */}
+      {/* Bottom-to-top dark gradient — ONLY purpose is text legibility.
+          Neutral black so it doesn't tint the photo. */}
       <div
         aria-hidden
         className="absolute inset-x-0 bottom-0 h-2/3"
         style={{
           background:
-            'linear-gradient(to top, rgba(11,45,52,0.85) 0%, rgba(11,45,52,0.35) 55%, transparent 100%)',
+            'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.30) 55%, transparent 100%)',
         }}
       />
 
