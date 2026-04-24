@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isAdminAuthenticated } from '@/lib/admin/auth'
-import { createAffiliateSessionToken } from '@/lib/affiliate/session'
+import { resetAffiliatePassword } from '@/lib/back-office/affiliates'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+/**
+ * POST /api/admin/affiliates/[code]/reset-password
+ * Generates a new random password, stores its hash, invalidates active sessions,
+ * and redirects back to the affiliate detail page with the plaintext in the
+ * flash query string so the admin can copy it once.
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: { code: string } }
@@ -14,9 +20,9 @@ export async function POST(
   }
 
   const code = decodeURIComponent(params.code)
-  const token = await createAffiliateSessionToken(code)
+  const plain = await resetAffiliatePassword(code)
 
-  const flash = token ? `magiclink:${token}` : 'error'
+  const flash = plain ? `resetpwd:${plain}` : 'error'
   return NextResponse.redirect(
     new URL(
       `/back-office/affiliates/${encodeURIComponent(code)}?flash=${encodeURIComponent(flash)}`,

@@ -1,6 +1,7 @@
 import 'server-only'
 import { getSql } from '@/lib/db/postgres'
 import { parseAffiliateRef } from '@/lib/affiliate/ref'
+import { generatePassword, hashPassword } from '@/lib/affiliate/password'
 
 export type AffiliateStatus = 'pending' | 'active' | 'suspended'
 export type SaleStatus = 'pending' | 'confirmed' | 'cancelled' | 'paid'
@@ -174,7 +175,7 @@ export type CreateAffiliateInput = {
 }
 
 export type CreateAffiliateResult =
-  | { ok: true; affiliate: AffiliateRow }
+  | { ok: true; affiliate: AffiliateRow; plainPassword: string }
   | { ok: false; reason: 'no_database' | 'invalid_code' | 'invalid_name' | 'invalid_rate' | 'duplicate_code' | 'db_error' }
 
 export async function createAffiliate(input: CreateAffiliateInput): Promise<CreateAffiliateResult> {
@@ -194,17 +195,87 @@ export async function createAffiliate(input: CreateAffiliateInput): Promise<Crea
     const existing = await sql`SELECT 1 AS ok FROM affiliates WHERE code = ${code} LIMIT 1`
     if (Array.isArray(existing) && existing.length > 0) return { ok: false, reason: 'duplicate_code' }
 
+    const plainPassword = generatePassword(12)
+    const passwordHash = hashPassword(plainPassword)
     const approvedAt = status === 'active' ? new Date().toISOString() : null
     await sql`
-      INSERT INTO affiliates (code, name, email, commission_percent, status, approved_at)
-      VALUES (${code}, ${name}, ${email}, ${rate}, ${status}, ${approvedAt})
+      INSERT INTO affiliates
+        (code, name, email, commission_percent, status, approved_at, password_hash)
+      VALUES
+        (${code}, ${name}, ${email}, ${rate}, ${status}, ${approvedAt}, ${passwordHash})
     `
     const row = await getAffiliateByCode(code)
     if (!row) return { ok: false, reason: 'db_error' }
-    return { ok: true, affiliate: row }
+    return { ok: true, affiliate: row, plainPassword }
   } catch (e) {
     console.error('[admin/affiliates] createAffiliate failed', e)
     return { ok: false, reason: 'db_error' }
+  }
+}
+
+/**
+ * Generate a new random password for an existing affiliate and persist its hash.
+ * Returns the plaintext (to be shown ONCE to the admin) on success, null on failure.
+ */
+export async function resetAffiliatePassword(code: string): Promise<string | null> {
+  const sql = getSql()
+  if (!sql) return null
+  const normalized = parseAffiliateRef(code)
+  if (!normalized) return null
+  try {
+    const existing = await sql`SELECT 1 AS ok FROM affiliates WHERE code = ${normalized} LIMIT 1`
+    if (!Array.isArray(existing) || existing.length === 0) return null
+
+    const plain = generatePassword(12)
+    const hash = hashPassword(plain)
+    await sql`
+      UPDATE affiliates SET password_hash = ${hash} WHERE code = ${normalized}
+    `
+    // Invalidate all existing sessions so old magic-link tokens / logged-in
+    // sessions can no longer be used with the old password.
+    await sql`DELETE FROM affiliate_sessions WHERE affiliate_code = ${normalized}`
+    return plain
+  } catch (e) {
+    console.error('[admin/affiliates] resetAffiliatePassword failed', e)
+    return null
+  }
+}
+
+/**
+ * Look up an affiliate by code and return its password hash + minimal fields
+ * needed for login (no heavy joins). Used by POST /api/affiliate/login.
+ */
+export async function getAffiliateForLogin(code: string): Promise<
+  | {
+      code: string
+      name: string
+      email: string | null
+      status: AffiliateStatus
+      passwordHash: string | null
+    }
+  | null
+> {
+  const sql = getSql()
+  if (!sql) return null
+  const normalized = parseAffiliateRef(code)
+  if (!normalized) return null
+  try {
+    const rows = await sql`
+      SELECT code, name, email, status, password_hash
+      FROM affiliates WHERE code = ${normalized} LIMIT 1
+    `
+    if (!Array.isArray(rows) || rows.length === 0) return null
+    const r = rows[0] as Record<string, unknown>
+    return {
+      code: String(r.code ?? ''),
+      name: String(r.name ?? ''),
+      email: r.email == null ? null : String(r.email),
+      status: (String(r.status ?? 'pending') as AffiliateStatus),
+      passwordHash: r.password_hash == null ? null : String(r.password_hash),
+    }
+  } catch (e) {
+    console.error('[admin/affiliates] getAffiliateForLogin failed', e)
+    return null
   }
 }
 
