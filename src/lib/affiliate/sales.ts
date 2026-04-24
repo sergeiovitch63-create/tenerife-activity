@@ -15,6 +15,22 @@ export interface RecordAffiliateSaleInput {
   bookingReference: string
   amount?: number | null
   activityName?: string | null
+  /** Activity date as YYYYMMDD (Atlantico format) or YYYY-MM-DD. Optional. */
+  activityDate?: string | null
+}
+
+/**
+ * Normalize a YYYYMMDD or YYYY-MM-DD string to ISO YYYY-MM-DD for Postgres DATE.
+ * Returns null if the input is missing or malformed.
+ */
+function normalizeActivityDate(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  const s = String(raw).trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+  if (/^\d{8}$/.test(s)) {
+    return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`
+  }
+  return null
 }
 
 /**
@@ -51,6 +67,7 @@ export async function recordAffiliateSaleFromRequest(
 
   const amount = typeof input.amount === 'number' && Number.isFinite(input.amount) ? input.amount : null
   const activityName = input.activityName ?? null
+  const activityDate = normalizeActivityDate(input.activityDate)
   const visitorId = request.cookies.get(AFFILIATE_VISITOR_COOKIE_NAME)?.value ?? null
 
   try {
@@ -85,15 +102,17 @@ export async function recordAffiliateSaleFromRequest(
     }
 
     // Insert. status defaults to 'pending' (column default). We store commission_amount
-    // at insert time so the dashboard/payout math doesn't have to re-derive it.
+    // and activity_date at insert time so the dashboard/payout math doesn't have to
+    // re-derive them, and so the display state can show "activité le DD/MM" + "versement
+    // fin MMMM" from day one.
     await sql`
       INSERT INTO affiliate_sales (
         affiliate_code, booking_reference, amount, activity_name,
-        commission_amount, visitor_id
+        commission_amount, visitor_id, activity_date
       )
       VALUES (
         ${code}, ${bookingRef}, ${amount}, ${activityName},
-        ${commissionAmount}, ${visitorId}
+        ${commissionAmount}, ${visitorId}, ${activityDate}
       )
     `
     console.log('[affiliate_sales] recorded', {
@@ -103,6 +122,7 @@ export async function recordAffiliateSaleFromRequest(
       commissionPercent,
       commissionAmount,
       visitorId,
+      activityDate,
     })
     return { recorded: true, affiliateCode: code, commissionAmount }
   } catch (e) {

@@ -34,6 +34,7 @@ ALTER TABLE affiliate_sales ADD COLUMN IF NOT EXISTS visitor_id TEXT;
 ALTER TABLE affiliate_sales ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ;
 ALTER TABLE affiliate_sales ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMPTZ;
 ALTER TABLE affiliate_sales ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
+ALTER TABLE affiliate_sales ADD COLUMN IF NOT EXISTS activity_date DATE;
 
 CREATE INDEX IF NOT EXISTS idx_affiliate_sales_affiliate_code ON affiliate_sales (affiliate_code);
 CREATE INDEX IF NOT EXISTS idx_affiliate_sales_created_at ON affiliate_sales (created_at DESC);

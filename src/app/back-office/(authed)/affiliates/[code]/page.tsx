@@ -4,9 +4,9 @@ import {
   getAffiliateByCode,
   listSalesForAffiliate,
   type AffiliateStatus,
-  type SaleStatus,
 } from '@/lib/back-office/affiliates'
 import { getSiteUrl } from '@/lib/site-url'
+import { getAdminDisplayState, TONE_BADGE_CLASS } from '@/lib/affiliate/sale-display'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Détail affilié — Back Office' }
@@ -20,18 +20,6 @@ const STATUS_CLASS: Record<AffiliateStatus, string> = {
   active: 'bg-green-100 text-green-800',
   pending: 'bg-amber-100 text-amber-800',
   suspended: 'bg-glass-200 text-glass-700',
-}
-const SALE_STATUS_LABEL: Record<SaleStatus, string> = {
-  pending: 'En attente',
-  confirmed: 'Confirmée',
-  cancelled: 'Annulée',
-  paid: 'Payée',
-}
-const SALE_STATUS_CLASS: Record<SaleStatus, string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  confirmed: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
-  paid: 'bg-ocean-100 text-ocean-900',
 }
 
 export default async function AffiliateDetailPage({
@@ -277,64 +265,89 @@ export default async function AffiliateDetailPage({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-glass-100">
-                  {sales.map((s) => (
-                    <tr key={s.id} className="hover:bg-ocean-50/40 transition">
-                      <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
-                        {new Date(s.created_at).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-glass-700">
-                        {s.booking_reference ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-glass-900 truncate max-w-xs">
-                        {s.activity_name ?? '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right text-glass-700">
-                        {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold text-glass-900">
-                        {s.commission_amount != null
-                          ? `${s.commission_amount.toFixed(2)} €`
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-block text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                        >
-                          {SALE_STATUS_LABEL[s.status]}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {sales.map((s) => {
+                    const ds = getAdminDisplayState(s)
+                    return (
+                      <tr
+                        key={s.id}
+                        className={`transition ${ds.actionRequired ? 'bg-sky-50/30 hover:bg-sky-50' : 'hover:bg-ocean-50/40'}`}
+                      >
+                        <td className="px-4 py-3 text-glass-500 text-xs whitespace-nowrap">
+                          {new Date(s.created_at).toLocaleDateString('fr-FR')}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-glass-700">
+                          {s.booking_reference ?? '—'}
+                        </td>
+                        <td className="px-4 py-3 text-glass-900 max-w-xs">
+                          <div className="truncate">{s.activity_name ?? '—'}</div>
+                          {s.activity_date ? (
+                            <div className="text-xs text-glass-500 mt-0.5">
+                              Activité{' '}
+                              {new Date(s.activity_date).toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: 'short',
+                              })}
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-3 text-right text-glass-700">
+                          {s.amount != null ? `${s.amount.toFixed(2)} €` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-glass-900">
+                          {s.commission_amount != null
+                            ? `${s.commission_amount.toFixed(2)} €`
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                            title={ds.hint}
+                          >
+                            <span aria-hidden>{ds.icon}</span>
+                            <span>{ds.label}</span>
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
 
             {/* Mobile: cards */}
             <div className="lg:hidden space-y-2.5">
-              {sales.map((s) => (
-                <div
-                  key={s.id}
-                  className="bg-white border border-glass-200 rounded-xl p-4 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium text-glass-900 truncate">
-                        {s.activity_name ?? 'Activité non renseignée'}
+              {sales.map((s) => {
+                const ds = getAdminDisplayState(s)
+                return (
+                  <div
+                    key={s.id}
+                    className={`border rounded-xl p-4 shadow-sm ${
+                      ds.actionRequired ? 'bg-sky-50/60 border-sky-200' : 'bg-white border-glass-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-glass-900 truncate">
+                          {s.activity_name ?? 'Activité non renseignée'}
+                        </div>
+                        <div className="text-xs text-glass-500 mt-0.5 font-mono truncate">
+                          Ref {s.booking_reference ?? '—'} ·{' '}
+                          {new Date(s.created_at).toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: 'short',
+                          })}
+                        </div>
                       </div>
-                      <div className="text-xs text-glass-500 mt-0.5 font-mono truncate">
-                        Ref {s.booking_reference ?? '—'} ·{' '}
-                        {new Date(s.created_at).toLocaleDateString('fr-FR', {
-                          day: '2-digit',
-                          month: 'short',
-                        })}
-                      </div>
+                      <span
+                        className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${TONE_BADGE_CLASS[ds.tone]}`}
+                        aria-label={ds.label}
+                      >
+                        {ds.icon}
+                      </span>
                     </div>
-                    <span
-                      className={`flex-shrink-0 text-xs px-2 py-1 rounded-md ${SALE_STATUS_CLASS[s.status]}`}
-                    >
-                      {SALE_STATUS_LABEL[s.status]}
-                    </span>
-                  </div>
+                    <div className="text-xs text-glass-700 mb-3 leading-relaxed">
+                      {ds.label}
+                    </div>
                   <div className="grid grid-cols-2 gap-2 pt-3 border-t border-glass-100">
                     <div>
                       <div className="text-[10px] uppercase tracking-wide text-glass-400">
@@ -356,7 +369,8 @@ export default async function AffiliateDetailPage({
                     </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </>
         )}
